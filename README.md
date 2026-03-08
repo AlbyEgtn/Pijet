@@ -1,59 +1,227 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Project Collaboration Guide
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Panduan ini menjelaskan workflow Git untuk mengerjakan project Laravel oleh **2 developer** menggunakan sistem **branch per feature / halaman**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+# 1. Struktur Branch
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Repository menggunakan struktur branch berikut:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```
+main
+ ├── feature-auth
+ ├── feature-dashboard
+ ├── feature-product
+ └── feature-order
+```
 
-## Learning Laravel
+Penjelasan:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+* **main** → branch utama (kode stabil / production ready)
+* **feature-*** → branch khusus untuk mengerjakan halaman atau fitur tertentu
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Contoh pembagian kerja:
 
-## Laravel Sponsors
+| Developer | Feature                          | Branch            |
+| --------- | -------------------------------- | ----------------- |
+| Dev 1     | Authentication (login, register) | feature-auth      |
+| Dev 2     | Dashboard                        | feature-dashboard |
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+# 2. Setup Project
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Clone repository:
 
-## Contributing
+```
+git clone https://github.com/username/project-name.git
+cd project-name
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Install dependency Laravel:
 
-## Code of Conduct
+```
+composer install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Copy environment file:
 
-## Security Vulnerabilities
+```
+cp .env.example .env
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Generate key:
 
-## License
+```
+php artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Jalankan migration:
+
+```
+php artisan migrate
+```
+
+Jalankan server:
+
+```
+php artisan serve
+```
+
+---
+
+# 3. Workflow Development
+
+Setiap developer bekerja pada **branch masing-masing**.
+
+### 1. Ambil branch terbaru
+
+```
+git checkout main
+git pull origin main
+```
+
+### 2. Buat branch feature
+
+```
+git checkout -b feature-auth
+```
+
+atau
+
+```
+git checkout -b feature-dashboard
+```
+
+---
+
+# 4. Proses Development
+
+Setelah melakukan perubahan:
+
+### Stage perubahan
+
+```
+git add .
+```
+
+### Commit perubahan
+
+```
+git commit -m "Add login page"
+```
+
+### Push ke repository
+
+```
+git push origin feature-auth
+```
+
+---
+
+# 5. Pull Request
+
+Setelah fitur selesai:
+
+1. Buka repository di **GitHub**
+2. Pilih **Pull Request**
+3. Pilih branch:
+
+```
+feature-auth → main
+```
+
+4. Klik **Create Pull Request**
+
+Pull request akan direview sebelum digabungkan ke branch **main**.
+
+---
+
+# 6. Merge Pull Request
+
+Jika fitur sudah benar:
+
+1. Review code
+2. Klik **Merge Pull Request**
+3. Delete branch jika sudah tidak digunakan
+
+---
+
+# 7. Update Project Setelah Merge
+
+Developer lain harus update project:
+
+```
+git checkout main
+git pull origin main
+```
+
+Jika ingin melanjutkan feature lain:
+
+```
+git checkout -b feature-product
+```
+
+---
+
+# 8. Best Practice
+
+Beberapa praktik yang disarankan:
+
+* Gunakan **1 branch = 1 feature**
+* Jangan langsung commit ke **main**
+* Gunakan commit message yang jelas
+* Selalu **pull main sebelum membuat branch baru**
+* Hindari branch yang terlalu lama tidak di merge
+
+Contoh commit message yang baik:
+
+```
+Add login validation
+Create dashboard layout
+Fix product pagination
+```
+
+---
+
+# 9. Contoh Pembagian Halaman
+
+Contoh pembagian kerja:
+
+| Feature          | Branch            | Developer |
+| ---------------- | ----------------- | --------- |
+| Login & Register | feature-auth      | Dev 1     |
+| Dashboard        | feature-dashboard | Dev 2     |
+| Product CRUD     | feature-product   | Dev 1     |
+| Order Management | feature-order     | Dev 2     |
+
+---
+
+# 10. Teknologi
+
+Project ini menggunakan:
+
+* Laravel
+* MySQL
+* TailwindCSS
+* Vite
+* Git & GitHub
+
+---
+
+# 11. Catatan
+
+Workflow ini cocok untuk:
+
+* Team kecil (2–4 developer)
+* Project tugas kuliah
+* Prototype atau MVP
+
+Jika project semakin besar, workflow dapat dikembangkan menggunakan **Git Flow** atau **Trunk Based Development**.
+
+---
+
+**Author**
+
+Developed collaboratively by the project team.
