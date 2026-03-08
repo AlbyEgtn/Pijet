@@ -8,14 +8,29 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
 
-    public function index()
+    public function superadmin()
     {
-        $user = Auth::user();
+        return view('pages.superadmin.dashboard');
+    }
 
-        return view('pages.dashboard', [
-            'user' => $user,
-            'role' => $user->role
-        ]);
+    public function admin()
+    {
+        return view('pages.admin.dashboard');
+    }
+
+    public function finance()
+    {
+        return view('pages.finance.dashboard');
+    }
+
+    public function terapis()
+    {
+        return view('pages.terapis.dashboard');
+    }
+
+    public function customer()
+    {
+        return view('pages.customer.dashboard');
     }
 
 }

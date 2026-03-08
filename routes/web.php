@@ -4,6 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 
+/*
+|--------------------------------------------------------------------------
+| LANDING PAGE
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -11,22 +21,91 @@ use App\Http\Controllers\DashboardController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', [LoginController::class, 'showLogin']);
-Route::post('/login', [LoginController::class, 'login']);
+// halaman login
+Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
 
+// proses login
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+
+// logout
 Route::post('/logout', [LoginController::class, 'logout'])
-    ->middleware('auth');
+    ->middleware('auth')
+    ->name('logout');
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD SUPER ADMIN
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','role:super_admin'])
+    ->prefix('superadmin')
+    ->group(function () {
+
+        Route::get('/dashboard', [DashboardController::class, 'superadmin'])
+            ->name('superadmin.dashboard');
+
+});
 
 
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD
+| DASHBOARD ADMIN
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth','role:admin'])
+    ->prefix('admin')
+    ->group(function () {
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'admin'])
+            ->name('admin.dashboard');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD FINANCE
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','role:finance'])
+    ->prefix('finance')
+    ->group(function () {
+
+        Route::get('/dashboard', [DashboardController::class, 'finance'])
+            ->name('finance.dashboard');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD TERAPIS
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','role:terapis'])
+    ->prefix('terapis')
+    ->group(function () {
+
+        Route::get('/dashboard', [DashboardController::class, 'terapis'])
+            ->name('terapis.dashboard');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD CUSTOMER
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','role:customer'])
+    ->prefix('customer')
+    ->group(function () {
+
+        Route::get('/dashboard', [DashboardController::class, 'customer'])
+            ->name('customer.dashboard');
 
 });
