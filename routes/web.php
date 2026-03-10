@@ -3,8 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Finance\FinanceController;
 use App\Http\Controllers\SuperAdmin\ServiceController;
 
+
+use App\Http\Controllers\Terapis\TerapisController;
 /*
 |--------------------------------------------------------------------------
 | LANDING PAGE
@@ -96,10 +99,32 @@ Route::middleware(['auth','role:admin'])
 
 Route::middleware(['auth','role:finance'])
     ->prefix('finance')
+    ->name('finance.')
     ->group(function () {
 
-        Route::get('/dashboard', [DashboardController::class, 'finance'])
-            ->name('finance.dashboard');
+        Route::get('/dashboard',[FinanceController::class,'dashboard'])->name('dashboard');
+        
+        Route::get('/dashboard-overview', [FinanceController::class,'overview'])->name('dashboard.overview');
+
+        Route::prefix('transaction')->name('transaction.')->group(function(){
+
+            Route::get('/transfer',[FinanceController::class,'transfer'])->name('transfer');
+
+            Route::get('/cash',[FinanceController::class,'cash'])->name('cash');
+
+            Route::get('/cancelled',[FinanceController::class,'cancelled'])->name('cancelled');
+
+            Route::get('/reschedule',[FinanceController::class,'reschedule'])->name('reschedule');
+
+        });
+
+        Route::get('/transaction/{id}',[FinanceController::class,'detail'])->name('transaction.detail');
+
+        Route::get('/recap',[FinanceController::class,'recap'])->name('recap');
+
+        Route::get('/salary',[FinanceController::class,'salary'])->name('salary');
+
+        Route::get('/setting',[FinanceController::class,'setting'])->name('setting');
 
 });
 
@@ -116,6 +141,15 @@ Route::middleware(['auth','role:terapis'])
 
         Route::get('/dashboard', [DashboardController::class, 'terapis'])
             ->name('terapis.dashboard');
+
+        Route::get('/profile', [TerapisController::class, 'profile'])
+            ->name('terapis.profile');
+
+        Route::get('/profile/detail', [TerapisController::class, 'detail'])
+            ->name('terapis.profile.detail');
+
+        Route::post('/profile/update', [TerapisController::class, 'update'])
+            ->name('terapis.profile.update');
 
 });
 

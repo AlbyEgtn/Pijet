@@ -18,11 +18,6 @@ class DashboardController extends Controller
         return view('pages.admin.dashboard');
     }
 
-    public function finance()
-    {
-        return view('pages.finance.dashboard');
-    }
-
     public function terapis()
     {
         return view('pages.terapis.dashboard');

@@ -39,7 +39,10 @@
 
         <!-- Dashboard -->
         <a href="{{ route('superadmin.dashboard') }}"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition">
+            class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+            {{ request()->routeIs('superadmin.dashboard') 
+                ? 'bg-white text-[#3E7F73] font-medium' 
+                : 'hover:bg-white/10 text-white' }}">
 
             <svg class="w-5 h-5 opacity-90" fill="none" stroke="currentColor"
                 viewBox="0 0 24 24">
@@ -52,10 +55,11 @@
 
         </a>
 
-
-        <!-- Layanan (ACTIVE) -->
         <a href="{{ route('superadmin.services') }}"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white text-[#3E7F73] font-medium">
+            class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+            {{ request()->routeIs('superadmin.services*') 
+                ? 'bg-white text-[#3E7F73] font-medium' 
+                : 'hover:bg-white/10 text-white' }}">
 
             <svg class="w-5 h-5" fill="none" stroke="currentColor"
                 viewBox="0 0 24 24">

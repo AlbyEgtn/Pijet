@@ -115,7 +115,7 @@ git commit -m "Add login page"
 ### Push ke repository
 
 ```
-git push origin feature-auth
+git push origin feature-
 ```
 
 ---
