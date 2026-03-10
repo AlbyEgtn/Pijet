@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Finance\FinanceController;
+use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\SuperAdmin\ServiceController;
 
 
@@ -29,6 +30,30 @@ Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
 
 // proses login
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+
+// halaman register
+Route::get('/register',[RegisterController::class,'index'])->name('register');
+
+// proses register
+Route::post('/register',[RegisterController::class,'store'])->name('register.store');
+
+Route::get('/register/therapist', function () {
+    return view('auth.register-therapist');
+})->name('register.therapist');
+
+Route::post('/register/therapist', [RegisterController::class, 'store'])
+    ->name('register.therapist.store');
+
+Route::get('/verify-email', function(){
+
+    return view('auth.verify-email');
+
+})->name('verify.notice');
+
+
+Route::post('/verify-email',
+    [RegisterController::class,'verifyOtp']
+)->name('verify.process');
 
 // logout
 Route::post('/logout', [LoginController::class, 'logout'])
@@ -154,7 +179,19 @@ Route::middleware(['auth','role:customer'])
     ->prefix('customer')
     ->group(function () {
 
-        Route::get('/dashboard', [DashboardController::class, 'customer'])
+        Route::get('/dashboard', [CustomerController::class, 'customer'])
             ->name('customer.dashboard');
+
+        Route::get('/services', function () {
+            return view('pages.customer.services');
+        })->name('customer.services');
+
+        Route::get('/cart', function () {
+            return view('pages.customer.cart');
+        })->name('customer.cart');
+
+        Route::get('/orders', function () {
+            return view('pages.customer.orders');
+        })->name('customer.orders');
 
 });

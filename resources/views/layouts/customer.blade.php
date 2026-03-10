@@ -15,7 +15,7 @@
 <body class="bg-gray-100">
 
     {{-- NAVBAR CUSTOMER --}}
-    @include('layouts.partials.navbar-customer')
+    @include('layouts.partials.customer.navbar')
 
     <main class="p-6">
 
