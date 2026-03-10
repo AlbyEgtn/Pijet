@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+       Schema::create('users', function (Blueprint $table) {
 
             $table->id();
 
@@ -26,7 +26,25 @@ return new class extends Migration
                 'customer'
             ])->default('customer');
 
+            $table->string('nik')->nullable();
+
+            $table->enum('gender',['L','P'])->nullable();
+
+            $table->date('birth_date')->nullable();
+
+            $table->string('phone')->nullable();
+
+            $table->string('work_area')->nullable();
+
+            $table->string('ktp')->nullable();
+
+            $table->string('skck')->nullable();
+
             $table->string('password');
+                      
+            $table->string('email_otp')->nullable();
+            
+            $table->timestamp('otp_expired_at')->nullable();
 
             $table->rememberToken();
 
