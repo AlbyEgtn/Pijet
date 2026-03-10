@@ -57,7 +57,7 @@
                 >
 
                 <span class="text-teal-600 font-semibold text-lg">
-                    Pijet.in
+                    Pijat.in
                 </span>
 
             </div>
