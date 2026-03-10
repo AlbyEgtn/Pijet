@@ -54,7 +54,7 @@
 
 
         <!-- Layanan (ACTIVE) -->
-        <a href="#"
+        <a href="{{ route('superadmin.services') }}"
         class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white text-[#3E7F73] font-medium">
 
             <svg class="w-5 h-5" fill="none" stroke="currentColor"
