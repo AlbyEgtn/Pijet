@@ -1,18 +1,15 @@
 <!DOCTYPE html>
-
 <html lang="id">
 
 <head>
 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title','Dashboard')</title>
 
-<title>@yield('title','Dashboard')</title>
-
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
@@ -20,75 +17,79 @@
 
 <div class="flex min-h-screen">
 
-<!-- SIDEBAR -->
-@include('layouts.partials.superadmin.sidebar')
-
-<!-- MAIN CONTENT -->
-<div class="flex flex-col flex-1">
-
-    <!-- NAVBAR -->
-    <header class="bg-white border-b">
-
-        <div class="flex items-center justify-between px-6 py-4">
-
-            <h1 class="text-lg font-semibold">
-
-                @yield('header','Dashboard')
-
-            </h1>
+    {{-- SIDEBAR --}}
+    @include('layouts.partials.superadmin.sidebar')
 
 
-            <div class="flex items-center gap-4">
+    {{-- MAIN CONTENT --}}
+    <div class="flex flex-col flex-1">
 
-                <span class="text-sm text-gray-600">
+        {{-- NAVBAR --}}
+        <header class="bg-white border-b">
 
-                    {{ auth()->user()->name ?? 'User' }}
+            <div class="flex items-center justify-between px-6 py-4">
 
-                </span>
+                <h1 class="text-lg font-semibold">
 
-                <form method="POST" action="{{ route('logout') }}">
+                    @yield('header','Dashboard')
 
-                    @csrf
+                </h1>
 
-                    <button class="text-sm text-red-500 hover:underline">
 
-                        Logout
+                <div class="flex items-center gap-4">
 
-                    </button>
+                    <span class="text-sm text-gray-600">
 
-                </form>
+                        {{ auth()->user()->name ?? 'User' }}
+
+                    </span>
+
+
+                    <form method="POST" action="{{ route('logout') }}">
+
+                        @csrf
+
+                        <button class="text-sm text-red-500 hover:underline">
+
+                            Logout
+
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 
-        </div>
-
-    </header>
+        </header>
 
 
+        {{-- CONTENT --}}
+        <main class="flex-1 p-6">
 
-    <!-- PAGE CONTENT -->
-    <main class="flex-1 p-6">
+            <div class="max-w-7xl mx-auto">
 
-        <div class="max-w-7xl mx-auto">
+                @yield('content')
 
-            @yield('content')
+            </div>
 
-        </div>
-
-    </main>
+        </main>
 
 
-    <!-- FOOTER -->
-    <footer class="bg-white border-t px-6 py-4 text-sm text-gray-500">
+        {{-- FOOTER --}}
+        <footer class="bg-white border-t px-6 py-4 text-sm text-gray-500 text-center">
 
-        © {{ date('Y') }} Pijat.in
+            © {{ date('Y') }} Pijat.in
 
-    </footer>
+        </footer>
 
-</div>
-
+    </div>
 
 </div>
+
+
+{{-- SCRIPT AREA --}}
+@yield('script')
 
 </body>
 

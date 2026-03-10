@@ -19,5 +19,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             TransactionSeeder::class,
         ]);
+        $this->call([
+            ServiceSeeder::class
+        ]);
     }
 }

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\FinanceController;
+use App\Http\Controllers\SuperAdmin\ServiceController;
 
 
 /*
@@ -46,6 +47,30 @@ Route::middleware(['auth','role:super_admin'])
         Route::get('/dashboard', [DashboardController::class, 'superadmin'])
             ->name('superadmin.dashboard');
 
+        Route::get(
+            '/services',
+            [ServiceController::class, 'index']
+        )->name('superadmin.services');
+
+        Route::post(
+            '/services',
+            [ServiceController::class, 'store']
+        )->name('superadmin.services.store');
+
+        Route::put(
+            '/services/{id}',
+            [ServiceController::class, 'update']
+        )->name('superadmin.services.update');
+
+        Route::delete(
+            '/services/{id}',
+            [ServiceController::class, 'destroy']
+        )->name('superadmin.services.destroy');
+
+        Route::post(
+            '/superadmin/additional-services',
+            [ServiceController::class,'store']
+        )->name('superadmin.additional-services.store');
 });
 
 
