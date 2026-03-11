@@ -23,9 +23,6 @@ class DashboardController extends Controller
         return view('pages.terapis.dashboard');
     }
 
-    public function customer()
-    {
-        return view('pages.customer.dashboard');
-    }
+
 
 }

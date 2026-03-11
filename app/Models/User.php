@@ -22,7 +22,17 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'role',
+        'nik',
+        'gender',
+        'birth_date',
+        'phone',
+        'work_area',
+        'ktp',
+        'skck',
+        'email_otp',
+        'otp_expired_at'
+
     ];
 
     /**
