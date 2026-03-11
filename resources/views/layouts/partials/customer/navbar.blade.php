@@ -46,11 +46,6 @@
             <div class="flex items-center gap-6">
 
                 {{-- CART ICON --}}
-                @php
-                    // dummy cart sementara
-                    $cartCount = 2;
-                @endphp
-
                 <a href="{{ route('customer.cart') }}" class="relative">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
@@ -63,20 +58,24 @@
                             stroke-linejoin="round"
                             stroke-width="2"
                             d="M3 3h2l.4 2M7 13h10l4-8H5.4m1.6
-                               8L5.4 5M7 13l-1.5 7h13M9 21a1
-                               1 0 100-2 1 1 0 000 2zm9
-                               0a1 1 0 100-2 1 1 0 000 2z" />
+                            8L5.4 5M7 13l-1.5 7h13M9 21a1
+                            1 0 100-2 1 1 0 000 2zm9
+                            0a1 1 0 100-2 1 1 0 000 2z" />
 
                     </svg>
 
                     @if($cartCount > 0)
-                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">
+
+                    <span id="cart-count"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">
+
                         {{ $cartCount }}
+
                     </span>
+
                     @endif
 
                 </a>
-
 
                 {{-- USER --}}
                 <div class="flex items-center gap-3">
