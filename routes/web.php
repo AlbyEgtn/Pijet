@@ -3,9 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Finance\FinanceController;
 use App\Http\Controllers\Customer\CustomerController;
-use App\Http\Controllers\SuperAdmin\ServiceController;
+use App\Http\Controllers\Customer\ServiceController;
+use App\Http\Controllers\Customer\CartController;
+use App\Http\Controllers\Customer\ServiceCustController;
+
 
 
 /*
@@ -50,10 +54,18 @@ Route::get('/verify-email', function(){
 
 })->name('verify.notice');
 
-
 Route::post('/verify-email',
     [RegisterController::class,'verifyOtp']
 )->name('verify.process');
+
+Route::get('/forgot-password', [ForgotPasswordController::class,'index']);
+Route::post('/forgot-password/send', [ForgotPasswordController::class,'sendOtp'])->name('forgot.send');
+
+Route::get('/forgot-password/verify', [ForgotPasswordController::class,'verifyPage']);
+Route::post('/forgot-password/verify', [ForgotPasswordController::class,'verifyOtp'])->name('forgot.verify');
+
+Route::get('/forgot-password/reset', [ForgotPasswordController::class,'resetPage']);
+Route::post('/forgot-password/reset', [ForgotPasswordController::class,'resetPassword'])->name('forgot.reset');
 
 // logout
 Route::post('/logout', [LoginController::class, 'logout'])
@@ -182,16 +194,39 @@ Route::middleware(['auth','role:customer'])
         Route::get('/dashboard', [CustomerController::class, 'customer'])
             ->name('customer.dashboard');
 
-        Route::get('/services', function () {
-            return view('pages.customer.services');
-        })->name('customer.services');
 
-        Route::get('/cart', function () {
-            return view('pages.customer.cart');
-        })->name('customer.cart');
+        /* SERVICES */
+        Route::get('/services', [ServiceCustController::class,'index'])
+            ->name('customer.services');
 
-        Route::get('/orders', function () {
-            return view('pages.customer.orders');
-        })->name('customer.orders');
+
+        /* CART */
+        Route::get('/cart', [CartController::class,'index'])
+            ->name('customer.cart');
+
+        Route::get('/cart/add/{id}', [CartController::class,'add'])
+            ->name('customer.cart.add');
+
+        Route::get('/cart/increase/{id}', [CartController::class,'increase'])
+            ->name('customer.cart.increase');
+
+        Route::get('/cart/decrease/{id}', [CartController::class,'decrease'])
+            ->name('customer.cart.decrease');
+
+        Route::get('/cart/remove/{id}', [CartController::class,'remove'])
+            ->name('customer.cart.remove');
+
+
+        /* ORDERS */
+        Route::get('/orders', [OrderController::class,'index'])
+            ->name('customer.orders');
+
+        Route::get('/cart/count', function(){
+
+            return response()->json([
+                'count' => \App\Models\Cart::where('user_id', auth()->id())->sum('qty')
+            ]);
+
+        })->middleware('auth');
 
 });

@@ -46,6 +46,10 @@ return new class extends Migration
             
             $table->timestamp('otp_expired_at')->nullable();
 
+            $table->string('reset_otp')->nullable();
+
+            $table->timestamp('reset_otp_expired_at')->nullable();
+
             $table->rememberToken();
 
             $table->timestamps();
