@@ -32,12 +32,12 @@
             <div class="h-40 w-full">
 
                 <img
-                    src="{{ $service->image ? asset('storage/'.$service->image) : 'https://via.placeholder.com/400x200' }}"
+                    src="{{ $service->image_url }}"
+                    alt="{{ $service->name }}"
                     class="w-full h-full object-cover"
                 >
 
             </div>
-
 
             <div class="p-4">
 
@@ -301,9 +301,11 @@
                     id="imageInput"
                     class="w-full border p-2 rounded mt-1">
 
-                <img
-                    id="previewImage"
-                    class="hidden mt-3 h-32 rounded">
+                    <img
+                        src="{{ $service->image_url }}"
+                        alt="{{ $service->name }}"
+                        class="w-full h-full object-cover"
+                    >
 
             </div>
 
@@ -422,8 +424,10 @@ class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50">
 
                 <!-- PREVIEW IMAGE -->
                 <img
-                    id="edit_preview"
-                    class="mt-3 h-32 rounded object-cover hidden">
+                    src="{{ $service->image_url }}"
+                    alt="{{ $service->name }}"
+                    class="w-full h-full object-cover"
+                >
 
             </div>
 
@@ -924,7 +928,12 @@ function openEditModal(id, name, price, duration, description, image)
 
     if(image){
 
-        preview.src = "/storage/" + image;
+        if(image.startsWith('http')){
+            preview.src = image;
+        }else{
+            preview.src = "/storage/" + image;
+        }
+
         preview.classList.remove('hidden');
 
     }else{

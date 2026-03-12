@@ -3,6 +3,11 @@
     <!-- LOGO -->
     <div class="px-6 py-7 flex items-center gap-3">
 
+        <img
+            src="{{ asset('images/logo.png') }}"
+            alt="logo"
+            class="w-10 h-10 object-contain bg-white rounded"
+        >
         <img src="{{ asset('images/logo-pth.png') }}"
             alt="Logo Pijat.in"
             class="h-12 object-contain">
@@ -39,6 +44,8 @@
 
         <!-- Dashboard -->
         <a href="{{ route('superadmin.dashboard') }}"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+        {{ request()->routeIs('superadmin.dashboard') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
            class="flex items-center gap-3 px-4 py-3 rounded-lg transition
            {{ request()->routeIs('superadmin.dashboard') 
            ? 'bg-white text-[#3E7F73] font-medium shadow-sm'
@@ -62,6 +69,14 @@
 
         <!-- Layanan -->
         <a href="{{ route('superadmin.services') }}"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+        {{ request()->routeIs('superadmin.services*') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
+
+            <svg class="w-5 h-5 opacity-90" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12l4-2 4 2V7a2 2 0 00-2-2H9z"/>
            class="flex items-center gap-3 px-4 py-3 rounded-lg transition
            {{ request()->routeIs('superadmin.services*') 
            ? 'bg-white text-[#3E7F73] font-medium shadow-sm'

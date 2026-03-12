@@ -4,12 +4,19 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 use App\Models\Cart;
 use App\Models\Service;
-use Illuminate\Http\Request;
+use App\Models\Transaction;
+use App\Models\TransactionService;
 
 class CartController extends Controller
 {
+
+    /* ================= CART PAGE ================= */
 
     public function index()
     {
@@ -18,15 +25,27 @@ class CartController extends Controller
             ->where('user_id', Auth::id())
             ->get();
 
-        // Hitung total
         $total = $carts->sum(function ($cart) {
+
             return $cart->service->price * $cart->qty;
+
         });
 
-        return view('pages.customer.cart.index', compact('carts','total'));
+        $additionalServices = Service::where('is_additional',1)
+            ->where('is_active',1)
+            ->get();
+
+        return view('pages.customer.cart.index',[
+            'carts' => $carts,
+            'total' => $total,
+            'additionalServices' => $additionalServices
+        ]);
 
     }
 
+
+
+    /* ================= ADD TO CART ================= */
 
     public function add($id)
     {
@@ -54,10 +73,12 @@ class CartController extends Controller
         $cartCount = Cart::where('user_id', Auth::id())->sum('qty');
 
         if(request()->ajax()){
+
             return response()->json([
                 'success' => true,
                 'count' => $cartCount
             ]);
+
         }
 
         return back();
@@ -65,31 +86,49 @@ class CartController extends Controller
     }
 
 
+
+    /* ================= INCREASE QTY ================= */
+
     public function increase($id)
     {
+
         $cart = Cart::findOrFail($id);
 
         $cart->qty += 1;
         $cart->save();
 
         return $this->cartResponse();
+
     }
+
+
+
+    /* ================= DECREASE QTY ================= */
 
     public function decrease($id)
     {
+
         $cart = Cart::findOrFail($id);
 
         $cart->qty -= 1;
 
         if($cart->qty <= 0){
+
             $cart->delete();
+
         }else{
+
             $cart->save();
+
         }
 
         return $this->cartResponse();
+
     }
 
+
+
+    /* ================= REMOVE ITEM ================= */
 
     public function remove($id)
     {
@@ -104,19 +143,159 @@ class CartController extends Controller
 
     }
 
+
+
+    /* ================= RESPONSE CART ================= */
+
     private function cartResponse()
     {
-        $carts = Cart::with('service')->where('user_id',auth()->id())->get();
+
+        $carts = Cart::with('service')
+            ->where('user_id', auth()->id())
+            ->get();
 
         $total = $carts->sum(function($cart){
+
             return $cart->qty * $cart->service->price;
+
         });
 
         return response()->json([
+
             'success' => true,
             'total' => number_format($total),
             'count' => $carts->count(),
             'qty' => $carts->sum('qty')
+
         ]);
+
     }
+
+
+
+    /* ================= CHECKOUT ================= */
+
+    public function checkout(Request $request)
+    {
+
+        $user = auth()->user();
+
+        $carts = Cart::with('service')
+            ->where('user_id', $user->id)
+            ->get();
+
+        if($carts->isEmpty()){
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Keranjang kosong'
+            ]);
+
+        }
+
+
+        DB::beginTransaction();
+
+        try{
+
+            /* ================= HITUNG TOTAL ================= */
+
+            $total = $carts->sum(function ($cart){
+
+                return $cart->service->price * $cart->qty;
+
+            });
+
+
+            /* ================= BUAT TRANSACTION ================= */
+
+            $transaction = Transaction::create([
+
+                'transaction_code' => 'TRX-'.Str::upper(Str::random(8)),
+
+                'customer_id' => $user->id,
+
+                'customer_name' => $user->name,
+
+                'customer_phone' => $user->phone ?? null,
+
+                'customer_address' => $user->address ?? null,
+
+                'customer_city' => $user->city ?? null,
+
+                'orderer_name' => $user->name,
+
+                'service_date' => $request->service_date ?? now()->addDay()->toDateString(),
+
+                'service_time' => $request->service_time ?? '10:00:00',
+
+                'payment_method' => $request->payment_method ?? 'cash',
+
+                'status' => 'belum_lunas',
+
+                'total_price' => $total
+
+            ]);
+
+
+            /* ================= SIMPAN SERVICES ================= */
+
+            foreach($carts as $cart){
+
+                TransactionService::create([
+
+                    'transaction_id' => $transaction->id,
+
+                    'service_name' => $cart->service->name,
+
+                    'duration' => $cart->service->duration,
+
+                    'service_price' => $cart->service->price,
+
+                    'therapist_name' => null,
+
+                    'additional_service' => null,
+
+                    'additional_price' => null,
+
+                    'total_duration' => $cart->service->duration * $cart->qty
+
+                ]);
+
+            }
+
+
+            /* ================= HAPUS CART ================= */
+
+            Cart::where('user_id',$user->id)->delete();
+
+
+            DB::commit();
+
+
+            return response()->json([
+
+                'success' => true,
+
+                'redirect' => route('customer.orders')
+
+            ]);
+
+        }
+        catch(\Exception $e){
+
+            DB::rollBack();
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => $e->getMessage()
+
+            ]);
+
+        }
+
+    }
+
 }

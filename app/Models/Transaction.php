@@ -12,7 +12,7 @@ class Transaction extends Model
     protected $fillable = [
 
         'transaction_code',
-
+        'customer_id',
         'customer_name',
         'customer_phone',
         'customer_address',

@@ -8,10 +8,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\FinanceController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Customer\CustomerController;
-use App\Http\Controllers\Customer\ServiceController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\ServiceCustController;
-
+use App\Http\Controllers\Customer\OrderController;
+use App\Http\Controllers\Superadmin\ServiceController;
+use App\Http\Controllers\Superadmin\SuperadminController;
 
 use App\Http\Controllers\SuperAdmin\ServiceController;
 use App\Http\Controllers\Terapis\TerapisController;
@@ -87,7 +88,7 @@ Route::middleware(['auth','role:super_admin'])
     ->prefix('superadmin')
     ->group(function () {
 
-        Route::get('/dashboard', [DashboardController::class, 'superadmin'])
+        Route::get('/dashboard', [SuperadminController::class, 'dashboard'])
             ->name('superadmin.dashboard');
 
         Route::get(
@@ -252,6 +253,9 @@ Route::middleware(['auth','role:customer'])
 
         Route::get('/cart/remove/{id}', [CartController::class,'remove'])
             ->name('customer.cart.remove');
+
+        Route::post('/cart/checkout', [CartController::class,'checkout'])
+            ->name('customer.cart.checkout');
 
 
         /* ORDERS */
