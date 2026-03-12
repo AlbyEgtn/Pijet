@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\FinanceController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\ServiceCustController;
@@ -12,8 +14,12 @@ use App\Http\Controllers\Customer\OrderController;
 use App\Http\Controllers\Superadmin\ServiceController;
 use App\Http\Controllers\Superadmin\SuperadminController;
 
+use App\Http\Controllers\SuperAdmin\ServiceController;
+use App\Http\Controllers\Terapis\TerapisController;
+use App\Http\Controllers\SuperAdmin\CabangController;
 
 /*
+
 |--------------------------------------------------------------------------
 | LANDING PAGE
 |--------------------------------------------------------------------------
@@ -109,6 +115,28 @@ Route::middleware(['auth','role:super_admin'])
             '/superadmin/additional-services',
             [ServiceController::class,'store']
         )->name('superadmin.additional-services.store');
+
+        Route::get('/cabang',[CabangController::class,'index'])
+             ->name('superadmin.cabang.index');
+
+        Route::get('/cabang/create',[CabangController::class,'create'])
+            ->name('superadmin.cabang.create');
+
+        Route::post('/cabang/store',[CabangController::class,'store'])
+            ->name('superadmin.cabang.store');
+
+        Route::get('/superadmin/cabang/{id}', 
+            [CabangController::class, 'show'])
+            ->name('superadmin.cabang.show');
+
+        Route::get('/cabang/{id}/edit',[CabangController::class,'edit'])
+            ->name('superadmin.cabang.edit');
+
+        Route::put('/cabang/{id}/update',[CabangController::class,'update'])
+            ->name('superadmin.cabang.update');
+
+        Route::delete('/cabang/{id}/delete',[CabangController::class,'destroy'])
+            ->name('superadmin.cabang.delete');
 });
 
 
@@ -178,6 +206,15 @@ Route::middleware(['auth','role:terapis'])
 
         Route::get('/dashboard', [DashboardController::class, 'terapis'])
             ->name('terapis.dashboard');
+
+        Route::get('/profile', [TerapisController::class, 'profile'])
+            ->name('terapis.profile');
+
+        Route::get('/profile/detail', [TerapisController::class, 'detail'])
+            ->name('terapis.profile.detail');
+
+        Route::post('/profile/update', [TerapisController::class, 'update'])
+            ->name('terapis.profile.update');
 
 });
 

@@ -20,6 +20,7 @@ class ServiceSeeder extends Seeder
             'price' => 150000,
             'duration' => 90,
             'image' => 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874',
+            'image' => 'services/Seed1.jpg',
             'is_additional' => 0,
             'is_active' => 1
         ]);
@@ -30,6 +31,7 @@ class ServiceSeeder extends Seeder
             'price' => 130000,
             'duration' => 60,
             'image' => 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1',
+            'image' => 'services/Seed1.jpg',
             'is_additional' => 0,
             'is_active' => 1
         ]);
@@ -110,6 +112,7 @@ class ServiceSeeder extends Seeder
             'price' => 175000,
             'duration' => 90,
             'image' => 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881',
+            'image' => 'services/Seed1.jpg',
             'is_additional' => 0,
             'is_active' => 1
         ]);
@@ -126,6 +129,8 @@ class ServiceSeeder extends Seeder
             'price' => 25000,
             'duration' => 0,
             'image' => 'https://images.unsplash.com/photo-1505577058444-a3dab90d4253',
+            'duration' => 10,
+            'image' => null,
             'is_additional' => 1,
             'is_active' => 1
         ]);
@@ -136,6 +141,8 @@ class ServiceSeeder extends Seeder
             'price' => 30000,
             'duration' => 0,
             'image' => 'https://images.unsplash.com/photo-1600334129128-685c5582fd35',
+            'duration' => 20,
+            'image' => null,
             'is_additional' => 1,
             'is_active' => 1
         ]);
@@ -176,6 +183,8 @@ class ServiceSeeder extends Seeder
             'price' => 30000,
             'duration' => 0,
             'image' => 'https://images.unsplash.com/photo-1598970434795-0c54fe7c0648',
+            'duration' => 10,
+            'image' => null,
             'is_additional' => 1,
             'is_active' => 1
         ]);

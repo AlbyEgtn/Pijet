@@ -730,7 +730,7 @@ class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50">
 
                 <button
                     type="button"
-                    onclick="closeEditModal()"
+                    onclick="closeEditAdditionalModal()"
                     class="px-4 py-2 bg-gray-200 rounded-lg"
                 >
                     Batal
@@ -1057,6 +1057,13 @@ function openDeleteAdditionalModal(id)
     modal.classList.add("flex");
 }
 
+function closeEditAdditionalModal()
+{
+    const modal = document.getElementById('editAdditionalModal');
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
 
 function closeDeleteAdditionalModal()
 {
