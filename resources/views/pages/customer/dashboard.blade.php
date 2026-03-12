@@ -4,26 +4,30 @@
 
 @section('content')
 
-<div class="max-w-7xl mx-auto space-y-10">
+<div class="max-w-7xl mx-auto space-y-12">
 
-    {{-- HERO / PENAWARAN --}}
-    <section class="bg-teal-700 rounded-xl p-6 text-white">
+    {{-- HERO --}}
+    <section class="bg-gradient-to-r from-teal-700 to-teal-600 rounded-2xl p-8 text-white shadow-lg">
 
-        <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between">
 
             <div>
-                <h1 class="text-xl font-semibold">
-                    Selamat Datang di Pijetin
+
+                <h1 class="text-2xl font-semibold">
+                    Selamat Datang di Pijat.in
                 </h1>
 
-                <p class="text-sm opacity-90 mt-1">
-                    Nikmati pengalaman pijat profesional di rumah anda
+                <p class="text-sm opacity-90 mt-2">
+                    Nikmati pengalaman pijat profesional langsung di rumah Anda.
                 </p>
+
             </div>
 
             <a href="{{ route('customer.services') }}"
-               class="bg-white text-teal-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition">
+               class="bg-white text-teal-700 px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition shadow">
+
                 Pesan Sekarang
+
             </a>
 
         </div>
@@ -35,113 +39,110 @@
     {{-- LAYANAN --}}
     <section>
 
-        <div class="flex justify-between items-center mb-5">
+        <div class="flex justify-between items-center mb-6">
 
-            <h2 class="text-lg font-semibold">
-                Layanan
+            <h2 class="text-xl font-semibold">
+                Layanan Populer
             </h2>
 
             <a href="{{ route('customer.services') }}"
                class="text-teal-600 text-sm hover:underline">
-                Selengkapnya
+
+                Lihat Semua
+
             </a>
 
         </div>
 
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @if($services->count())
 
-            <x-customer.service-card
-                title="Full Body Massage"
-                price="Rp150.000 / sesi"
-                image="/images/fbm.png"
-            />
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-            <x-customer.service-card
-                title="Hot Stone Massage"
-                price="Rp150.000 / sesi"
-                image="/images/hsm.png"
-            />
+            @foreach($services as $service)
 
-            <x-customer.service-card
-                title="Thai Massage"
-                price="Rp150.000 / sesi"
-                image="/images/thaim.png"
-            />
+                <x-customer.service-card
+                    :title="$service->name"
+                    :price="'Rp '.number_format($service->price,0,',','.')"
+                    :image="$service->image_url"
+                />
 
-            <x-customer.service-card
-                title="Traditional Massage"
-                price="Rp150.000 / sesi"
-                image="/images/tradm.png"
-            />
-
-            <x-customer.service-card
-                title="Deep Tissue Massage"
-                price="Rp150.000 / sesi"
-                image="/images/dtm.png"
-            />
-
-            <x-customer.service-card
-                title="Swedish Massage"
-                price="Rp150.000 / sesi"
-                image="/images/sm.png"
-            />
+            @endforeach
 
         </div>
+
+        @else
+
+        <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">
+
+            Belum ada layanan tersedia.
+
+        </div>
+
+        @endif
 
     </section>
 
 
 
-    {{-- TERAKHIR DIPESAN --}}
+    {{-- LAYANAN TAMBAHAN --}}
     <section>
 
-        <div class="flex justify-between items-center mb-5">
+        <div class="flex justify-between items-center mb-6">
 
-            <h2 class="text-lg font-semibold">
-                Terakhir Dipesan
+            <h2 class="text-xl font-semibold">
+                Layanan Tambahan
             </h2>
-
-            <a href="{{ route('customer.orders') }}"
-               class="text-teal-600 text-sm hover:underline">
-                Selengkapnya
-            </a>
 
         </div>
 
 
-        <div class="bg-white rounded-xl shadow p-4">
+        @if(isset($additionalServices) && $additionalServices->count())
 
-            <div class="flex items-center justify-between">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-                <div class="flex items-center gap-4">
+            @foreach($additionalServices as $service)
 
-                    <img
-                        src="/images/tradm.png"
-                        class="w-16 h-16 rounded-lg object-cover"
-                    >
+            <div class="bg-white rounded-xl shadow hover:shadow-md transition p-4 flex items-center gap-4">
 
-                    <div>
+                <img
+                    src="{{ $service->image_url }}"
+                    class="w-14 h-14 rounded-lg object-cover"
+                >
 
-                        <p class="font-semibold text-sm">
-                            Traditional Massage
-                        </p>
+                <div class="flex-1">
 
-                        <p class="text-xs text-gray-500">
-                            12 Mei 2026
-                        </p>
+                    <p class="font-semibold text-sm">
+                        {{ $service->name }}
+                    </p>
 
-                    </div>
+                    <p class="text-xs text-gray-500">
+                        {{ $service->description }}
+                    </p>
 
                 </div>
 
-                <span class="text-teal-600 font-semibold">
-                    Rp150.000
+                <span class="text-teal-600 font-semibold text-sm">
+
+                    Rp {{ number_format($service->price,0,',','.') }}
+
                 </span>
 
             </div>
 
+            @endforeach
+
         </div>
+
+        @else
+
+        <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">
+
+            Belum ada layanan tambahan tersedia.
+
+        </div>
+
+        @endif
 
     </section>
 
