@@ -2,9 +2,10 @@
 
 @section('content')
 
-<div class="bg-teal-700 text-white p-4">
+<!-- HEADER -->
+<div class="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6">
 
-    <h1 class="text-lg font-semibold">
+    <h1 class="text-xl font-semibold">
         Layanan
     </h1>
 
@@ -13,8 +14,9 @@
         <input
             type="text"
             name="search"
-            placeholder="Cari layanan"
-            class="w-full px-3 py-2 rounded-md text-black"
+            placeholder="Cari layanan..."
+            value="{{ request('search') }}"
+            class="w-full px-4 py-2 rounded-lg text-black focus:outline-none"
         >
 
     </form>
@@ -22,50 +24,134 @@
 </div>
 
 
-<div class="grid grid-cols-2 gap-4 p-4">
 
-@foreach($services as $service)
+<div class="max-w-7xl mx-auto p-6 space-y-10">
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
 
-    <img
-        src="{{ asset($service->image ?? 'images/service-default.jpg') }}"
-        class="w-full h-32 object-cover"
-    >
+<!-- ======================
+    LAYANAN UTAMA
+====================== -->
 
-    <div class="p-3">
+<section>
 
-        <h3 class="text-sm font-semibold">
-            {{ $service->name }}
-        </h3>
+    <h2 class="text-lg font-semibold mb-5">
+        Layanan Utama
+    </h2>
 
-        <p class="text-xs text-gray-500">
-            {{ $service->duration }} menit
-        </p>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-        <div class="flex justify-between items-center mt-2">
+        @foreach($services as $service)
 
-            <span class="text-teal-600 font-semibold text-sm">
-                Rp {{ number_format($service->price) }}
-            </span>
+        <div class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden group">
 
-            <button
-                onclick="addToCart({{ $service->id }})"
-                class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded text-xs">
-                +
-            </button>
+            <div class="aspect-[4/3] overflow-hidden">
+
+                <img
+                    src="{{ $service->image_url }}"
+                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                >
+
+            </div>
+
+            <div class="p-4">
+
+                <h3 class="font-semibold text-sm line-clamp-1">
+                    {{ $service->name }}
+                </h3>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    {{ $service->duration }} menit
+                </p>
+
+                <div class="flex justify-between items-center mt-3">
+
+                    <span class="text-teal-600 font-semibold text-sm">
+                        Rp {{ number_format($service->price) }}
+                    </span>
+
+                    <button
+                        onclick="addToCart({{ $service->id }})"
+                        class="bg-teal-600 hover:bg-teal-700 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">
+
+                        +
+
+                    </button>
+
+                </div>
+
+            </div>
 
         </div>
 
+        @endforeach
+
     </div>
 
-</div>
+</section>
 
-@endforeach
+
+
+<!-- ======================
+    LAYANAN TAMBAHAN
+====================== -->
+
+<section>
+
+    <h2 class="text-lg font-semibold mb-5">
+        Add-on / Layanan Tambahan
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        @foreach($additionalServices as $service)
+
+        <div class="bg-white rounded-xl shadow hover:shadow-md transition p-4 flex items-center gap-4">
+
+            <img
+                src="{{ $service->image_url }}"
+                class="w-16 h-16 rounded-lg object-cover"
+            >
+
+            <div class="flex-1">
+
+                <p class="font-semibold text-sm">
+                    {{ $service->name }}
+                </p>
+
+                <p class="text-xs text-gray-500">
+                    {{ $service->description }}
+                </p>
+
+            </div>
+
+            <div class="text-right">
+
+                <p class="text-teal-600 font-semibold text-sm">
+                    Rp {{ number_format($service->price) }}
+                </p>
+
+                <button
+                    onclick="addToCart({{ $service->id }})"
+                    class="mt-1 text-xs bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded">
+
+                    Tambah
+
+                </button>
+
+            </div>
+
+        </div>
+
+        @endforeach
+
+    </div>
+
+</section>
 
 </div>
 
 @endsection
+
 
 
 @push('scripts')
@@ -130,7 +216,6 @@ function showToast(message){
         px-4 py-2 rounded-lg
         shadow-lg
         text-sm
-        animate-bounce
         z-50
     `;
 
