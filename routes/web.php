@@ -6,16 +6,22 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\FinanceController;
-use App\Http\Controllers\Auth\RegisterController;
+
+/// Customer
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Customer\ServiceController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\ServiceCustController;
+use App\Http\Controllers\Customer\OrderController;
 
-
-use App\Http\Controllers\SuperAdmin\ServiceController;
-use App\Http\Controllers\Terapis\TerapisController;
+//Superadmin
+use App\Http\Controllers\SuperAdmin\ServiceController as SuperAdminServiceController;
 use App\Http\Controllers\SuperAdmin\CabangController;
+use App\Http\Controllers\SuperAdmin\LandingPageController;
+use App\Http\Controllers\SuperAdmin\LandingBenefitController;
+
+// Terapis
+use App\Http\Controllers\Terapis\TerapisController;
 
 /*
 
@@ -27,6 +33,7 @@ use App\Http\Controllers\SuperAdmin\CabangController;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+Route::get('/', [LandingPageController::class, 'showLanding']);
 
 
 /*
@@ -92,27 +99,27 @@ Route::middleware(['auth','role:super_admin'])
 
         Route::get(
             '/services',
-            [ServiceController::class, 'index']
+            [SuperAdminServiceController::class, 'index']
         )->name('superadmin.services');
 
         Route::post(
             '/services',
-            [ServiceController::class, 'store']
+            [SuperAdminServiceController::class, 'store']
         )->name('superadmin.services.store');
 
         Route::put(
             '/services/{id}',
-            [ServiceController::class, 'update']
+            [SuperAdminServiceController::class, 'update']
         )->name('superadmin.services.update');
 
         Route::delete(
             '/services/{id}',
-            [ServiceController::class, 'destroy']
+            [SuperAdminServiceController::class, 'destroy']
         )->name('superadmin.services.destroy');
 
         Route::post(
             '/superadmin/additional-services',
-            [ServiceController::class,'store']
+            [SuperAdminServiceController::class,'store']
         )->name('superadmin.additional-services.store');
 
         Route::get('/cabang',[CabangController::class,'index'])
@@ -136,6 +143,37 @@ Route::middleware(['auth','role:super_admin'])
 
         Route::delete('/cabang/{id}/delete',[CabangController::class,'destroy'])
             ->name('superadmin.cabang.delete');
+
+        Route::get(
+            '/landing-page',
+            [LandingPageController::class,'index']
+        )->name('superadmin.landing');
+
+        Route::post(
+            '/landing-page/update',
+            [LandingPageController::class,'update']
+        )->name('superadmin.landing.update');
+
+        Route::get('/benefit/create', 
+            [LandingPageController::class,'createBenefit']
+        )->name('benefit.create');
+
+        Route::post('/benefit/store', 
+            [LandingPageController::class,'storeBenefit']
+        )->name('benefit.store');
+
+        Route::get('/benefit/edit/{id}', 
+            [LandingPageController::class,'editBenefit']
+        )->name('benefit.edit');
+
+        Route::post('/benefit/update/{id}', 
+            [LandingPageController::class,'updateBenefit']
+        )->name('benefit.update');
+
+        Route::delete('/benefit/delete/{id}', 
+            [LandingPageController::class,'destroyBenefit']
+        )->name('benefit.destroy');
+
 });
 
 

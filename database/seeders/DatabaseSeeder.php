@@ -18,8 +18,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             TransactionSeeder::class,
-        ]);
-        $this->call([
+            LandingPageSeeder::class,
+            LandingStatisticSeeder::class,
+            LandingBenefitSeeder::class,
             ServiceSeeder::class
         ]);
     }
