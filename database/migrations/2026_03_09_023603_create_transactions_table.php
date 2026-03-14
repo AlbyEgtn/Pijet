@@ -47,6 +47,7 @@ return new class extends Migration
             // status transaksi
             $table->enum('status',[
                 'lunas',
+                'proses',
                 'belum_lunas',
                 'dibatalkan',
                 'reschedule'

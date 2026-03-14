@@ -122,7 +122,7 @@ Route::middleware(['auth','role:admin'])
     ->prefix('admin')
     ->group(function () {
 
-        Route::get('/dashboard', [DashboardController::class, 'admin'])
+        Route::get('/dashboard', [FinanceController::class, 'admin'])
             ->name('admin.dashboard');
 
 });
@@ -176,7 +176,7 @@ Route::middleware(['auth','role:terapis'])
     ->prefix('terapis')
     ->group(function () {
 
-        Route::get('/dashboard', [DashboardController::class, 'terapis'])
+        Route::get('/dashboard', [FinanceController::class, 'terapis'])
             ->name('terapis.dashboard');
 
 });
@@ -224,6 +224,15 @@ Route::middleware(['auth','role:customer'])
         /* ORDERS */
         Route::get('/orders', [OrderController::class,'index'])
             ->name('customer.orders');
+
+        Route::get('/orders/{id}', [OrderController::class,'show'])
+            ->name('customer.orders.show');
+
+        Route::post('/orders/{id}/payment', [OrderController::class,'payment'])
+            ->name('customer.orders.payment');
+
+        Route::get('/payment/{id}', [OrderController::class,'paymentPage'])
+            ->name('customer.payment');
 
         Route::get('/cart/count', function(){
 

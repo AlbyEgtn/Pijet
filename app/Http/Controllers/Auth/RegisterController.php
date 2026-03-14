@@ -27,8 +27,13 @@ class RegisterController extends Controller
             'name'       => ['required','string','max:255'],
             'email'      => ['required','email','unique:users,email'],
             'phone'      => ['required'],
+
+            'city'       => ['required','string','max:255'],
+            'address'    => ['required','string'],
+
             'password'   => ['required','confirmed','min:6'],
             'role'       => ['required','in:customer,terapis'],
+
             'ktp'        => ['nullable','file','mimes:jpg,png,pdf'],
             'skck'       => ['nullable','file','mimes:jpg,png,pdf']
 
@@ -64,9 +69,14 @@ class RegisterController extends Controller
             'name'       => $validated['name'],
             'email'      => $validated['email'],
             'phone'      => $validated['phone'],
+
+            'city'       => $validated['city'],
+            'address'    => $validated['address'],
+
             'role'       => $validated['role'],
             'ktp'        => $ktpPath,
             'skck'       => $skckPath,
+
             'password'   => Hash::make($validated['password']),
             'email_otp'  => $otp,
             'otp_expired_at' => now()->addMinutes(10)

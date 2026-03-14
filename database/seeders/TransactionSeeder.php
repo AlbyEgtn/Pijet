@@ -6,11 +6,25 @@ use Illuminate\Database\Seeder;
 use App\Models\Transaction;
 use App\Models\TransactionService;
 use App\Models\Payment;
+use App\Models\User;
 
 class TransactionSeeder extends Seeder
 {
     public function run(): void
     {
+
+        /*
+        |--------------------------------------------------------------------------
+        | GET THERAPISTS
+        |--------------------------------------------------------------------------
+        */
+
+        $therapists = User::where('role', 'therapist')->take(2)->get();
+
+        $therapist1 = $therapists->get(0)?->id;
+        $therapist2 = $therapists->get(1)?->id;
+
+
 
         $transactions = [
 
@@ -53,7 +67,7 @@ class TransactionSeeder extends Seeder
 
 
 
-        foreach($transactions as $data){
+        foreach ($transactions as $data) {
 
             $trx = Transaction::create([
 
@@ -101,7 +115,7 @@ class TransactionSeeder extends Seeder
 
                 'service_name' => 'Full Body Massage',
 
-                'therapist_name' => 'Amy Lee',
+                'therapist_id' => $therapist1,
 
                 'duration' => 60,
 
@@ -122,7 +136,7 @@ class TransactionSeeder extends Seeder
 
                 'service_name' => 'Hot Stone Massage',
 
-                'therapist_name' => 'Syn Gates',
+                'therapist_id' => $therapist2,
 
                 'duration' => 90,
 
