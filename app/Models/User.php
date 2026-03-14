@@ -27,12 +27,15 @@ class User extends Authenticatable
         'gender',
         'birth_date',
         'phone',
+
+        'city',
+        'address',
+
         'work_area',
         'ktp',
         'skck',
         'email_otp',
         'otp_expired_at'
-
     ];
 
     /**

@@ -402,6 +402,12 @@ function updateQty(cartId,type){
 
         }
 
+    })
+    .catch(err => {
+
+        console.error(err);
+        showToast("Gagal memperbarui keranjang");
+
     });
 
 }
@@ -457,6 +463,14 @@ function updateTotal(){
 
 
 
+/* ================= USER DATA ================= */
+
+const userPhone = @json(auth()->user()->phone);
+const userCity = @json(auth()->user()->city);
+const userAddress = @json(auth()->user()->address);
+
+
+
 /* ================= CHECKOUT ================= */
 
 function confirmCheckout(){
@@ -472,38 +486,64 @@ function confirmCheckout(){
     const time =
         document.getElementById("service_time").value;
 
+    const phone = @json(auth()->user()->phone);
+    const city = @json(auth()->user()->city);
+    const address = @json(auth()->user()->address);
+
+    if(!date || !time){
+
+        showToast("Silakan pilih jadwal layanan");
+        return;
+
+    }
+
+    const formData = new FormData();
+
+    formData.append('payment_method', payment);
+    formData.append('service_date', date);
+    formData.append('service_time', time);
+
+    formData.append('phone', phone);
+    formData.append('city', city);
+    formData.append('address', address);
+
 
     fetch("{{ route('customer.cart.checkout') }}",{
 
         method:"POST",
 
         headers:{
-            "Content-Type":"application/json",
             "X-CSRF-TOKEN":"{{ csrf_token() }}",
             "X-Requested-With":"XMLHttpRequest"
         },
 
-        body: JSON.stringify({
-
-            payment_method: payment,
-            service_date: date,
-            service_time: time
-
-        })
+        body: formData
 
     })
-    .then(res=>res.json())
-    .then(data=>{
+    .then(res => res.json())
+    .then(data => {
 
         if(data.success){
 
             showToast("Pesanan anda sedang diproses");
 
             setTimeout(()=>{
+
                 window.location.href = data.redirect;
+
             },1500);
 
+        }else{
+
+            showToast(data.message ?? "Checkout gagal");
+
         }
+
+    })
+    .catch(err => {
+
+        console.error(err);
+        showToast("Terjadi kesalahan sistem");
 
     });
 

@@ -24,8 +24,11 @@ return new class extends Migration
 
             $table->integer('service_price');
 
-            // terapis
-            $table->string('therapist_name')->nullable();
+            // terapis (relasi ke users)
+            $table->foreignId('therapist_id')
+                  ->nullable()
+                  ->constrained('users')
+                  ->nullOnDelete();
 
             // layanan tambahan
             $table->string('additional_service')->nullable();

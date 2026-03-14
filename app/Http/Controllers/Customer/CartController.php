@@ -178,11 +178,37 @@ class CartController extends Controller
     public function checkout(Request $request)
     {
 
+        $request->validate([
+
+            'service_date' => ['required','date'],
+            'service_time' => ['required'],
+            'payment_method' => ['required','in:cash,transfer'],
+
+            'phone'   => ['required'],
+            'city'    => ['required','string'],
+            'address' => ['required','string']
+
+        ]);
+
+
         $user = auth()->user();
+
+
+        /* ================= UPDATE DATA USER ================= */
+
+        $user->update([
+
+            'phone' => $request->phone,
+            'city' => $request->city,
+            'address' => $request->address
+
+        ]);
+
 
         $carts = Cart::with('service')
             ->where('user_id', $user->id)
             ->get();
+
 
         if($carts->isEmpty()){
 
@@ -217,19 +243,19 @@ class CartController extends Controller
 
                 'customer_name' => $user->name,
 
-                'customer_phone' => $user->phone ?? null,
+                'customer_phone' => $request->phone,
 
-                'customer_address' => $user->address ?? null,
+                'customer_address' => $request->address,
 
-                'customer_city' => $user->city ?? null,
+                'customer_city' => $request->city,
 
                 'orderer_name' => $user->name,
 
-                'service_date' => $request->service_date ?? now()->addDay()->toDateString(),
+                'service_date' => $request->service_date,
 
-                'service_time' => $request->service_time ?? '10:00:00',
+                'service_time' => $request->service_time,
 
-                'payment_method' => $request->payment_method ?? 'cash',
+                'payment_method' => $request->payment_method,
 
                 'status' => 'belum_lunas',
 
@@ -252,7 +278,7 @@ class CartController extends Controller
 
                     'service_price' => $cart->service->price,
 
-                    'therapist_name' => null,
+                    'therapist_id' => null,
 
                     'additional_service' => null,
 
