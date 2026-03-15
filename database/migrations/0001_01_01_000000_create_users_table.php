@@ -34,6 +34,10 @@ return new class extends Migration
 
             $table->string('phone')->nullable();
 
+            $table->string('city')->nullable()->after('phone');
+
+            $table->text('address')->nullable()->after('city');
+
             $table->string('work_area')->nullable();
 
             $table->string('ktp')->nullable();
