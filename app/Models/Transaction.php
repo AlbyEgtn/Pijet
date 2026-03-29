@@ -24,6 +24,8 @@ class Transaction extends Model
         'service_time',
 
         'payment_method',
+        'payment_expired_at',
+        'payment_uploaded_at',
 
         'status',
 

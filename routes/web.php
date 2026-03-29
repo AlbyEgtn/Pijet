@@ -7,6 +7,10 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\FinanceController;
 
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\TherapistController;
+
 /// Customer
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Customer\CartController;
@@ -188,8 +192,82 @@ Route::middleware(['auth','role:admin'])
     ->prefix('admin')
     ->group(function () {
 
-        Route::get('/dashboard', [FinanceController::class, 'admin'])
+        Route::get('/dashboard', [AdminController::class, 'index'])
             ->name('admin.dashboard');
+
+        /*
+        |--------------------------------------------------------------------------
+        | ORDERS
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('orders')->group(function () {
+
+            Route::get('/status', [AdminOrderController::class, 'status'])->name('admin.orders.status');
+            Route::get('/waiting', [AdminOrderController::class, 'waiting'])->name('admin.orders.waiting');
+            Route::get('/finished', [AdminOrderController::class, 'finished'])->name('admin.orders.finished');
+            Route::get('/reschedule', [AdminOrderController::class, 'reschedule'])->name('admin.orders.reschedule');
+
+            Route::get('/{id}/detail', [AdminOrderController::class,'detail'])
+                ->name('admin.orders.detail');
+
+            Route::get('/{id}/edit', [AdminOrderController::class,'edit'])
+                ->name('admin.orders.edit');
+
+            Route::put('/{id}/update', [AdminOrderController::class,'update'])
+                ->name('admin.orders.update');
+
+            Route::delete('/{id}/delete', [AdminOrderController::class,'delete'])
+                ->name('admin.orders.delete');
+
+            Route::post('/{id}/approve', [AdminOrderController::class,'approve'])
+                ->name('admin.orders.approve');
+
+            Route::post('/{id}/reject', [AdminOrderController::class,'reject'])
+                ->name('admin.orders.reject');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | THERAPIST
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('therapist')->group(function () {
+
+            // 🔹 AKUN (CRUD)
+            Route::get('/', [TherapistController::class, 'index'])
+                ->name('admin.therapist.index');
+
+            Route::get('/create', [TherapistController::class, 'create'])
+                ->name('admin.therapist.create');
+
+            Route::post('/store', [TherapistController::class, 'store'])
+                ->name('admin.therapist.store');
+
+            Route::get('/{id}/edit', [TherapistController::class, 'edit'])
+                ->name('admin.therapist.edit');
+
+            Route::put('/{id}/update', [TherapistController::class, 'update'])
+                ->name('admin.therapist.update');
+
+            Route::delete('/{id}/delete', [TherapistController::class, 'destroy'])
+                ->name('admin.therapist.delete');
+
+
+            // 🔹 VERIFIKASI
+            Route::get('/verification', [TherapistController::class, 'verification'])
+                ->name('admin.therapist.verification');
+
+            Route::post('/{id}/verify', [TherapistController::class, 'verify'])
+                ->name('admin.therapist.verify');
+
+            Route::post('/{id}/reject', [TherapistController::class, 'reject'])
+                ->name('admin.therapist.reject');
+
+
+            // 🔹 RATING & ULASAN
+            Route::get('/review', [TherapistController::class, 'review'])
+                ->name('admin.therapist.review');
+        });
 
 });
 
@@ -244,6 +322,7 @@ Route::middleware(['auth','role:terapis'])
     ->group(function () {
 
         Route::get('/dashboard', [TerapisController::class, 'dashboard'])
+            ->name('terapis.dashboard');
             ->name('dashboard');
 
         Route::get('/profile', [TerapisController::class, 'profile'])
@@ -354,6 +433,9 @@ Route::middleware(['auth','role:customer'])
 
         Route::get('/payment/{id}', [OrderController::class,'paymentPage'])
             ->name('customer.payment');
+
+        Route::post('/customer/orders/{id}/upload-payment', [OrderController::class, 'uploadPaymentProof'])
+            ->name('customer.upload.payment');
 
         Route::get('/cart/count', function(){
 
