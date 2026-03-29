@@ -44,6 +44,12 @@ return new class extends Migration
                 'cash'
             ]);
 
+            $table->timestamp('payment_expired_at')->nullable();
+
+            $table->timestamp('payment_uploaded_at')->nullable();
+
+            $table->string('payment_proof')->nullable();
+
             // status transaksi
             $table->enum('status',[
                 'lunas',

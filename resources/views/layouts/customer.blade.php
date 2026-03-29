@@ -1,61 +1,83 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title')</title>
+    <title>{{ config('app.name', 'Pijetin') }}</title>
 
+    {{-- VITE --}}
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    {{-- STACK STYLE --}}
+    @stack('styles')
 </head>
 
-<body class="bg-gray-100">
+<body class="min-h-screen flex flex-col bg-gray-100">
 
+    {{-- ================= NAVBAR ================= --}}
     @include('layouts.partials.customer.navbar')
 
-    <main class="p-6">
-        @yield('content')
+
+
+    {{-- ================= MAIN CONTENT ================= --}}
+    <main class="flex-1 flex flex-col">
+
+        {{-- ===== OPTIONAL HEADER (PER PAGE) ===== --}}
+        @hasSection('header')
+            <div class="w-full">
+                @yield('header')
+            </div>
+        @endif
+
+
+        {{-- ===== PAGE CONTENT ===== --}}
+        <div class="flex-1 w-full">
+            @yield('content')
+        </div>
+
     </main>
 
-    @include('layouts.partials.footer')
 
+
+    {{-- ================= FOOTER ================= --}}
+    <footer class="p-4 text-sm text-center text-gray-500 bg-white border-t">
+        © {{ date('Y') }} pijet.in
+    </footer>
+
+
+
+    {{-- ================= GLOBAL SCRIPT ================= --}}
+    <script>
+        /**
+         * Global Toast (simple version)
+         */
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.innerText = message;
+
+            toast.className = `
+                fixed top-5 right-5
+                bg-black text-white text-sm
+                px-4 py-2 rounded-lg shadow-lg
+                opacity-0 transition duration-300 z-50
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.remove('opacity-0'), 100);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+    </script>
+
+
+
+    {{-- ================= STACK SCRIPT ================= --}}
     @stack('scripts')
 
 </body>
-<script>
-
-function updateCartCount(){
-
-    fetch("/customer/cart/count")
-    .then(res => res.json())
-    .then(data => {
-
-        const badge = document.getElementById("cart-count");
-        const cartIcon = document.querySelector('a[href="{{ route('customer.cart') }}"]');
-
-        if(badge){
-
-            badge.innerText = data.count;
-
-        }else if(data.count > 0){
-
-            const span = document.createElement("span");
-
-            span.id = "cart-count";
-            span.className = "absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full";
-            span.innerText = data.count;
-
-            cartIcon.appendChild(span);
-
-        }
-
-    });
-
-}
-
-</script>
-
 </html>
