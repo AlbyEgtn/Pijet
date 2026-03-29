@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-       Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
 
             $table->id();
 
@@ -34,9 +34,9 @@ return new class extends Migration
 
             $table->string('phone')->nullable();
 
-            $table->string('city')->nullable()->after('phone');
+            $table->string('city')->nullable();
 
-            $table->text('address')->nullable()->after('city');
+            $table->text('address')->nullable();
 
             $table->string('work_area')->nullable();
 
@@ -45,9 +45,9 @@ return new class extends Migration
             $table->string('skck')->nullable();
 
             $table->string('password');
-                      
+
             $table->string('email_otp')->nullable();
-            
+
             $table->timestamp('otp_expired_at')->nullable();
 
             $table->string('reset_otp')->nullable();

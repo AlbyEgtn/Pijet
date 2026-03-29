@@ -62,7 +62,7 @@ class User extends Authenticatable
     }
 
     public function terapis()
-{
-    return $this->hasOne(Terapis::class);
-}
+    {
+        return $this->hasOne(Terapis::class);
+    }
 }

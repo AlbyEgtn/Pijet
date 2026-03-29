@@ -14,7 +14,8 @@ class Terapis extends Model
         'gender',
         'whatsapp',
         'address',
-        'bank_account',
+        'bank_name',
+        'bank_number',
         'total_orders',
         'balance',
         'status'
