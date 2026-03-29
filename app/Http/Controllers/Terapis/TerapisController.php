@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Terapis\Terapis;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Transaction;
 
 class TerapisController extends Controller
 {
@@ -15,8 +16,81 @@ class TerapisController extends Controller
     {
         $user = Auth::user();
         $terapis = $user->terapis;
+        $transactions = Transaction::latest()->take(5)->get();
 
-        return view('pages.terapis.dashboard', compact('user','terapis'));
+        return view('pages.terapis.dashboard', compact('user','terapis','transactions'));
+    }
+    public function pesanan()
+    {
+        $user = Auth::user();
+        $terapis = $user->terapis;
+
+        $transactions = Transaction::latest()->get();
+
+        return view('pages.terapis.pesanan', compact('user','terapis','transactions'));
+    }
+
+    public function detailPesanan($id)
+    {
+        $user = Auth::user();
+        $terapis = $user->terapis;
+
+        $transaction = Transaction::findOrFail($id);
+
+        return view('pages.terapis.pesanan_detail', compact('user','terapis','transaction'));
+    }
+
+    public function ambilPesanan($id)
+    {
+        $user = auth()->user();
+
+        if (!$user->terapis) {
+            return back()->with('error', 'Data terapis belum tersedia');
+        }
+
+        $updated = Transaction::where('id', $id)
+            ->where('status', 'belum_lunas')
+            ->update([
+                'status' => 'proses',
+                'terapis_id' => $user->terapis->id
+            ]);
+
+        if (!$updated) {
+            return back()->with('error', 'Pesanan tidak tersedia');
+        }
+
+        return redirect()->route('terapis.pesanan.saya')
+            ->with('success', 'Pesanan berhasil diambil');
+    }
+    
+    public function pesananSaya()
+    {
+        $user = auth()->user();
+
+        if (!$user->terapis) {
+            return back()->with('error', 'Data terapis tidak ditemukan');
+        }
+
+        $transactions = \App\Models\Transaction::where('terapis_id', $user->terapis->id)
+            ->latest()
+            ->get();
+
+        return view('pages.terapis.pesanan_saya', compact('transactions'));
+    }
+
+    public function detailPesananSaya($id)
+    {
+        $user = auth()->user();
+
+        if (!$user->terapis) {
+            return back()->with('error', 'Data terapis tidak ditemukan');
+        }
+
+        $transaction = \App\Models\Transaction::where('id', $id)
+            ->where('terapis_id', $user->terapis->id) // 🔥 keamanan
+            ->firstOrFail();
+
+        return view('pages.terapis.pesanan_saya_detail', compact('transaction'));
     }
 
     public function detail()

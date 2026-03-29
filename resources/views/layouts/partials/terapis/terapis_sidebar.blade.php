@@ -22,11 +22,15 @@
 
         </a>
 
-        <a href="#"
+        <a href="{{ route('terapis.pesanan') }}"
            class="block px-4 py-2 rounded hover:bg-teal-700">
 
             Pesanan
 
+        </a>
+        <a href="{{ route('terapis.pesanan.saya') }}"
+        class="block px-4 py-2 rounded hover:bg-teal-700">
+            Pesanan Saya
         </a>
 
     </nav>

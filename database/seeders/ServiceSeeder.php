@@ -20,7 +20,6 @@ class ServiceSeeder extends Seeder
             'price' => 150000,
             'duration' => 90,
             'image' => 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874',
-            'image' => 'services/Seed1.jpg',
             'is_additional' => 0,
             'is_active' => 1
         ]);
@@ -31,7 +30,6 @@ class ServiceSeeder extends Seeder
             'price' => 130000,
             'duration' => 60,
             'image' => 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1',
-            'image' => 'services/Seed1.jpg',
             'is_additional' => 0,
             'is_active' => 1
         ]);
@@ -112,7 +110,6 @@ class ServiceSeeder extends Seeder
             'price' => 175000,
             'duration' => 90,
             'image' => 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881',
-            'image' => 'services/Seed1.jpg',
             'is_additional' => 0,
             'is_active' => 1
         ]);
@@ -127,10 +124,8 @@ class ServiceSeeder extends Seeder
             'name' => 'Aromatherapy Oil',
             'description' => 'Minyak aromaterapi untuk meningkatkan relaksasi selama pijat.',
             'price' => 25000,
-            'duration' => 0,
             'image' => 'https://images.unsplash.com/photo-1505577058444-a3dab90d4253',
             'duration' => 10,
-            'image' => null,
             'is_additional' => 1,
             'is_active' => 1
         ]);
@@ -139,10 +134,8 @@ class ServiceSeeder extends Seeder
             'name' => 'Hot Stone Add-on',
             'description' => 'Tambahan terapi batu panas pada layanan pijat.',
             'price' => 30000,
-            'duration' => 0,
             'image' => 'https://images.unsplash.com/photo-1600334129128-685c5582fd35',
             'duration' => 20,
-            'image' => null,
             'is_additional' => 1,
             'is_active' => 1
         ]);
@@ -151,7 +144,7 @@ class ServiceSeeder extends Seeder
             'name' => 'Body Scrub',
             'description' => 'Scrub tubuh untuk mengangkat sel kulit mati.',
             'price' => 35000,
-            'duration' => 0,
+            'duration' => 10,
             'image' => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1200&auto=format',
             'is_additional' => 1,
             'is_active' => 1
@@ -161,7 +154,7 @@ class ServiceSeeder extends Seeder
             'name' => 'Foot Spa',
             'description' => 'Perawatan kaki untuk relaksasi dan kesehatan kaki.',
             'price' => 30000,
-            'duration' => 0,
+            'duration' => 15,
             'image' => 'https://images.unsplash.com/photo-1599058917212-d750089bc07e',
             'is_additional' => 1,
             'is_active' => 1
@@ -171,7 +164,7 @@ class ServiceSeeder extends Seeder
             'name' => 'Herbal Compress',
             'description' => 'Kompres herbal hangat untuk membantu relaksasi otot.',
             'price' => 35000,
-            'duration' => 0,
+            'duration' => 10,
             'image' => 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092',
             'is_additional' => 1,
             'is_active' => 1
@@ -181,10 +174,8 @@ class ServiceSeeder extends Seeder
             'name' => 'Face Massage',
             'description' => 'Pijat wajah untuk meningkatkan sirkulasi darah dan relaksasi.',
             'price' => 30000,
-            'duration' => 0,
+            'duration' => 15,
             'image' => 'https://images.unsplash.com/photo-1598970434795-0c54fe7c0648',
-            'duration' => 10,
-            'image' => null,
             'is_additional' => 1,
             'is_active' => 1
         ]);
