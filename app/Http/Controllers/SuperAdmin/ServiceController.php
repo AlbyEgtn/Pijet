@@ -5,118 +5,103 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\SuperAdmin\Service;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ServiceController extends Controller
 {
 
     public function index()
     {
-        $services = Service::where('is_additional',0)->get();
+        $services = Service::where('is_additional', 0)->latest()->get();
 
-        $additionalServices = Service::where('is_additional',1)->get();
+        $additionalServices = Service::where('is_additional', 1)->latest()->get();
 
         return view(
             'pages.superadmin.services.index',
-            compact('services','additionalServices')
+            compact('services', 'additionalServices')
         );
     }
 
 
     public function store(Request $request)
     {
+    $validated = $request->validate([
+        'name'          => 'required|string|max:255',
+        'price'         => 'required|numeric',
+        'duration'      => 'nullable|numeric',
+        'description'   => 'nullable|string',
+        'image'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'is_additional' => 'required|boolean'
+    ]);
 
-        $request->validate([
+    if ($request->hasFile('image')) {
 
-            'name'        => 'required|string|max:255',
-            'price'       => 'required|numeric',
-            'duration'    => 'nullable|numeric',
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'is_additional' => 'required|boolean'
+        $file = $request->file('image');
 
-        ]);
+        $filename = time().'.webp';
 
+        $path = storage_path('app/public/services/'.$filename);
 
-        $imagePath = null;
+        $manager = new ImageManager(new Driver());
 
-        if ($request->hasFile('image')) {
+        $image = $manager->read($file)
+            ->scale(width: 800)
+            ->toWebp(80);
 
-            $imagePath = $request->file('image')->store(
-                'services',
-                'public'
-            );
+        $image->save($path);
 
-        }
-
-
-        Service::create([
-
-            'name'        => $request->name,
-            'price'       => $request->price,
-            'duration'    => $request->duration ?? 0,
-            'description' => $request->description,
-            'image'       => $imagePath,
-            'is_additional' => $request->is_additional,
-            'is_active'   => 1
-
-        ]);
-
-
-        return back()->with(
-            'success',
-            'Layanan berhasil ditambahkan'
-        );
+        $validated['image'] = 'services/'.$filename;
     }
 
+    Service::create($validated);
+
+    return back()->with('success','Layanan berhasil ditambahkan');
+}
 
     public function update(Request $request, $id)
     {
-
         $service = Service::findOrFail($id);
 
-
-        $data = $request->validate([
-
+        $validated = $request->validate([
             'name'        => 'required|string|max:255',
             'price'       => 'required|numeric',
             'duration'    => 'nullable|numeric',
             'description' => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
-
         ]);
-
 
         if ($request->hasFile('image')) {
 
-            $data['image'] = $request->file('image')->store(
+            // hapus gambar lama
+            if ($service->image && Storage::disk('public')->exists($service->image)) {
+                Storage::disk('public')->delete($service->image);
+            }
+
+            $validated['image'] = $request->file('image')->store(
                 'services',
                 'public'
             );
-
         }
 
+        $service->update($validated);
 
-        $service->update($data);
-
-
-        return back()->with(
-            'success',
-            'Layanan berhasil diperbarui'
-        );
+        return back()->with('success', 'Layanan berhasil diperbarui');
     }
 
 
     public function destroy($id)
     {
-
         $service = Service::findOrFail($id);
+
+        // hapus gambar dari storage
+        if ($service->image && Storage::disk('public')->exists($service->image)) {
+            Storage::disk('public')->delete($service->image);
+        }
 
         $service->delete();
 
-        return back()->with(
-            'success',
-            'Layanan berhasil dihapus'
-        );
+        return back()->with('success', 'Layanan berhasil dihapus');
     }
-
 }

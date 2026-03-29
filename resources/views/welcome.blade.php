@@ -285,12 +285,13 @@
             <!-- IMAGE -->
             <div class="overflow-hidden">
                 <img
-                    src="{{ asset('storage/'.$service->image) }}"
+                    src="{{ $service->image_url }}"
+                    srcset="{{ $service->image_url }} 600w"
+                    sizes="(max-width:768px) 100vw, 33vw"
                     loading="lazy"
-                    decoding="async"
                     alt="{{ $service->name }}"
                     class="w-full h-60 object-cover group-hover:scale-110 transition duration-500"
-                >
+                />
             </div>
 
             <!-- CONTENT -->

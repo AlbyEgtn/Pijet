@@ -240,50 +240,65 @@ Route::middleware(['auth','role:finance'])
 
 Route::middleware(['auth','role:terapis'])
     ->prefix('terapis')
+    ->name('terapis.') // 🔥 INI YANG KURANG
     ->group(function () {
 
         Route::get('/dashboard', [TerapisController::class, 'dashboard'])
-            ->name('terapis.dashboard');
+            ->name('dashboard');
 
         Route::get('/profile', [TerapisController::class, 'profile'])
-            ->name('terapis.profile');
+            ->name('profile');
+            
+        Route::get('/pesanan', [TerapisController::class, 'pesanan'])
+            ->name('pesanan');
 
-         Route::get('/profile/confirm', [TerapisController::class,'confirmPassword'])
-            ->name('terapis.confirm.password');
+        Route::get('/pesanan/{id}', [TerapisController::class, 'detailPesanan'])
+            ->name('pesanan.detail');
+
+        Route::post('/pesanan/{id}/ambil', [TerapisController::class, 'ambilPesanan'])
+            ->name('pesanan.ambil');
+
+        Route::get('/pesanan-saya', [TerapisController::class, 'pesananSaya'])
+            ->name('pesanan.saya');
+
+        Route::get('/pesanan-saya/{id}', [TerapisController::class, 'detailPesananSaya'])
+            ->name('pesanan.saya.detail');
+
+        Route::get('/profile/confirm', [TerapisController::class,'confirmPassword'])
+            ->name('confirm.password');
 
         Route::post('/profile/confirm', [TerapisController::class,'checkPassword'])
-            ->name('terapis.confirm.check');
+            ->name('confirm.check');
 
         Route::get('/profile/detail', [TerapisController::class, 'detail'])
-            ->name('terapis.detail');
+            ->name('detail');
 
         Route::post('/update', [TerapisController::class, 'update'])
-            ->name('terapis.update');
+            ->name('update');
 
         Route::get('/informasi/confirm',[TerapisController::class,'confirmInformasi'])
-            ->name('terapis.informasi.confirm');
+            ->name('informasi.confirm');
 
         Route::post('/informasi/confirm',[TerapisController::class,'checkInformasiPassword'])
-            ->name('terapis.informasi.check');
+            ->name('informasi.check');
 
         Route::get('/informasi',[TerapisController::class,'informasi'])
-            ->name('terapis.informasi');
+            ->name('informasi');
 
         Route::post('/informasi/update',[TerapisController::class,'updateInformasi'])
-            ->name('terapis.informasi.update');
+            ->name('informasi.update');
 
         Route::get('/pedoman',[TerapisController::class,'pedoman'])
-            ->name('terapis.pedoman');
+            ->name('pedoman');
             
         Route::get('/bantuan',[TerapisController::class,'bantuan'])
-            ->name('terapis.bantuan');
+            ->name('bantuan');
 
         Route::get('/terapis/password', [TerapisController::class,'passwordForm'])
-            ->name('terapis.password.form');
+            ->name('password.form');
 
         Route::post('/terapis/password/update', [TerapisController::class,'updatePassword'])
-            ->name('terapis.password.update');
-
+            ->name('password.update');
 
 });
 

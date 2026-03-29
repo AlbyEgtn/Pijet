@@ -16,13 +16,17 @@ class LandingPageController extends Controller
     {
         $page = LandingPage::first();
 
-        $statistics = LandingStatistic::all();
+        $statistics = LandingStatistic::latest()->get();
 
-        $benefits = LandingBenefit::all();
+        $benefits = LandingBenefit::latest()->get();
 
-        $services = Service::where('is_active', 1)
-            ->where('is_additional', 0)
-            ->get();
+        $services = Service::where([
+            ['is_additional', 0],
+            ['is_active', 1]
+        ])
+        ->latest()
+        ->limit(6)
+        ->get();
 
         return view(
             'pages.superadmin.landing.index',
@@ -43,8 +47,12 @@ class LandingPageController extends Controller
 
         $benefits = LandingBenefit::all();
 
-        $services = Service::where('is_active', 1)
-            ->where('is_additional', 0)
+        $services = Service::where([
+            ['is_additional', 0],
+            ['is_active', 1]
+        ])
+            ->latest()
+            ->limit(6)
             ->get();
 
         return view(

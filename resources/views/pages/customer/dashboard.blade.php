@@ -3,7 +3,7 @@
 @section('title', 'Dashboard Customer')
 
 @section('content')
-
+<br>
 <div class="max-w-7xl mx-auto space-y-12">
 
     {{-- HERO --}}
