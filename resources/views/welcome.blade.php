@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Pijat.in</title>
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link
@@ -39,8 +39,19 @@
             margin: auto;
         }
 
-    </style>
+        img {
+            content-visibility: auto;
+        }
 
+        section {
+            content-visibility: auto;
+            contain-intrinsic-size: 600px;
+        }
+
+    </style>
+    <link rel="preload"
+      as="image"
+      href="{{ asset('images/'.$page->hero_image) }}">
 </head>
 
 <body class="bg-white antialiased">
@@ -49,7 +60,7 @@
 <!-- HERO SECTION -->
 <section
     class="relative h-screen bg-cover bg-center"
-    style="background-image:url('{{ asset('images/'.$page->hero_image) }}')"
+    style="background-image:url('{{ asset('images/'.$page->hero_image) }}'); background-size:cover;"
 >
 
     <div class="hero-overlay absolute inset-0"></div>
@@ -66,6 +77,7 @@
                     src="{{ asset('images/logo-pth.png') }}"
                     alt="Pijat.in Logo"
                     class="h-10 w-auto"
+                    fetchpriority="high"
                 >
 
                 <span class="font-semibold text-xl tracking-tight">
@@ -217,6 +229,8 @@
 
             <img
                 src="{{ asset('images/'.$page->about_image) }}"
+                loading="lazy"
+                decoding="async"
                 class="rounded-2xl shadow-xl w-full max-w-lg object-cover"
             >
 
@@ -271,10 +285,13 @@
             <!-- IMAGE -->
             <div class="overflow-hidden">
                 <img
-                    src="{{ asset('storage/'.$service->image) }}"
+                    src="{{ $service->image_url }}"
+                    srcset="{{ $service->image_url }} 600w"
+                    sizes="(max-width:768px) 100vw, 33vw"
+                    loading="lazy"
                     alt="{{ $service->name }}"
                     class="w-full h-60 object-cover group-hover:scale-110 transition duration-500"
-                >
+                />
             </div>
 
             <!-- CONTENT -->
@@ -324,7 +341,10 @@
             <div class="bg-white rounded-2xl shadow-lg p-10 text-center">
 
                 @if($benefit->icon)
-                    <img src="{{ asset('images/'.$benefit->icon) }}"
+                    <img
+                        src="{{ asset('images/'.$benefit->icon) }}"
+                        loading="lazy"
+                        decoding="async"
                         class="w-14 h-14 mx-auto mb-4">
                 @endif
 
@@ -363,6 +383,8 @@
 
             <img
                 src="{{ asset('images/'.$page->join_image) }}"
+                loading="lazy"
+                decoding="async"
                 class="relative rounded-3xl shadow-2xl object-cover w-full max-w-md h-105 transition duration-500 hover:scale-105"
             >
 
@@ -441,6 +463,8 @@
 
             <img
                 src="{{ asset('images/'.$page->download_image) }}"
+                loading="lazy"
+                decoding="async"
                 class="w-full max-w-md rounded-3xl shadow-2xl transition duration-500 hover:scale-105"
             >
 

@@ -17,9 +17,14 @@ return new class extends Migration
 
             // relasi customer
             $table->foreignId('customer_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
+            $table->foreignId('terapis_id')
+                ->nullable()
+                ->constrained('terapis')
+                ->nullOnDelete();
 
             // data customer snapshot
             $table->string('customer_name');
