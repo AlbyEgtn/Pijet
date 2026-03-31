@@ -20,8 +20,9 @@ return new class extends Migration
             $table->string('gender')->nullable();
             $table->string('whatsapp')->nullable();
             $table->text('address')->nullable();
-            $table->string('bank_account')->nullable();
-
+            $table->string('bank_name')->nullable();
+            $table->string('bank_number')->nullable();
+            $table->string('account_holder')->nullable();
             $table->integer('total_orders')->default(0);
             $table->integer('balance')->default(0);
 

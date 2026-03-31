@@ -184,11 +184,15 @@ class TherapistController extends Controller
                 'gender' => $user->gender,
                 'whatsapp' => $user->phone,
                 'address' => $user->address,
-                'bank_account' => null, // nanti bisa diisi
+
+                // payout (kosong dulu)
+                'bank_name' => null,
+                'bank_number' => null,
+                'account_holder' => null,
 
                 'total_orders' => 0,
                 'balance' => 0,
-                'status' => true, // aktif setelah approve
+                'status' => true,
             ]);
         }
 
