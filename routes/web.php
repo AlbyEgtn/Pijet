@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\RegisterController; 
+use App\Http\Controllers\Auth\TherapistAssessmentController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\FinanceController;
@@ -59,12 +60,17 @@ Route::get('/register',[RegisterController::class,'index'])->name('register');
 // proses register
 Route::post('/register',[RegisterController::class,'store'])->name('register.store');
 
-Route::get('/register/therapist', function () {
-    return view('auth.register-therapist');
-})->name('register.therapist');
+Route::get('/register/therapist', [RegisterController::class, 'index'])
+    ->name('register.therapist');
 
 Route::post('/register/therapist', [RegisterController::class, 'store'])
     ->name('register.therapist.store');
+
+Route::get('/terapis/assessment', [TherapistAssessmentController::class, 'index'])
+    ->name('therapist.assessment');
+
+Route::post('/terapis/assessment', [TherapistAssessmentController::class, 'store'])
+    ->name('terapis.assessment.store');
 
 Route::get('/verify-email', function(){
 
@@ -262,6 +268,9 @@ Route::middleware(['auth','role:admin'])
 
             Route::post('/{id}/reject', [TherapistController::class, 'reject'])
                 ->name('admin.therapist.reject');
+
+            Route::get('/admin/therapist/{id}', [TherapistController::class, 'show'])
+                ->name('admin.therapist.show'); 
 
 
             // 🔹 RATING & ULASAN

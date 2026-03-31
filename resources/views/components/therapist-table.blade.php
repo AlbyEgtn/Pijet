@@ -1,75 +1,147 @@
-<div class="bg-white rounded-xl shadow p-4">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-4">
-        <form method="GET" class="flex gap-2 w-1/2">
-            <input 
-                type="text" 
-                name="search"
-                value="{{ request('search') }}"
-                placeholder="Cari nomor id, nama, email, dll"
-                class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-green-200"
-            >
-            <button class="bg-green-500 text-white px-4 rounded-lg">
-                🔍
-            </button>
-        </form>
+@props([
+    'therapists',
+    'mode' => 'list' // list | verify
+])
 
-        <a href="{{ route('therapist.create') }}" 
-           class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm">
-            + Tambahkan akun terapis
-        </a>
+<div class="bg-white rounded-xl shadow overflow-hidden">
+
+    <!-- ================= HEADER ================= -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 border-b">
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Cari nama, email, no hp..."
+            class="w-full md:w-1/2 px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#4C9A8B] outline-none"
+        >
+
+        <button class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm">
+            Filter & Sort
+        </button>
+
     </div>
 
-    <!-- Table -->
+
+    <!-- ================= TABLE ================= -->
     <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left border-collapse">
-            <thead class="bg-green-600 text-white">
+
+        <table class="min-w-full text-sm table-auto">
+
+            <!-- HEADER -->
+            <thead class="bg-[#E7F1EE] text-gray-700 text-xs uppercase tracking-wide">
                 <tr>
-                    <th class="px-3 py-2">Nomor ID</th>
-                    <th class="px-3 py-2">Nama Lengkap</th>
-                    <th class="px-3 py-2">Jenis Kelamin</th>
-                    <th class="px-3 py-2">Ponsel</th>
-                    <th class="px-3 py-2">Email</th>
-                    <th class="px-3 py-2 text-center">Aksi</th>
+                    <th class="px-4 py-3 w-[100px] text-left">ID</th>
+                    <th class="px-4 py-3 w-[180px] text-left">Nama</th>
+                    <th class="px-4 py-3 w-[140px] text-center">Gender</th>
+                    <th class="px-4 py-3 w-[160px] text-center">No. HP</th>
+                    <th class="px-4 py-3 w-[220px] text-left">Email</th>
+
+                    @if($mode == 'verify')
+                        <th class="px-4 py-3 w-[140px] text-center">Status</th>
+                    @endif
+
+                    <th class="px-4 py-3 w-[200px] text-center">Aksi</th>
                 </tr>
             </thead>
-            <tbody>
-                @forelse ($therapists as $therapist)
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="px-3 py-2">{{ $therapist->code }}</td>
-                        <td class="px-3 py-2">{{ $therapist->name }}</td>
-                        <td class="px-3 py-2">{{ $therapist->gender }}</td>
-                        <td class="px-3 py-2">{{ $therapist->phone }}</td>
-                        <td class="px-3 py-2">{{ $therapist->email }}</td>
-                        <td class="px-3 py-2 text-center flex justify-center gap-2">
-                            <a href="{{ route('admin.therapist.edit', $therapist->id) }}" 
-                               class="text-blue-500">
-                                ✏️
-                            </a>
 
-                            <form action="{{ route('admin.therapist.destroy', $therapist->id) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button onclick="return confirm('Yakin hapus?')" 
-                                        class="text-red-500">
-                                    🗑️
-                                </button>
-                            </form>
+
+            <!-- BODY -->
+            <tbody class="divide-y divide-gray-100">
+
+            @forelse($therapists as $item)
+
+                <tr class="even:bg-gray-50 hover:bg-[#F5FBF9] transition">
+
+                    <!-- ID -->
+                    <td class="px-4 py-3 font-medium text-gray-800">
+                        {{ $item->id }}
+                    </td>
+
+                    <!-- NAMA -->
+                    <td class="px-4 py-3 text-gray-700">
+                        {{ $item->name }}
+                    </td>
+
+                    <!-- GENDER -->
+                    <td class="px-4 py-3 text-center">
+                        <span class="px-2 py-1 rounded-md text-xs bg-gray-100 text-gray-600">
+                            {{ $item->gender ?? '-' }}
+                        </span>
+                    </td>
+
+                    <!-- PHONE -->
+                    <td class="px-4 py-3 text-center text-gray-600">
+                        {{ $item->phone }}
+                    </td>
+
+                    <!-- EMAIL -->
+                    <td class="px-4 py-3 text-gray-600">
+                        {{ $item->email }}
+                    </td>
+
+
+                    <!-- STATUS (KHUSUS VERIFY) -->
+                    @if($mode == 'verify')
+                        <td class="px-4 py-3 text-center">
+                            @if($item->verification_status == 'approved')                                
+                                <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-600">
+                                    Verified
+                                </span>
+                            @else
+                                <span class="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-600">
+                                    Pending
+                                </span>
+                            @endif
                         </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center py-4">
-                            Data tidak ditemukan
-                        </td>
-                    </tr>
-                @endforelse
+                    @endif
+
+
+                    <!-- AKSI -->
+                    <td class="px-4 py-3">
+                        <div class="flex justify-center gap-2">
+
+                            @if($mode == 'verify')
+
+                                <a href="{{ route('admin.therapist.show', $item->id) }}"
+                                class="px-3 py-1.5 text-xs rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100">
+                                    Detail
+                                </a>
+
+                            @endif
+
+                        </div>
+                    </td>
+
+                </tr>
+
+            @empty
+
+                <tr>
+                    <td colspan="7" class="text-center p-6 text-gray-400">
+                        Data tidak ditemukan
+                    </td>
+                </tr>
+
+            @endforelse
+
             </tbody>
+
         </table>
+
     </div>
 
-    <!-- Pagination -->
-    <div class="mt-4">
-        {{ $therapists->links() }}
+
+    <!-- ================= FOOTER ================= -->
+    <div class="flex items-center justify-between p-4 border-t text-sm text-gray-500">
+
+        <span>
+            Menampilkan {{ $therapists->count() }} data
+        </span>
+
+        <div>
+            {{ $therapists->links() }}
+        </div>
+
     </div>
+
 </div>

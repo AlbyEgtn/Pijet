@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 
 class Transaction extends Model
 {
@@ -104,6 +105,26 @@ class Transaction extends Model
     public function serviceCount()
     {
         return $this->services()->count();
+    }
+
+    // jumlah layanan
+    public function getServiceCountAttribute()
+    {
+        return $this->services->count();
+    }
+
+    // terapis terisi
+    public function getTherapistFilledAttribute()
+    {
+        return $this->services->whereNotNull('therapist_id')->count();
+    }
+
+    // tanggal (ambil dari service pertama)
+    public function getExecutionDateAttribute()
+    {
+        return $this->service_date
+            ? Carbon::parse($this->service_date)->format('d M Y')
+            : '-';
     }
 
 }

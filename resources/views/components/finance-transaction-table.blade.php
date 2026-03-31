@@ -3,224 +3,188 @@
     'type' => 'cash'
 ])
 
-<div class="bg-white rounded-xl shadow">
+<div class="bg-white rounded-xl shadow overflow-hidden">
 
-    <!-- SEARCH -->
-    <form method="GET" class="flex justify-between items-center p-4">
+    <!-- ================= SEARCH ================= -->
+    <form method="GET" class="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 border-b">
 
         <input
             type="text"
             name="search"
             value="{{ request('search') }}"
             placeholder="Cari nomor id, nama, kota, dll"
-            class="w-1/2 px-4 py-2 border rounded-lg text-sm"
+            class="w-full md:w-1/2 px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none"
         >
 
-        <div class="flex gap-3">
-
+        <div class="flex gap-2">
             <button
                 type="submit"
-                class="bg-teal-500 text-white px-4 py-2 rounded-lg"
+                class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg text-sm"
             >
-                🔍
+                Cari
             </button>
 
             <button
                 type="button"
-                class="bg-teal-600 text-white px-4 py-2 rounded-lg"
+                class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm"
             >
                 Filter
             </button>
-
         </div>
 
     </form>
 
 
-    <!-- TABLE -->
-    <table class="w-full text-sm">
+    <!-- ================= TABLE ================= -->
+    <div class="overflow-x-auto">
 
-        <thead class="bg-blue-200 text-gray-700">
+        <table class="min-w-full text-sm table-auto">
 
-            <tr>
+            <!-- HEADER -->
+            <thead class="bg-slate-100 text-gray-700 text-xs uppercase tracking-wide sticky top-0 z-10">
+                <tr>
+                    <th class="px-4 py-3 w-[160px] text-left">Nomor ID</th>
+                    <th class="px-4 py-3 w-[180px] text-left">Customer</th>
+                    <th class="px-4 py-3 w-[120px] text-center">Layanan</th>
+                    <th class="px-4 py-3 w-[120px] text-center">Terapis</th>
+                    <th class="px-4 py-3 w-[140px] text-right">Total</th>
+                    <th class="px-4 py-3 w-[160px] text-center">Tanggal</th>
+                    <th class="px-4 py-3 w-[140px] text-center">Metode</th>
 
-                <th class="p-3 text-left">Nomor ID</th>
+                    @if($type == 'reschedule')
+                        <th class="px-4 py-3 w-[160px] text-center">Reschedule</th>
+                    @endif
 
-                <th class="p-3 text-left">Nama Customer</th>
+                    @if($type == 'cancel')
+                        <th class="px-4 py-3 w-[160px] text-center">Refund</th>
+                    @endif
 
-                <th class="p-3 text-center">Jumlah Layanan</th>
-
-                <th class="p-3 text-center">Terisi Terapis</th>
-
-                <th class="p-3 text-center">Total Harga</th>
-
-                <th class="p-3 text-center">Tanggal Pelaksanaan</th>
-
-                <th class="p-3 text-center">Metode Pembayaran</th>
-
-
-                {{-- KHUSUS RESCHEDULE --}}
-                @if($type == 'reschedule')
-
-                    <th class="p-3 text-center">Reschedule</th>
-
-                @endif
-
-
-                {{-- KHUSUS DIBATALKAN --}}
-                @if($type == 'cancel')
-
-                    <th class="p-3 text-center">Ket. Refund</th>
-
-                @endif
+                    <th class="px-4 py-3 w-[140px] text-center">Status</th>
+                    <th class="px-4 py-3 w-[100px] text-center">Aksi</th>
+                </tr>
+            </thead>
 
 
-                <th class="p-3 text-center">Status</th>
+            <!-- BODY -->
+            <tbody class="divide-y divide-gray-100">
 
-                <th class="p-3 text-center"></th>
+            @forelse($transactions as $trx)
 
-            </tr>
+                <tr class="even:bg-gray-50 hover:bg-slate-50 transition">
 
-        </thead>
-
-
-        <tbody class="divide-y">
-
-        @forelse($transactions as $trx)
-
-            <tr class="hover:bg-gray-50">
-
-                <!-- NOMOR ID -->
-                <td class="p-3">
-                    {{ $trx->transaction_code }}
-                </td>
-
-
-                <!-- CUSTOMER -->
-                <td class="p-3">
-                    {{ $trx->customer_name }}
-                </td>
-
-
-                <!-- JUMLAH LAYANAN -->
-                <td class="p-3 text-center">
-                    {{ $trx->service_count }}
-                </td>
-
-
-                <!-- TERISI TERAPIS -->
-                <td class="p-3 text-center">
-                    {{ $trx->therapist_filled }}
-                </td>
-
-
-                <!-- TOTAL HARGA -->
-                <td class="p-3 text-center">
-                    Rp{{ number_format($trx->total_price) }}
-                </td>
-
-
-                <!-- TANGGAL -->
-                <td class="p-3 text-center">
-                    {{ $trx->execution_date }}
-                </td>
-
-
-                <!-- METODE PEMBAYARAN -->
-                <td class="p-3 text-center">
-                    {{ ucfirst($trx->payment_method) }}
-                </td>
-
-
-                {{-- KOLOM RESCHEDULE --}}
-                @if($type == 'reschedule')
-
-                    <td class="p-3 text-center">
-                        {{ $trx->reschedule_date ?? '-' }}
+                    <!-- ID -->
+                    <td class="px-4 py-3 font-medium text-gray-800">
+                        {{ $trx->transaction_code }}
                     </td>
 
-                @endif
-
-
-                {{-- KOLOM REFUND --}}
-                @if($type == 'cancel')
-
-                    <td class="p-3 text-center">
-
-                        @if($trx->refund_status == 'success')
-
-                            <span class="px-3 py-1 rounded-full text-xs bg-blue-500 text-white">
-                                Refund Sukses
-                            </span>
-
-                        @elseif($trx->refund_status == 'pending')
-
-                            <span class="px-3 py-1 rounded-full text-xs bg-gray-400 text-white">
-                                Belum Refund
-                            </span>
-
-                        @else
-                            -
-                        @endif
-
+                    <!-- CUSTOMER -->
+                    <td class="px-4 py-3 text-gray-600">
+                        {{ $trx->customer_name }}
                     </td>
 
-                @endif
+                    <!-- LAYANAN -->
+                    <td class="px-4 py-3 text-center">
+                        {{ $trx->service_count }}
+                    </td>
+
+                    <!-- TERAPIS -->
+                    <td class="px-4 py-3 text-center">
+                        {{ $trx->therapist_filled }}
+                    </td>
+
+                    <!-- TOTAL -->
+                    <td class="px-4 py-3 text-right font-semibold text-gray-800">
+                        Rp{{ number_format($trx->total_price) }}
+                    </td>
+
+                    <!-- TANGGAL -->
+                    <td class="px-4 py-3 text-center text-gray-600">
+                        {{ $trx->execution_date }}
+                    </td>
+
+                    <!-- METODE -->
+                    <td class="px-4 py-3 text-center">
+                        <span class="px-2 py-1 bg-gray-100 rounded text-xs">
+                            {{ ucfirst($trx->payment_method) }}
+                        </span>
+                    </td>
 
 
-                <!-- STATUS -->
-                <td class="p-3 text-center">
-
-                    @php
-                        $statusClass = match($trx->status) {
-                            'lunas' => 'bg-blue-500 text-white',
-                            'belum_lunas' => 'bg-gray-400 text-white',
-                            'dibatalkan' => 'bg-red-500 text-white',
-                            'reschedule' => 'bg-green-500 text-white',
-                            default => 'bg-gray-300'
-                        };
-                    @endphp
-
-                    <span class="px-3 py-1 rounded-full text-xs {{ $statusClass }}">
-                        {{ ucfirst(str_replace('_',' ',$trx->status)) }}
-                    </span>
-
-                </td>
+                    {{-- RESCHEDULE --}}
+                    @if($type == 'reschedule')
+                        <td class="px-4 py-3 text-center text-gray-600">
+                            {{ $trx->reschedule_date ?? '-' }}
+                        </td>
+                    @endif
 
 
-                <!-- DETAIL -->
-                <td class="p-3 text-center">
-
-                    <a
-                        href="{{ route('finance.transaction.detail',$trx->id) }}"
-                        class="text-blue-500 text-xs"
-                    >
-                        Detail
-                    </a>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-
-                <td colspan="10" class="text-center p-6 text-gray-400">
-                    Data tidak ditemukan
-                </td>
-
-            </tr>
-
-        @endforelse
-
-        </tbody>
-
-    </table>
+                    {{-- REFUND --}}
+                    @if($type == 'cancel')
+                        <td class="px-4 py-3 text-center">
+                            @if($trx->refund_status == 'success')
+                                <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-600">
+                                    Sukses
+                                </span>
+                            @elseif($trx->refund_status == 'pending')
+                                <span class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-600">
+                                    Pending
+                                </span>
+                            @else
+                                -
+                            @endif
+                        </td>
+                    @endif
 
 
-    <!-- PAGINATION -->
-    <div class="p-4">
+                    <!-- STATUS -->
+                    <td class="px-4 py-3 text-center">
+                        @php
+                            $statusClass = match($trx->status) {
+                                'lunas' => 'bg-blue-100 text-blue-600',
+                                'belum_lunas' => 'bg-gray-100 text-gray-600',
+                                'dibatalkan' => 'bg-red-100 text-red-600',
+                                'reschedule' => 'bg-green-100 text-green-600',
+                                default => 'bg-gray-100 text-gray-500'
+                            };
+                        @endphp
+
+                        <span class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full {{ $statusClass }}">
+                            {{ ucfirst(str_replace('_',' ',$trx->status)) }}
+                        </span>
+                    </td>
+
+
+                    <!-- AKSI -->
+                    <td class="px-4 py-3 text-center">
+                        <a
+                            href="{{ route('finance.transaction.detail',$trx->id) }}"
+                            class="text-teal-600 hover:text-teal-800 text-xs font-medium"
+                        >
+                            Detail →
+                        </a>
+                    </td>
+
+                </tr>
+
+            @empty
+
+                <tr>
+                    <td colspan="10" class="text-center p-6 text-gray-400">
+                        Data tidak ditemukan
+                    </td>
+                </tr>
+
+            @endforelse
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================= PAGINATION ================= -->
+    <div class="p-4 border-t">
         {{ $transactions->links() }}
     </div>
 

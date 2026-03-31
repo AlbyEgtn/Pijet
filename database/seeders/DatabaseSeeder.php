@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
             LandingPageSeeder::class,
             LandingStatisticSeeder::class,
             LandingBenefitSeeder::class,
-            ServiceSeeder::class
+            ServiceSeeder::class,
+            CitySeeder::class
         ]);
     }
 }

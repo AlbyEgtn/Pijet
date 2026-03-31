@@ -1,141 +1,78 @@
-<aside class="w-64 bg-[#E7F1EE] min-h-screen flex flex-col border-r">
+<aside class="w-64 bg-[#4C9A8B] text-white flex flex-col min-h-screen">
 
     <!-- LOGO -->
-    <div class="px-6 py-6 flex items-center gap-3">
+    <div class="px-6 py-6 flex items-center gap-3 border-b border-white/10">
 
-        <img
-            src="{{ asset('images/logo.png') }}"
-            class="w-10 h-10 bg-white rounded object-contain"
-        >
+        <img src="{{ asset('images/logo.png') }}"
+             class="w-10 h-10 bg-white rounded object-contain">
 
-        <span class="text-xl font-semibold text-[#3E7F73]">
+        <span class="text-xl font-semibold tracking-wide">
             Pijat.in
         </span>
 
     </div>
 
 
+    <!-- KOTA -->
+    <div class="px-6 py-4 text-sm text-white/80 flex items-center justify-between cursor-pointer hover:text-white transition">
+
+        Seluruh Kota
+
+        <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor">
+            <path stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+
+    </div>
+
+
     <!-- MENU -->
-    <nav class="flex-1 px-4 space-y-2 text-[15px]">
+    <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
 
-        <!-- Seluruh Kota -->
-        <div class="flex items-center justify-between text-gray-600 px-3 py-2 cursor-pointer">
-
-            Seluruh Kota
-
-            <svg class="w-4 h-4"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 9l-7 7-7-7"/>
-
-            </svg>
-
-        </div>
-
-
-        <!-- Dashboard -->
-        <a href="#"
-           class="flex items-center gap-3 px-3 py-3 rounded-lg bg-[#4C9A8B] text-white">
-
-            <svg class="w-5 h-5"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M3 13h8V3H3v10zM13 21h8V11h-8v10zM13 3v6h8V3h-8zM3 21v-6h8v6H3z"/>
-
-            </svg>
-
+        <!-- DASHBOARD -->
+        <a href="{{ route('admin.dashboard') }}"
+           class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+           {{ request()->routeIs('admin.dashboard') 
+           ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
+           : 'hover:bg-white/10' }}">
             Dashboard
-
         </a>
 
 
-        <!-- Order Dropdown -->
-        <div x-data="{ open: false }">
+        <!-- ORDER -->
+        <div x-data="{ open: true }">
 
-            <!-- Parent Menu -->
-            <button
-                @click="open = !open"
-                class="w-full flex items-center justify-between px-3 py-3 rounded-lg hover:bg-gray-200"
-            >
+            <button @click="open = !open"
+                class="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white/10">
 
-                <div class="flex items-center gap-3">
+                <span>Order</span>
 
-                    <svg class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 12h6m-6 4h6M9 8h6M5 3h14a2 2 0 012 2v14"/>
-
-                    </svg>
-
-                    Order
-
-                </div>
-
-                <svg
-                    class="w-4 h-4 transition-transform"
-                    :class="{'rotate-180': open}"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 9l-7 7-7-7"/>
-
+                <svg :class="open ? 'rotate-180' : ''"
+                     class="w-4 h-4 transition">
+                    <path stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
 
             </button>
 
-
-            <!-- Dropdown Menu -->
-            <div
-                x-show="open"
-                x-transition
-                class="ml-9 mt-1 space-y-1 text-sm"
-            >
+            <div x-show="open" x-transition class="ml-3 mt-1 space-y-1 text-sm">
 
                 <a href="{{ route('admin.orders.status') }}"
-                class="block px-3 py-2 rounded hover:bg-gray-200">
-
+                   class="block px-3 py-2 rounded hover:bg-white/10">
                     Status Order
-
                 </a>
 
                 <a href="{{ route('admin.orders.waiting') }}"
-                class="block px-3 py-2 rounded hover:bg-gray-200">
-
+                   class="block px-3 py-2 rounded hover:bg-white/10">
                     Menunggu
-
                 </a>
 
                 <a href="{{ route('admin.orders.finished') }}"
-                class="block px-3 py-2 rounded hover:bg-gray-200">
-
+                   class="block px-3 py-2 rounded hover:bg-white/10">
                     Selesai
-
                 </a>
 
                 <a href="{{ route('admin.orders.reschedule') }}"
-                class="block px-3 py-2 rounded hover:bg-gray-200">
-
+                   class="block px-3 py-2 rounded hover:bg-white/10">
                     Reschedule
-
                 </a>
 
             </div>
@@ -143,114 +80,53 @@
         </div>
 
 
-        <!-- Data Pelanggan -->
+        <!-- PELANGGAN -->
         <a href="#"
-           class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-200">
-
-            <svg class="w-5 h-5"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5.121 17.804A7 7 0 1118.88 6.197"/>
-
-            </svg>
-
+           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10">
             Data Pelanggan
-
         </a>
 
 
-        <!-- DATA TERAPIS -->
+        <!-- TERAPIS -->
         <div x-data="{ open: true }">
-            <button @click="open = !open" 
-                    class="flex items-center justify-between w-full px-4 py-2 text-left hover:bg-green-100 rounded-lg">
-                <span>👥 Data Terapis</span>
-                <span x-show="!open">▼</span>
-                <span x-show="open">▲</span>
+
+            <button @click="open = !open"
+                class="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white/10">
+
+                <span>Data Terapis</span>
+
+                <span class="text-xs">▾</span>
+
             </button>
 
-            <div x-show="open" class="ml-4 mt-2 space-y-1">
-                <a href="{{ route('admin.therapist.index') }}" 
-                class="block px-4 py-2 rounded-lg hover:bg-green-200">
+            <div x-show="open" class="ml-3 mt-1 space-y-1 text-sm">
+
+                <a href="{{ route('admin.therapist.index') }}"
+                   class="block px-3 py-2 rounded hover:bg-white/10">
                     Akun
                 </a>
 
-                <a href="{{ route('admin.therapist.verification') }}" 
-                class="block px-4 py-2 rounded-lg hover:bg-green-200">
+                <a href="{{ route('admin.therapist.verification') }}"
+                   class="block px-3 py-2 rounded hover:bg-white/10">
                     Verifikasi
                 </a>
 
-                <a href="{{ route('admin.therapist.review') }}" 
-                class="block px-4 py-2 rounded-lg hover:bg-green-200">
+                <a href="{{ route('admin.therapist.review') }}"
+                   class="block px-3 py-2 rounded hover:bg-white/10">
                     Rating & Ulasan
                 </a>
+
             </div>
+
         </div>
 
 
-        <!-- Penangguhan -->
+        <!-- REPORT -->
         <a href="#"
-           class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-200">
-
-            <svg class="w-5 h-5"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 9v2m0 4h.01"/>
-
-            </svg>
-
-            Penangguhan
-
-        </a>
-
-
-        <!-- Report -->
-        <a href="#"
-           class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-200">
-
-            <svg class="w-5 h-5"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 17v-6m4 6v-4m4 4v-8"/>
-
-            </svg>
-
+           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10">
             Report
-
         </a>
 
     </nav>
-
-
-    <!-- LOGOUT -->
-    <div class="p-4">
-
-        <form method="POST" action="{{ route('logout') }}">
-
-            @csrf
-
-            <button class="bg-red-500 text-white px-4 py-2 rounded-lg w-full text-sm">
-
-                Keluar
-
-            </button>
-
-        </form>
-
-    </div>
 
 </aside>
