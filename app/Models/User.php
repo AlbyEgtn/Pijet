@@ -6,7 +6,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Terapis\Terapis;
 
 class User extends Authenticatable
 {
@@ -35,7 +34,8 @@ class User extends Authenticatable
         'ktp',
         'skck',
         'email_otp',
-        'otp_expired_at'
+        'otp_expired_at',
+        'verification_status'
     ];
 
     /**
@@ -61,8 +61,14 @@ class User extends Authenticatable
         ];
     }
 
+    public function therapistProfile()
+    {
+        return $this->hasOne(TherapistProfile::class);
+    }
+
     public function terapis()
     {
-        return $this->hasOne(Terapis::class);
+        return $this->hasOne(Terapis::class, 'user_id', 'id');
     }
+
 }

@@ -15,35 +15,42 @@ class UserSeeder extends Seeder
                 'name' => 'Super Admin',
                 'email' => 'superadmin@pijet.in',
                 'password' => 'password',
-                'role' => 'super_admin'
+                'role' => 'super_admin',
+                'verification_status' => 'approved'
             ],
 
             [
                 'name' => 'Admin',
                 'email' => 'admin@pijet.in',
                 'password' => 'password',
-                'role' => 'admin'
+                'role' => 'admin',
+                'verification_status' => 'approved'
+
             ],
 
             [
                 'name' => 'Finance',
                 'email' => 'finance@pijet.in',
                 'password' => 'password',
-                'role' => 'finance'
+                'role' => 'finance',
+                'verification_status' => 'approved'
+
             ],
 
             [
                 'name' => 'Terapis',
                 'email' => 'terapis@pijet.in',
                 'password' => 'password',
-                'role' => 'terapis'
+                'role' => 'terapis',
+                'verification_status' => 'approved'
             ],
 
             [
                 'name' => 'Customer',
                 'email' => 'customer@pijet.in',
                 'password' => 'password',
-                'role' => 'customer'
+                'role' => 'customer',
+                'verification_status' => 'approved'
             ],
 
         ];

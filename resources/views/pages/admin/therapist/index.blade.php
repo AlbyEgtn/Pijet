@@ -1,15 +1,14 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('title','Terapis Aktif ')
+@section('header','Terapis Aktif ')
+
 
 @section('content')
-<div class="p-6">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold">
-            Data Akun Terapis
-        </h1>
-    </div>
 
-    <!-- Component Table -->
-    <x-table.therapist-table :therapists="$therapists" />
-</div>
+
+
+    <x-therapist-table :therapists="$therapists" mode="list" />
+
+
 @endsection

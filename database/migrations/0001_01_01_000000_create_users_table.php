@@ -54,6 +54,24 @@ return new class extends Migration
 
             $table->timestamp('reset_otp_expired_at')->nullable();
 
+            // STATUS VERIFIKASI
+            $table->enum('verification_status', [
+                'pending',
+                'approved',
+                'rejected'
+            ])->default('pending');
+
+            // ALASAN REJECT
+            $table->string('reject_reason')->nullable()->after('verification_status');
+
+            // WAKTU VERIFIKASI
+            $table->timestamp('verified_at')->nullable();
+
+            // ADMIN YANG VERIFIKASI
+            $table->foreignId('verified_by')->nullable()
+                  ->constrained('users')
+                  ->nullOnDelete();
+
             $table->rememberToken();
 
             $table->timestamps();

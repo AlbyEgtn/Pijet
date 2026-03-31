@@ -17,12 +17,26 @@ class LoginController extends Controller
     {
         $credentials = $request->only('email','password');
 
-        if(Auth::attempt($credentials)){
+        if (Auth::attempt($credentials)) {
 
             $request->session()->regenerate();
 
             $user = Auth::user();
 
+            // =========================
+            // 🔥 CONSTRAINT TERAPIS
+            // =========================
+            if ($user->role === 'terapis' && $user->verification_status !== 'approved') {
+
+                Auth::logout(); // paksa logout
+
+                return redirect('/login')
+                    ->with('error','Akun terapis belum disetujui admin');
+            }
+
+            // =========================
+            // REDIRECT BERDASARKAN ROLE
+            // =========================
             switch ($user->role) {
 
                 case 'super_admin':
@@ -39,9 +53,7 @@ class LoginController extends Controller
 
                 case 'customer':
                     return redirect()->route('customer.dashboard');
-
             }
-
         }
 
         return back()->with('error','Email atau password salah');

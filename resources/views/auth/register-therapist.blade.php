@@ -178,17 +178,27 @@
 
                     <div class="col-span-3">
 
-                        <label class="text-sm text-gray-600">
-                            Area Kerja
-                        </label>
+                        <div class="col-span-3">
+                            <label class="text-sm text-gray-600">
+                                Area Kerja
+                            </label>
 
-                        <input
-                            type="text"
-                            name="work_area"
-                            value="{{ old('work_area') }}"
-                            required
-                            class="w-full border rounded-lg px-4 py-2 mt-1"
-                        >
+                            <select
+                                name="work_area"
+                                required
+                                class="w-full border rounded-lg px-4 py-2 mt-1"
+                            >
+                                <option value="">-- Pilih Kota --</option>
+
+                                @foreach($cities as $city)
+                                    <option value="{{ $city->name }}"
+                                        {{ old('work_area') == $city->name ? 'selected' : '' }}>
+                                        {{ $city->name }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+                        </div>
 
                     </div>
 
