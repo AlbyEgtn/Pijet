@@ -5,6 +5,6 @@
 
 @section('content')
 
-    <x-therapist-table :therapists="$therapists" mode="verify" />
+    <x-admin.therapist-table :therapists="$therapists" mode="verify" />
 
 @endsection

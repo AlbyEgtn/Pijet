@@ -5,7 +5,7 @@
 
 @section('content')
 
-<x-admin-transaction-table 
+<x-admin.admin-transaction-table 
     :transactions="$transactions"
     type="finished"
 />

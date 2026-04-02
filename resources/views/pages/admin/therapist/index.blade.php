@@ -8,7 +8,7 @@
 
 
 
-    <x-therapist-table :therapists="$therapists" mode="list" />
+    <x-admin.therapist-table :therapists="$therapists" mode="list" />
 
 
 @endsection
