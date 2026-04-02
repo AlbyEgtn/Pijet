@@ -36,7 +36,6 @@ class OrderController extends Controller
     }
 
 
-
     /*
     |--------------------------------------------------------------------------
     | ORDER DETAIL
@@ -70,7 +69,6 @@ class OrderController extends Controller
     }
 
 
-
     /*
     |--------------------------------------------------------------------------
     | PROCESS PAYMENT METHOD
@@ -89,7 +87,6 @@ class OrderController extends Controller
             ->findOrFail($id);
 
 
-
         /*
         |--------------------------------------------------------------------------
         | UPDATE ORDER
@@ -98,7 +95,6 @@ class OrderController extends Controller
 
         $order->payment_method = $request->payment_method;
         $order->status = 'proses';
-
 
 
         /*
@@ -120,7 +116,6 @@ class OrderController extends Controller
             ]);
 
         }
-
 
 
         /*
@@ -154,7 +149,6 @@ class OrderController extends Controller
         ];
 
 
-
         /*
         |--------------------------------------------------------------------------
         | VALIDATE BANK
@@ -171,7 +165,6 @@ class OrderController extends Controller
         }
 
 
-
         /*
         |--------------------------------------------------------------------------
         | SET PAYMENT EXPIRED (ONLY FIRST TIME)
@@ -185,7 +178,6 @@ class OrderController extends Controller
         }
 
         $order->save();
-
 
 
         /*
@@ -211,14 +203,12 @@ class OrderController extends Controller
         );
 
 
-
         return response()->json([
             'success' => true,
             'redirect' => route('customer.payment', $order->id)
         ]);
 
     }
-
 
 
     /*
@@ -229,15 +219,19 @@ class OrderController extends Controller
 
     public function paymentPage($id)
     {
-
         $order = Transaction::with(['services', 'payment'])
             ->where('customer_id', Auth::id())
             ->findOrFail($id);
 
+        // 🔥 FIX 2: pastikan expired tidak null
+        if (!$order->payment_expired_at) {
+            $order->payment_expired_at = now()->addHours(24);
+            $order->save();
+        }
+
         return view('pages.customer.orders.payment', [
             'order' => $order
         ]);
-
     }
 
     public function uploadPaymentProof(Request $request, $id)
@@ -253,7 +247,6 @@ class OrderController extends Controller
             'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-
         /*
         |--------------------------------------------------------------------------
         | AMBIL TRANSAKSI
@@ -262,7 +255,6 @@ class OrderController extends Controller
 
         $order = Transaction::where('customer_id', auth()->id())
             ->findOrFail($id);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -278,7 +270,6 @@ class OrderController extends Controller
 
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | HAPUS FILE LAMA (JIKA ADA)
@@ -290,7 +281,6 @@ class OrderController extends Controller
             \Storage::disk('public')->delete($order->payment_proof);
 
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -308,13 +298,11 @@ class OrderController extends Controller
             '.' .
             $file->getClientOriginalExtension();
 
-
         $path = $file->storeAs(
             'payment_proofs',
             $filename,
             'public'
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -328,7 +316,6 @@ class OrderController extends Controller
 
         $order->save();
 
-
         /*
         |--------------------------------------------------------------------------
         | REDIRECT
@@ -341,3 +328,4 @@ class OrderController extends Controller
 
     }
 }
+

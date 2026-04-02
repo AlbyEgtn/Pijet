@@ -13,7 +13,6 @@
 </div>
 
 
-
 <!-- ================= CART LIST ================= -->
 <div class="max-w-4xl mx-auto p-6 space-y-4" id="cart-container">
 
@@ -45,7 +44,6 @@
             </p>
 
         </div>
-
 
         <!-- QTY CONTROL -->
         <div class="flex items-center gap-3">
@@ -89,7 +87,6 @@
 </div>
 
 
-
 <!-- ================= CHECKOUT BAR ================= -->
 <div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
 
@@ -124,14 +121,12 @@
 </div>
 
 
-
 <!-- ================= CHECKOUT SHEET ================= -->
 <div
     id="checkoutSheet"
     class="fixed inset-0 bg-black/40 hidden z-50">
 
     <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-w-xl mx-auto max-h-[90vh] overflow-y-auto p-6">
-
 
         <!-- HEADER -->
         <div class="flex items-center justify-between mb-4">
@@ -153,7 +148,6 @@
         </div>
 
 
-
         <!-- SERVICE INFO -->
         <div class="flex flex-col items-center text-center">
 
@@ -166,7 +160,6 @@
             </p>
 
         </div>
-
 
 
         <!-- DURASI -->
@@ -187,7 +180,6 @@
             </select>
 
         </div>
-
 
 
         <!-- GENDER TERAPIS -->
@@ -224,7 +216,6 @@
             </div>
 
         </div>
-
 
 
         <!-- ADDITIONAL SERVICES -->
@@ -266,7 +257,6 @@
         </div>
 
 
-
         <!-- JADWAL -->
         <div class="mt-6">
 
@@ -289,7 +279,6 @@
             </div>
 
         </div>
-
 
 
         <!-- METODE PEMBAYARAN -->
@@ -329,7 +318,6 @@
         </div>
 
 
-
         <!-- TOTAL -->
         <div class="mt-6 bg-gray-100 rounded-lg p-4 flex justify-between items-center">
 
@@ -359,13 +347,11 @@
 
         </div>
 
-
     </div>
 
 </div>
 
 @endsection
-
 
 
 @push('scripts')
@@ -413,7 +399,6 @@ function updateQty(cartId,type){
 }
 
 
-
 /* ================= CHECKOUT SHEET ================= */
 
 function openCheckoutSheet(){
@@ -433,7 +418,6 @@ function closeCheckoutSheet(){
         .add("hidden");
 
 }
-
 
 
 /* ================= TOTAL ADDITIONAL ================= */
@@ -462,13 +446,11 @@ function updateTotal(){
 }
 
 
-
 /* ================= USER DATA ================= */
 
 const userPhone = @json(auth()->user()->phone);
 const userCity = @json(auth()->user()->city);
 const userAddress = @json(auth()->user()->address);
-
 
 
 /* ================= CHECKOUT ================= */
@@ -506,7 +488,6 @@ function confirmCheckout(){
     formData.append('phone', phone);
     formData.append('city', city);
     formData.append('address', address);
-
 
     fetch("{{ route('customer.cart.checkout') }}",{
 
@@ -550,7 +531,6 @@ function confirmCheckout(){
 }
 
 
-
 /* ================= TOAST ================= */
 
 function showToast(message){
@@ -581,3 +561,4 @@ function showToast(message){
 </script>
 
 @endpush
+

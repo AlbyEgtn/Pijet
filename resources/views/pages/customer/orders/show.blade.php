@@ -15,49 +15,148 @@
 </div>
 
 
+{{-- SUCCESS MESSAGE --}}
+@if(session('success'))
+
+<div class="max-w-xl mx-auto p-4">
+
+    <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg text-sm">
+        {{ session('success') }}
+    </div>
+
+</div>
+
+@endif
+
 
 <div class="max-w-xl mx-auto p-4 space-y-4">
 
-    <!-- CUSTOMER -->
-    <div class="bg-white rounded-xl shadow p-4">
+    {{-- ================= COUNTDOWN ================= --}}
+    @if($order->payment_method === 'transfer')
 
-        <p class="font-semibold">
-            {{ $order->customer_name }}
+    <div class="bg-teal-700 text-white rounded-xl p-4 text-center">
+
+        <p class="text-xs opacity-80">
+            Waktu pembayaran
         </p>
 
-        <p class="text-xs text-gray-500">
-            ID Pesanan {{ $order->transaction_code }}
+        <div id="countdown" class="text-2xl font-semibold">
+            00 : 00 : 00
+        </div>
+
+        <p class="text-xs opacity-80">
+            Selesaikan pembayaran sebelum waktu berakhir
         </p>
 
     </div>
 
+    @endif
 
 
-    <!-- ADDRESS -->
+    {{-- ================= CASH INFO ================= --}}
+    @if($order->payment_method === 'cash')
+
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-700">
+
+        Pembayaran dilakukan saat therapist datang ke lokasi.
+        Harap menyiapkan uang sesuai dengan total tagihan.
+
+    </div>
+
+    @endif
+
+
+    {{-- ================= BANK INFO ================= --}}
+    @if($order->payment_method === 'transfer')
+
     <div class="bg-white rounded-xl shadow p-4">
 
-        <p class="font-semibold mb-2">
-            Alamat Utama
+        <p class="text-sm text-gray-500 mb-2">
+            Transfer ke rekening berikut
         </p>
 
-        <p class="text-sm text-gray-600">
+        <div class="space-y-2">
+
+            <div class="flex justify-between text-sm">
+
+                <span class="text-gray-500">
+                    Bank
+                </span>
+
+                <span class="font-semibold">
+                    {{ $order->payment->bank_name ?? '-' }}
+                </span>
+
+            </div>
+
+            <div class="flex justify-between text-sm">
+
+                <span class="text-gray-500">
+                    No Rekening
+                </span>
+
+                <span class="font-semibold">
+                    {{ $order->payment->account_number ?? '-' }}
+                </span>
+
+            </div>
+
+            <div class="flex justify-between text-sm">
+
+                <span class="text-gray-500">
+                    Atas Nama
+                </span>
+
+                <span class="font-semibold">
+                    {{ $order->payment->account_holder ?? '-' }}
+                </span>
+
+            </div>
+
+        </div>
+
+        <button
+            onclick="copyRek()"
+            class="mt-3 text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 transition"
+        >
+            Salin Nomor Rekening
+        </button>
+
+    </div>
+
+    @endif
+
+
+    {{-- ================= ORDER INFO ================= --}}
+    <div class="bg-white rounded-xl shadow p-4 space-y-3">
+
+        <div class="flex justify-between text-sm">
+
+            <span>
+                {{ $order->customer_name }}
+            </span>
+
+            <span class="text-gray-500">
+                ID Pesanan {{ $order->transaction_code }}
+            </span>
+
+        </div>
+
+        <div class="text-sm text-gray-500">
             {{ $order->customer_address }}
-        </p>
+        </div>
 
-        <p class="text-sm text-gray-500">
-            {{ $order->customer_city }}
-        </p>
+        <div class="flex justify-between text-sm">
 
-    </div>
+            <span class="text-gray-500">
+                Kota
+            </span>
 
+            <span>
+                {{ $order->customer_city }}
+            </span>
 
-
-    <!-- JADWAL -->
-    <div class="bg-white rounded-xl shadow p-4">
-
-        <p class="font-semibold mb-3">
-            Jadwal
-        </p>
+        </div>
 
         <div class="flex justify-between text-sm">
 
@@ -71,7 +170,7 @@
 
         </div>
 
-        <div class="flex justify-between text-sm mt-2">
+        <div class="flex justify-between text-sm">
 
             <span class="text-gray-500">
                 Waktu
@@ -86,8 +185,7 @@
     </div>
 
 
-
-    <!-- LAYANAN -->
+    {{-- ================= SERVICES ================= --}}
     <div class="bg-white rounded-xl shadow p-4">
 
         <p class="font-semibold mb-3">
@@ -96,19 +194,15 @@
 
         @foreach($order->services as $service)
 
-        <div class="border rounded-lg p-3 mb-3">
+        <div class="flex justify-between text-sm mb-2">
 
-            <div class="flex justify-between text-sm">
+            <span>
+                {{ $service->service_name }}
+            </span>
 
-                <span>
-                    {{ $service->service_name }}
-                </span>
-
-                <span class="text-gray-500">
-                    {{ $service->duration }} menit
-                </span>
-
-            </div>
+            <span class="text-gray-500">
+                {{ $service->duration }} menit
+            </span>
 
         </div>
 
@@ -117,8 +211,7 @@
     </div>
 
 
-
-    <!-- TOTAL -->
+    {{-- ================= TOTAL ================= --}}
     <div class="bg-white rounded-xl shadow p-4">
 
         <div class="flex justify-between font-semibold">
@@ -136,184 +229,170 @@
     </div>
 
 
+    {{-- ================= UPLOAD BUKTI ================= --}}
+    @if($order->payment_method === 'transfer')
 
-    <!-- METODE PEMBAYARAN -->
     <div class="bg-white rounded-xl shadow p-4">
 
-        <p class="font-semibold mb-3">
-            Metode Pembayaran
+        <p class="text-sm text-gray-600 mb-3">
+            Upload bukti pembayaran
         </p>
 
-        <div class="space-y-2">
+        <form
+            action="{{ route('customer.upload.payment',$order->id) }}"
+            method="POST"
+            enctype="multipart/form-data"
+        >
 
-            <label class="flex justify-between border rounded-lg p-3 cursor-pointer">
+        @csrf
 
-                Cash
+            <input
+                type="file"
+                name="payment_proof"
+                id="payment_proof"
+                class="border w-full p-2 rounded"
+                accept="image/*"
+            >
 
-                <input
-                    type="radio"
-                    name="payment_method"
-                    value="cash"
-                    checked
-                    onchange="toggleBank()">
+            <button
+                type="submit"
+                class="mt-4 w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition"
+            >
+                Upload Bukti Pembayaran
+            </button>
 
-            </label>
-
-            <label class="flex justify-between border rounded-lg p-3 cursor-pointer">
-
-                Transfer
-
-                <input
-                    type="radio"
-                    name="payment_method"
-                    value="transfer"
-                    onchange="toggleBank()">
-
-            </label>
-
-        </div>
-
-
-
-        <!-- BANK LIST -->
-        <div id="bankList" class="hidden mt-4">
-
-            <select
-                id="bank"
-                class="w-full border rounded-lg px-3 py-2">
-
-                <option value="">
-                    Pilih Bank
-                </option>
-
-                <option value="BCA">
-                    BCA Bank Transfer
-                </option>
-
-                <option value="BRI">
-                    BRI Bank Transfer
-                </option>
-
-                <option value="BNI">
-                    BNI Bank Transfer
-                </option>
-
-                <option value="MANDIRI">
-                    Mandiri Bank Transfer
-                </option>
-
-            </select>
-
-        </div>
+        </form>
 
     </div>
 
+    @endif
 
 
-    <!-- BUTTON -->
-    <div class="flex gap-3">
+    {{-- ================= BUKTI PEMBAYARAN ================= --}}
+    @if($order->payment_proof)
 
-        <a
-            href="{{ route('customer.orders') }}"
-            class="flex-1 border text-center py-2 rounded-lg">
+    <div class="bg-white rounded-xl shadow p-4">
 
-            Batal
+        <p class="text-sm mb-2">
+            Bukti pembayaran saat ini
+        </p>
 
-        </a>
+        <img
+            src="{{ asset('storage/'.$order->payment_proof) }}"
+            class="rounded-lg border max-h-64 object-contain mx-auto"
+        >
 
-        <button
-            onclick="processPayment({{ $order->id }})"
-            class="flex-1 bg-teal-600 text-white py-2 rounded-lg">
-
-            Selanjutnya
-
-        </button>
+        <p class="text-xs text-gray-500 mt-2 text-center">
+            Jika bukti salah, silakan upload ulang.
+        </p>
 
     </div>
+
+    @endif
 
 </div>
 
 @endsection
 
 
-
 @push('scripts')
 
 <script>
 
-/* ================= SHOW BANK ================= */
+/* ================= COPY REKENING ================= */
 
-function toggleBank(){
+function copyRek(){
 
-    const method =
-        document.querySelector(
-            'input[name="payment_method"]:checked'
-        ).value;
+    const rek = "{{ $order->payment->account_number ?? '' }}";
 
-    const bankList =
-        document.getElementById("bankList");
+    if(!rek){
 
-    if(method === "transfer"){
-
-        bankList.classList.remove("hidden");
-
-    }else{
-
-        bankList.classList.add("hidden");
-
-    }
-
-}
-
-
-
-/* ================= PROCESS PAYMENT ================= */
-
-function processPayment(orderId){
-
-    const method =
-        document.querySelector(
-            'input[name="payment_method"]:checked'
-        ).value;
-
-    const bank =
-        document.getElementById("bank")?.value ?? null;
-
-
-    if(method === "transfer" && !bank){
-
-        alert("Silakan pilih bank terlebih dahulu");
+        alert("Nomor rekening belum tersedia");
         return;
 
     }
 
+    navigator.clipboard.writeText(rek);
 
-    fetch(`/customer/orders/${orderId}/payment`,{
+    alert("Nomor rekening berhasil disalin");
 
-        method:"POST",
+}
 
-        headers:{
-            "Content-Type":"application/json",
-            "X-CSRF-TOKEN":"{{ csrf_token() }}",
-            "X-Requested-With":"XMLHttpRequest"
-        },
 
-        body: JSON.stringify({
+/* ================= COUNTDOWN ================= */
 
-            payment_method: method,
-            bank: bank
+@if($order->payment_method === 'transfer')
 
-        })
+const expiredTimestamp =
+    {{ \Carbon\Carbon::parse($order->payment_expired_at)->timestamp * 1000 }};
 
-    })
-    .then(res => res.json())
-    .then(data => {
+function updateCountdown(){
 
-        if(data.success){
+    const now = Date.now();
 
-            window.location.href = data.redirect;
+    const distance = expiredTimestamp - now;
 
-        }
+    const el = document.getElementById("countdown");
+
+    if(distance <= 0){
+
+        el.innerText = "Waktu habis";
+        return;
+
+    }
+
+    const hours =
+        Math.floor(distance / (1000 * 60 * 60));
+
+    const minutes =
+        Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+    const seconds =
+        Math.floor((distance % (1000 * 60)) / 1000);
+
+    el.innerText =
+        String(hours).padStart(2,'0') + " : " +
+        String(minutes).padStart(2,'0') + " : " +
+        String(seconds).padStart(2,'0');
+
+}
+
+updateCountdown();
+
+setInterval(updateCountdown,1000);
+
+@endif
+
+
+/* ================= IMAGE PREVIEW ================= */
+
+const inputFile = document.getElementById("payment_proof");
+
+if(inputFile){
+
+    inputFile.addEventListener("change", function(){
+
+        const file = this.files[0];
+
+        if(!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            const previewContainer =
+                document.getElementById("previewContainer");
+
+            const previewImage =
+                document.getElementById("previewImage");
+
+            previewImage.src = e.target.result;
+
+            previewContainer.classList.remove("hidden");
+
+        };
+
+        reader.readAsDataURL(file);
 
     });
 
@@ -322,3 +401,4 @@ function processPayment(orderId){
 </script>
 
 @endpush
+

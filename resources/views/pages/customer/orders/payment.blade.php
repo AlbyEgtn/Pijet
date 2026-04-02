@@ -15,7 +15,6 @@
 </div>
 
 
-
 {{-- SUCCESS MESSAGE --}}
 @if(session('success'))
 
@@ -28,7 +27,6 @@
 </div>
 
 @endif
-
 
 
 <div class="max-w-xl mx-auto p-4 space-y-4">
@@ -55,7 +53,6 @@
     @endif
 
 
-
     {{-- ================= CASH INFO ================= --}}
     @if($order->payment_method === 'cash')
 
@@ -67,7 +64,6 @@
     </div>
 
     @endif
-
 
 
     {{-- ================= BANK INFO ================= --}}
@@ -131,7 +127,6 @@
     @endif
 
 
-
     {{-- ================= ORDER INFO ================= --}}
     <div class="bg-white rounded-xl shadow p-4 space-y-3">
 
@@ -190,7 +185,6 @@
     </div>
 
 
-
     {{-- ================= SERVICES ================= --}}
     <div class="bg-white rounded-xl shadow p-4">
 
@@ -217,7 +211,6 @@
     </div>
 
 
-
     {{-- ================= TOTAL ================= --}}
     <div class="bg-white rounded-xl shadow p-4">
 
@@ -234,7 +227,6 @@
         </div>
 
     </div>
-
 
 
     {{-- ================= UPLOAD BUKTI ================= --}}
@@ -276,7 +268,6 @@
     @endif
 
 
-
     {{-- ================= BUKTI PEMBAYARAN ================= --}}
     @if($order->payment_proof)
 
@@ -304,7 +295,6 @@
 @endsection
 
 
-
 @push('scripts')
 
 <script>
@@ -329,13 +319,21 @@ function copyRek(){
 }
 
 
-
 /* ================= COUNTDOWN ================= */
 
 @if($order->payment_method === 'transfer')
 
+@if($order->payment_expired_at)
+
 const expiredTimestamp =
     {{ \Carbon\Carbon::parse($order->payment_expired_at)->timestamp * 1000 }};
+
+@else
+
+// fallback kalau null → kasih 24 jam dari sekarang
+const expiredTimestamp = Date.now() + (24 * 60 * 60 * 1000);
+
+@endif
 
 function updateCountdown(){
 
@@ -375,7 +373,6 @@ setInterval(updateCountdown,1000);
 @endif
 
 
-
 /* ================= IMAGE PREVIEW ================= */
 
 const inputFile = document.getElementById("payment_proof");
@@ -413,3 +410,4 @@ if(inputFile){
 </script>
 
 @endpush
+

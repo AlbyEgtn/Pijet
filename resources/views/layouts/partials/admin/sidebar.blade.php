@@ -81,7 +81,7 @@
 
 
         <!-- PELANGGAN -->
-        <a href="#"
+        <a href="{{ route('admin.customer.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10">
             Data Pelanggan
         </a>
@@ -122,7 +122,7 @@
 
 
         <!-- REPORT -->
-        <a href="#"
+        <a href="{{ route('admin.report.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10">
             Report
         </a>

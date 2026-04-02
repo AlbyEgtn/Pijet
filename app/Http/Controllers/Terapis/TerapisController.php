@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Terapis;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Terapis\Terapis;
+use App\Models\Terapis;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Transaction;
 

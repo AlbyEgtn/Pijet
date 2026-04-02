@@ -2,102 +2,58 @@
 
 @section('content')
 
-<!-- ======================
-    HEADER COMPACT
-====================== -->
-<div class="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b">
+<!-- HEADER -->
+<div class="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6">
 
-    <!-- TOP -->
-    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+    <h1 class="text-xl font-semibold">
+        Layanan
+    </h1>
 
-        <!-- TITLE -->
-        <div>
-            <h1 class="text-base font-semibold text-gray-800">
-                Layanan
-            </h1>
-            <p class="text-xs text-gray-500">
-                Pilih layanan terbaik untuk relaksasi
-            </p>
-        </div>
+    <form method="GET" class="mt-3">
 
-        <!-- CART -->
-        <a href="{{ route('customer.cart') }}" class="relative">
+        <input
+            type="text"
+            name="search"
+            placeholder="Cari layanan..."
+            value="{{ request('search') }}"
+            class="w-full px-4 py-2 rounded-lg text-black focus:outline-none"
+        >
 
-            <div class="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition">
-                🛒
-            </div>
-
-        </a>
-
-    </div>
-
-    <!-- SEARCH -->
-    <div class="max-w-7xl mx-auto px-6 pb-4">
-
-        <form method="GET">
-            <div class="flex items-center bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-200 focus-within:ring-2 focus-within:ring-gray-300 transition">
-
-                <span class="text-gray-400 mr-2">🔍</span>
-
-                <input
-                    type="text"
-                    name="search"
-                    placeholder="Cari layanan pijat..."
-                    value="{{ request('search') }}"
-                    class="w-full bg-transparent text-sm text-gray-700 focus:outline-none"
-                >
-
-                @if(request('search'))
-                <a href="{{ route('customer.services') }}"
-                   class="text-gray-400 hover:text-red-500 text-sm">
-                    ✕
-                </a>
-                @endif
-
-            </div>
-        </form>
-
-    </div>
-
-    <!-- ACCENT LINE -->
-    <div class="h-[2px] bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+    </form>
 
 </div>
 
 
-<!-- ======================
-    CONTENT
-====================== -->
-<div class="max-w-7xl mx-auto px-6 py-6 space-y-8">
-
+<div class="max-w-7xl mx-auto p-6 space-y-10">
 
 <!-- ======================
     LAYANAN UTAMA
 ====================== -->
+
 <section>
 
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="text-base font-semibold text-gray-800">
-            Layanan Utama
-        </h2>
-    </div>
+    <h2 class="text-lg font-semibold mb-5">
+        Layanan Utama
+    </h2>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
         @foreach($services as $service)
 
-        <div class="bg-white rounded-xl border hover:shadow-md transition overflow-hidden group">
+        <div class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden group">
 
             <div class="aspect-[4/3] overflow-hidden">
+
                 <img
                     src="{{ $service->image_url }}"
                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                 >
+
             </div>
 
             <div class="p-4">
 
-                <h3 class="font-semibold text-sm line-clamp-1 text-gray-800">
+                <h3 class="font-semibold text-sm line-clamp-1">
                     {{ $service->name }}
                 </h3>
 
@@ -113,7 +69,7 @@
 
                     <button
                         onclick="addToCart({{ $service->id }})"
-                        class="bg-teal-600 hover:bg-teal-700 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg transition">
+                        class="bg-teal-600 hover:bg-teal-700 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg">
 
                         +
 
@@ -132,34 +88,34 @@
 </section>
 
 
-
 <!-- ======================
     LAYANAN TAMBAHAN
 ====================== -->
+
 <section>
 
-    <h2 class="text-base font-semibold text-gray-800 mb-4">
+    <h2 class="text-lg font-semibold mb-5">
         Add-on / Layanan Tambahan
     </h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
         @foreach($additionalServices as $service)
 
-        <div class="bg-white rounded-xl border hover:shadow-md transition p-4 flex items-center gap-4">
+        <div class="bg-white rounded-xl shadow hover:shadow-md transition p-4 flex items-center gap-4">
 
             <img
                 src="{{ $service->image_url }}"
-                class="w-14 h-14 rounded-lg object-cover"
+                class="w-16 h-16 rounded-lg object-cover"
             >
 
             <div class="flex-1">
 
-                <p class="font-semibold text-sm text-gray-800">
+                <p class="font-semibold text-sm">
                     {{ $service->name }}
                 </p>
 
-                <p class="text-xs text-gray-500 line-clamp-2">
+                <p class="text-xs text-gray-500">
                     {{ $service->description }}
                 </p>
 
@@ -173,7 +129,7 @@
 
                 <button
                     onclick="addToCart({{ $service->id }})"
-                    class="mt-1 text-xs bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded transition">
+                    class="mt-1 text-xs bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded">
 
                     Tambah
 
@@ -192,3 +148,82 @@
 </div>
 
 @endsection
+
+
+@push('scripts')
+
+<script>
+
+function addToCart(id){
+
+    fetch(`/customer/cart/add/${id}`,{
+        method:"GET",
+        headers:{
+            "X-Requested-With":"XMLHttpRequest"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.success){
+
+            updateCartBadge(data.count);
+            showToast("Layanan berhasil masuk ke keranjang");
+
+        }
+
+    });
+
+}
+
+function updateCartBadge(count){
+
+    let badge = document.getElementById("cart-count");
+    const cartIcon = document.querySelector('a[href="{{ route('customer.cart') }}"]');
+
+    if(badge){
+
+        badge.innerText = count;
+
+    }else{
+
+        const span = document.createElement("span");
+
+        span.id = "cart-count";
+        span.className = "absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full";
+
+        span.innerText = count;
+
+        cartIcon.appendChild(span);
+
+    }
+
+}
+
+function showToast(message){
+
+    const toast = document.createElement("div");
+
+    toast.className = `
+        fixed bottom-6 right-6
+        bg-teal-600 text-white
+        px-4 py-2 rounded-lg
+        shadow-lg
+        text-sm
+        z-50
+    `;
+
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(()=>{
+        toast.remove();
+    },2500);
+
+}
+
+</script>
+
+@endpush
+

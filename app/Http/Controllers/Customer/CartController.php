@@ -44,7 +44,6 @@ class CartController extends Controller
     }
 
 
-
     /* ================= ADD TO CART ================= */
 
     public function add($id)
@@ -86,7 +85,6 @@ class CartController extends Controller
     }
 
 
-
     /* ================= INCREASE QTY ================= */
 
     public function increase($id)
@@ -100,7 +98,6 @@ class CartController extends Controller
         return $this->cartResponse();
 
     }
-
 
 
     /* ================= DECREASE QTY ================= */
@@ -127,7 +124,6 @@ class CartController extends Controller
     }
 
 
-
     /* ================= REMOVE ITEM ================= */
 
     public function remove($id)
@@ -142,7 +138,6 @@ class CartController extends Controller
         return back();
 
     }
-
 
 
     /* ================= RESPONSE CART ================= */
@@ -172,7 +167,6 @@ class CartController extends Controller
     }
 
 
-
     /* ================= CHECKOUT ================= */
 
     public function checkout(Request $request)
@@ -190,9 +184,7 @@ class CartController extends Controller
 
         ]);
 
-
         $user = auth()->user();
-
 
         /* ================= UPDATE DATA USER ================= */
 
@@ -204,11 +196,9 @@ class CartController extends Controller
 
         ]);
 
-
         $carts = Cart::with('service')
             ->where('user_id', $user->id)
             ->get();
-
 
         if($carts->isEmpty()){
 
@@ -218,7 +208,6 @@ class CartController extends Controller
             ]);
 
         }
-
 
         DB::beginTransaction();
 
@@ -231,7 +220,6 @@ class CartController extends Controller
                 return $cart->service->price * $cart->qty;
 
             });
-
 
             /* ================= BUAT TRANSACTION ================= */
 
@@ -259,10 +247,12 @@ class CartController extends Controller
 
                 'status' => 'belum_lunas',
 
-                'total_price' => $total
+                'total_price' => $total,
+
+                'payment_expired_at' => now()->addHours(24)
+
 
             ]);
-
 
             /* ================= SIMPAN SERVICES ================= */
 
@@ -290,14 +280,11 @@ class CartController extends Controller
 
             }
 
-
             /* ================= HAPUS CART ================= */
 
             Cart::where('user_id',$user->id)->delete();
 
-
             DB::commit();
-
 
             return response()->json([
 
@@ -325,3 +312,4 @@ class CartController extends Controller
     }
 
 }
+

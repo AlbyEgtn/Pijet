@@ -77,6 +77,9 @@ return new class extends Migration
 
             $table->timestamps();
 
+            $table->timestamp('expired_at')->nullable();
+
+
         });
 
     }

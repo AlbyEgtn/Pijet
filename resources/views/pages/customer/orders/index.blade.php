@@ -12,7 +12,6 @@
 </div>
 
 
-
 <!-- ================= STATUS MENU ================= -->
 <div class="max-w-5xl mx-auto px-6 pt-6">
 
@@ -73,7 +72,6 @@
 </div>
 
 
-
 <!-- ================= ORDER LIST ================= -->
 <div class="max-w-5xl mx-auto p-6 space-y-4">
 
@@ -95,7 +93,6 @@
             </p>
 
         </div>
-
 
 
         <!-- STATUS BADGE -->
@@ -129,7 +126,6 @@
     </div>
 
 
-
     <!-- SERVICES -->
     <div class="space-y-2">
 
@@ -150,7 +146,6 @@
         @endforeach
 
     </div>
-
 
 
     <!-- FOOTER -->
@@ -194,3 +189,4 @@
 </div>
 
 @endsection
+

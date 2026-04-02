@@ -10,7 +10,9 @@ use App\Http\Controllers\Finance\FinanceController;
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\Admin\TherapistController;
+use App\Http\Controllers\Admin\TherapistController; 
+use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\Admin\ReportController;
 
 /// Customer
 use App\Http\Controllers\Customer\CustomerController;
@@ -278,6 +280,37 @@ Route::middleware(['auth','role:admin'])
                 ->name('admin.therapist.review');
         });
 
+        /*
+        |--------------------------------------------------------------------------
+        | REPORT
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('report')->group(function () {
+
+            // 🔹 AKUN (CRUD)
+            Route::get('/', [ReportController::class, 'index'])
+                ->name('admin.report.index');
+
+        });
+
+                /*
+        |--------------------------------------------------------------------------
+        | CUSTOMER
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('customer')->group(function () {
+
+            // 🔹 AKUN (CRUD)
+            Route::get('/', [AdminCustomerController::class, 'index'])
+                ->name('admin.customer.index');
+
+            Route::get('/admin/detail/{id}', [AdminCustomerController::class, 'show'])
+                ->name('admin.customer.detail');
+
+        });
+
+
+
 });
 
 
@@ -331,7 +364,6 @@ Route::middleware(['auth','role:terapis'])
     ->group(function () {
 
         Route::get('/dashboard', [TerapisController::class, 'dashboard'])
-            ->name('terapis.dashboard');
             ->name('dashboard');
 
         Route::get('/profile', [TerapisController::class, 'profile'])
