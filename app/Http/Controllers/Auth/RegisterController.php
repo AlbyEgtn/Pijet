@@ -12,12 +12,8 @@ use App\Mail\SendOtpMail;
 use App\Models\City;
 use Illuminate\Support\Facades\Auth;
 
-
 class RegisterController extends Controller
 {
-    /**
-     * Show form register
-     */
     public function index(Request $request)
     {
         $cities = City::orderBy('name')->get();
@@ -29,9 +25,6 @@ class RegisterController extends Controller
         return view('auth.register', compact('cities'));
     }
 
-    /**
-     * Store user baru
-     */
     public function store(Request $request)
     {
         DB::beginTransaction();
@@ -39,67 +32,52 @@ class RegisterController extends Controller
         try {
 
             // =========================
-            // VALIDASI BERDASARKAN ROLE
+            // VALIDATION (DYNAMIC ROLE)
             // =========================
-            if ($request->role === 'terapis') {
+            $rules = [
 
-                $validated = $request->validate([
+                'nik'        => ['required','digits_between:10,20'],
+                'name'       => ['required','string','max:255'],
+                'email'      => ['required','email','max:255','unique:users,email'],
+                'phone'      => ['required','string','max:20'],
 
-                    // IDENTITAS
-                    'nik'        => ['required','digits_between:10,20'],
-                    'name'       => ['required','string','max:255'],
-                    'email'      => ['required','email','max:255','unique:users,email'],
-                    'phone'      => ['required','string','max:20'],
+                'gender'     => ['required','in:L,P'],
+                'birth_date' => ['required','date'],
 
-                    // KHUSUS TERAPIS
-                    'gender'     => ['required','in:L,P'],
-                    'birth_date' => ['required','date'],
-                    'work_area'  => ['required','string','max:255'],
+                'city_id'    => ['required','exists:cities,id'],
 
-                    // AUTH
-                    'password'   => ['required','confirmed','min:6'],
-                    'role'       => ['required','in:terapis'],
+                'password'   => ['required','confirmed','min:6'],
+                'role'       => ['required','in:terapis,customer'],
+            ];
 
-                    // FILE
-                    'ktp'        => ['required','file','mimes:jpg,png,pdf','max:2048'],
-                    'skck'       => ['required','file','mimes:jpg,png,pdf','max:2048'],
-                ]);
+            // =========================
+            // CONDITIONAL RULES
+            // =========================
+            if ($request->role === 'customer') {
 
-            } else {
+                $rules['address'] = ['required','string'];
 
-                // CUSTOMER
-                $validated = $request->validate([
+            } else { // TERAPIS
 
-                    'nik'        => ['required','digits_between:10,20'],
-                    'name'       => ['required','string','max:255'],
-                    'email'      => ['required','email','max:255','unique:users,email'],
-                    'phone'      => ['required','string','max:20'],
+                $rules['ktp']  = ['required','file','mimes:jpg,png,pdf','max:2048'];
+                $rules['skck'] = ['required','file','mimes:jpg,png,pdf','max:2048'];
 
-                    'gender'     => ['required','in:L,P'],
-                    'birth_date' => ['required','date'],
-
-                    // KHUSUS CUSTOMER
-                    'city'       => ['required','string','max:255'],
-                    'address'    => ['required','string'],
-
-                    'password'   => ['required','confirmed','min:6'],
-                    'role'       => ['required','in:customer'],
-                ]);
+                // address optional biar ga error
+                $rules['address'] = ['nullable','string'];
             }
+
+            $validated = $request->validate($rules);
 
             // =====================
             // HANDLE FILE UPLOAD
             // =====================
-            $ktpPath = null;
-            $skckPath = null;
+            $ktpPath = $request->hasFile('ktp')
+                ? $request->file('ktp')->store('ktp','public')
+                : null;
 
-            if ($request->hasFile('ktp')) {
-                $ktpPath = $request->file('ktp')->store('ktp','public');
-            }
-
-            if ($request->hasFile('skck')) {
-                $skckPath = $request->file('skck')->store('skck','public');
-            }
+            $skckPath = $request->hasFile('skck')
+                ? $request->file('skck')->store('skck','public')
+                : null;
 
             // =====================
             // GENERATE OTP
@@ -119,13 +97,9 @@ class RegisterController extends Controller
                 'gender'     => $validated['gender'],
                 'birth_date' => $validated['birth_date'],
 
-                // =====================
-                // ROLE BASED FIELD
-                // =====================
-                'city'       => $validated['city'] ?? $validated['work_area'],
-                'address'    => $validated['address'] ?? '-',
+                'city_id'    => $validated['city_id'],
 
-                'work_area'  => $validated['work_area'] ?? null,
+                'address'    => $validated['address'] ?? '-',
 
                 'role'       => $validated['role'],
 
@@ -141,10 +115,15 @@ class RegisterController extends Controller
             ]);
 
             // =====================
-            // SEND OTP EMAIL
+            // SEND EMAIL (SAFE MODE)
             // =====================
-            Mail::to($user->email)
-                ->send(new SendOtpMail($otp));
+            try {
+                Mail::to($user->email)->send(new SendOtpMail($otp));
+            } catch (\Exception $mailError) {
+
+                // log error email tapi user tetap dibuat
+                \Log::error('Mail error: '.$mailError->getMessage());
+            }
 
             session([
                 'verify_user_id' => $user->id
@@ -158,15 +137,14 @@ class RegisterController extends Controller
 
             DB::rollBack();
 
+            \Log::error('Register error: '.$e->getMessage());
+
             return back()
                 ->withInput()
-                ->with('error', 'Registrasi gagal: '.$e->getMessage());
+                ->with('error', 'Registrasi gagal. Silakan cek input atau hubungi admin.');
         }
     }
 
-    /**
-     * Verify OTP
-     */
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -175,9 +153,6 @@ class RegisterController extends Controller
 
         $user = User::find(session('verify_user_id'));
 
-        // =====================
-        // VALIDASI USER
-        // =====================
         if (!$user) {
             return redirect('/register')
                 ->with('error','Session verifikasi tidak ditemukan');
@@ -191,33 +166,20 @@ class RegisterController extends Controller
             return back()->with('error','Kode OTP sudah kadaluarsa');
         }
 
-        // =====================
-        // UPDATE VERIFIKASI
-        // =====================
         $user->update([
             'email_verified_at' => now(),
             'email_otp' => null,
             'otp_expired_at' => null,
 
-            // 🔥 LOGIC BARU
             'verification_status' => $user->role === 'terapis'
                 ? 'pending'
                 : 'approved',
         ]);
 
-        // =====================
-        // 🔥 AUTO LOGIN (KUNCI FIX ERROR)
-        // =====================
         Auth::login($user);
-
-        // OPTIONAL: regenerate session (security best practice)
         $request->session()->regenerate();
-
         session()->forget('verify_user_id');
 
-        // =====================
-        // REDIRECT BERDASARKAN ROLE
-        // =====================
         if ($user->role === 'terapis') {
             return redirect()
                 ->route('therapist.assessment')
@@ -225,7 +187,7 @@ class RegisterController extends Controller
         }
 
         return redirect()
-            ->route('login') // atau dashboard kalau mau langsung login user
+            ->route('login')
             ->with('success','Email berhasil diverifikasi');
     }
 }

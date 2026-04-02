@@ -6,167 +6,169 @@
 
 <div class="grid grid-cols-12 gap-6">
 
-    {{-- LEFT SIDE --}}
+    <!-- ================= LEFT ================= -->
     <div class="col-span-8 space-y-6">
 
-        {{-- HEADER --}}
+        <!-- HEADER -->
         <div class="bg-teal-600 text-white p-6 rounded-2xl shadow">
 
             <div class="flex justify-between items-center">
 
                 <div>
                     <h2 class="text-lg font-semibold">
-                        Selamat Bergabung
+                        Halo, {{ $user->name }} 👋
                     </h2>
                     <p class="text-sm opacity-80">
-                        {{ $user->name }}
+                        Siap menerima pesanan hari ini?
                     </p>
                 </div>
 
-                {{-- TOGGLE --}}
-                <label class="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="sr-only peer" checked>
-                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 relative">
-                        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
-                    </div>
-                </label>
+                <!-- STATUS -->
+                <form method="POST" action="{{ route('terapis.update.informasi') }}">
+                    @csrf
+
+                    <input type="hidden" name="status" value="0">
+
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="status" value="1"
+                            onchange="this.form.submit()"
+                            {{ $terapis->status ? 'checked' : '' }}
+                            class="sr-only peer">
+
+                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 relative">
+                            <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
+                        </div>
+                    </label>
+                </form>
 
             </div>
 
         </div>
 
-        {{-- LIST PESANAN --}}
+
+        <!-- LIST PESANAN -->
         <div class="bg-white rounded-2xl shadow p-6">
 
             <div class="flex justify-between mb-4">
-                <h2 class="font-semibold">
-                    Pesanan Layanan
+
+                <h2 class="font-semibold text-gray-800">
+                    Pesanan Masuk
                 </h2>
-                <a href="#" class="text-sm text-blue-500">
-                    Selengkapnya
+
+                <a href="{{ route('terapis.pesanan') }}"
+                    class="text-sm text-teal-600 hover:underline">
+                    Lihat Semua
                 </a>
+
             </div>
 
-            {{-- ITEM --}}
-            @for ($i = 0; $i < 5; $i++)
-            <div class="flex items-center justify-between py-3 border-b">
+            <div class="space-y-4">
 
-                <div class="flex items-center gap-3">
+                @forelse($transactions as $trx)
 
-                    <div class="w-10 h-10 rounded-full bg-gray-200"></div>
+                <div class="border rounded-xl p-4 hover:shadow transition">
 
-                    <div>
-                        <p class="font-medium">
-                            Matt Shadow
-                        </p>
-                        <p class="text-xs text-gray-500">
-                            Menunggu
-                        </p>
+                    <div class="flex justify-between">
+
+                        <!-- LEFT -->
+                        <div>
+
+                            <p class="font-semibold">
+                                {{ $trx->customer_name }}
+                            </p>
+
+                            <p class="text-xs text-gray-500">
+                                {{ $trx->customer_city }}
+                            </p>
+
+                            <p class="text-sm mt-1">
+                                {{ $trx->services->first()->service_name ?? '-' }}
+                                • {{ $trx->services->first()->duration ?? 0 }} menit
+                            </p>
+
+                        </div>
+
+                        <!-- RIGHT -->
+                        <div class="text-right">
+
+                            <p class="text-sm text-gray-500">
+                                {{ \Carbon\Carbon::parse($trx->service_date)->format('d M Y') }}
+                            </p>
+
+                            <p class="font-semibold text-teal-600">
+                                Rp {{ number_format($trx->total_price) }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ACTION -->
+                    <div class="flex justify-between items-center mt-4">
+
+                        <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
+                            Siap Diambil
+                        </span>
+
+                        <div class="flex gap-2">
+
+                            <!-- ✅ ROUTE FIX -->
+                            <a href="{{ route('terapis.pesanan.detail',$trx->id) }}"
+                                class="text-sm px-3 py-1 border rounded hover:bg-gray-100">
+                                Detail
+                            </a>
+
+                            <!-- ✅ ROUTE FIX -->
+                            <form method="POST" action="{{ route('terapis.pesanan.ambil',$trx->id) }}">
+                                @csrf
+                                <button
+                                    class="text-sm bg-teal-600 text-white px-3 py-1 rounded hover:bg-teal-700">
+                                    Ambil
+                                </button>
+                            </form>
+
+                        </div>
+
                     </div>
 
                 </div>
 
-                <span class="text-blue-500 text-sm">
-                    Menunggu
-                </span>
+                @empty
+
+                <div class="text-center py-10 text-gray-500">
+                    Belum ada pesanan di kota kamu
+                </div>
+
+                @endforelse
 
             </div>
-            @endfor
-{{-- PESANAN --}}
-<div class="bg-white mt-8 rounded-xl shadow">
-
-    <div class="p-6 border-b flex justify-between items-center">
 
         </div>
-
-        <a href="{{ route('terapis.pesanan') }}"
-           class="text-sm text-teal-600 hover:underline">
-            Lihat Semua
-        </a>
 
     </div>
 
 
-    {{-- RIGHT SIDE --}}
+    <!-- ================= RIGHT ================= -->
     <div class="col-span-4 space-y-6">
 
-        {{-- DETAIL --}}
+        <!-- PROFIL -->
         <div class="bg-white rounded-2xl shadow p-6">
 
             <h2 class="font-semibold mb-4">
-                Detail Pesanan
+                Profil Terapis
             </h2>
 
-            {{-- CARD --}}
-            <div class="border rounded-xl p-4 mb-4">
-
-                <p class="font-medium">
-                    Matt Shadow
+            <div class="text-sm space-y-2">
+                <p><b>Nama:</b> {{ $user->name }}</p>
+                <p><b>WhatsApp:</b> {{ $terapis->whatsapp ?? '-' }}</p>
+                <p><b>Status:</b>
+                    <span class="{{ $terapis->status ? 'text-green-600' : 'text-red-500' }}">
+                        {{ $terapis->status ? 'Online' : 'Offline' }}
+                    </span>
                 </p>
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="p-4 text-left">Customer</th>
-                <th class="p-4 text-left">Tanggal</th>
-                <th class="p-4 text-left">Status</th>
-            </tr>
-        </thead>
-
-                <p class="text-sm text-gray-500 mt-1">
-                    Full Body Massage (90 menit)
-                </p>
-
-                <div class="mt-3 text-sm text-gray-600">
-                    <p>Lokasi: Homecare</p>
-                    <p>Tanggal: 25 Agustus 2025</p>
-                </div>
-
-                <div class="mt-3 font-semibold text-right">
-                    Rp 170.000
-                </div>
-
-                <button class="mt-3 w-full bg-teal-600 text-white py-2 rounded-lg">
-                    Ambil Pesanan
-                </button>
-
             </div>
 
         </div>
-            @forelse($transactions as $trx)
-            <tr class="border-t hover:bg-gray-50">
-
-                <td class="p-4">
-                    {{ $trx->customer_name }}
-                </td>
-
-                <td class="p-4">
-                    {{ \Carbon\Carbon::parse($trx->service_date)->format('d M Y') }}
-                </td>
-
-                <td class="p-4">
-
-                    <span class="px-2 py-1 rounded text-xs
-                        @if($trx->status == 'belum_lunas') bg-yellow-100 text-yellow-700
-                        @elseif($trx->status == 'proses') bg-blue-100 text-blue-700
-                        @elseif($trx->status == 'lunas') bg-green-100 text-green-700
-                        @elseif($trx->status == 'dibatalkan') bg-red-100 text-red-700
-                        @else bg-gray-100 text-gray-700
-                        @endif
-                    ">
-                        {{ ucfirst(str_replace('_',' ',$trx->status)) }}
-                    </span>
-
-                </td>
-
-            </tr>
-            @empty
-            <tr>
-                <td colspan="3" class="p-4 text-center text-gray-500">
-                    Belum ada pesanan
-                </td>
-            </tr>
-            @endforelse
-            
-        </tbody>
 
     </div>
 

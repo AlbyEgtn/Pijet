@@ -13,7 +13,10 @@ class Transaction extends Model
     protected $fillable = [
 
         'transaction_code',
+
         'customer_id',
+        'terapis_id',
+
         'customer_name',
         'customer_phone',
         'customer_address',
@@ -25,17 +28,32 @@ class Transaction extends Model
         'service_time',
 
         'payment_method',
-        'payment_expired_at',
-        'payment_uploaded_at',
 
-        'status',
+        'payment_status',
+        'payment_uploaded_at',
+        'payment_verified_at',
+        'payment_expired_at',
+        'payment_proof',
+
+        'order_status',
 
         'total_price',
 
         'reschedule_date',
         'reschedule_time',
 
-        'cancel_reason'
+        'cancel_reason',
+
+        'expired_at'
+    ];
+
+    protected $casts = [
+        'service_date' => 'date',
+        'service_time' => 'datetime:H:i',
+        'payment_uploaded_at' => 'datetime',
+        'payment_verified_at' => 'datetime',
+        'payment_expired_at' => 'datetime',
+        'expired_at' => 'datetime',
     ];
 
 
@@ -125,6 +143,11 @@ class Transaction extends Model
         return $this->service_date
             ? Carbon::parse($this->service_date)->format('d M Y')
             : '-';
+    }
+
+    public function getStatusAttribute()
+    {
+        return $this->payment_status;
     }
 
 }

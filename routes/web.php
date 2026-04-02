@@ -420,6 +420,9 @@ Route::middleware(['auth','role:terapis'])
         Route::post('/terapis/password/update', [TerapisController::class,'updatePassword'])
             ->name('password.update');
 
+        Route::post('/terapis/update-informasi', [TerapisController::class, 'updateInformasi'])
+            ->name('update.informasi');
+
 });
 
 

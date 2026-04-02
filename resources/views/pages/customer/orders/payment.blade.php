@@ -72,55 +72,57 @@
     <div class="bg-white rounded-xl shadow p-4">
 
         <p class="text-sm text-gray-500 mb-2">
-            Transfer ke rekening berikut
+            Pilih rekening tujuan
         </p>
 
-        <div class="space-y-2">
+        <select id="rekeningSelect"
+            class="w-full border rounded px-3 py-2 text-sm">
+
+            <option value="">-- Pilih Rekening --</option>
+
+            @foreach($accounts as $acc)
+                <option 
+                    value="{{ $acc->account_number }}"
+                    data-bank="{{ $acc->bank_name }}"
+                    data-number="{{ $acc->account_number }}"
+                    data-holder="{{ $acc->account_holder }}"
+                >
+                    {{ $acc->bank_name }} - {{ $acc->account_number }}
+                </option>
+            @endforeach
+
+        </select>
+
+        <div id="rekeningDetail"
+            class="mt-3 border rounded p-3 bg-gray-50 hidden">
 
             <div class="flex justify-between text-sm">
-
-                <span class="text-gray-500">
-                    Bank
-                </span>
-
-                <span class="font-semibold">
-                    {{ $order->payment->bank_name ?? '-' }}
-                </span>
-
+                <span class="text-gray-500">Bank</span>
+                <span id="rekBank" class="font-semibold"></span>
             </div>
 
             <div class="flex justify-between text-sm">
-
-                <span class="text-gray-500">
-                    No Rekening
-                </span>
-
-                <span class="font-semibold">
-                    {{ $order->payment->account_number ?? '-' }}
-                </span>
-
+                <span class="text-gray-500">No Rekening</span>
+                <span id="rekNumber" class="font-semibold"></span>
             </div>
 
             <div class="flex justify-between text-sm">
-
-                <span class="text-gray-500">
-                    Atas Nama
-                </span>
-
-                <span class="font-semibold">
-                    {{ $order->payment->account_holder ?? '-' }}
-                </span>
-
+                <span class="text-gray-500">Atas Nama</span>
+                <span id="rekHolder" class="font-semibold"></span>
             </div>
 
         </div>
 
-        <button
-            onclick="copyRek()"
-            class="mt-3 text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 transition"
-        >
+        <button onclick="copyRek()"
+            class="mt-3 text-sm bg-gray-100 px-3 py-1 rounded">
             Salin Nomor Rekening
         </button>
+
+        @if($order->payment_status === 'uploaded')
+            <p class="text-xs text-green-600 mt-2">
+                Bukti pembayaran sudah diupload, menunggu konfirmasi admin
+            </p>
+        @endif
 
     </div>
 

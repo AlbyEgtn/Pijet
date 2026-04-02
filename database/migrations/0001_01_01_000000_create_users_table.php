@@ -34,11 +34,13 @@ return new class extends Migration
 
             $table->string('phone')->nullable();
 
-            $table->string('city')->nullable();
+            // 🔥 RELASI KE CITIES (CABANG)
+            $table->foreignId('city_id')
+                  ->nullable()
+                  ->constrained('cities')
+                  ->nullOnDelete();
 
             $table->text('address')->nullable();
-
-            $table->string('work_area')->nullable();
 
             $table->string('ktp')->nullable();
 
@@ -62,13 +64,14 @@ return new class extends Migration
             ])->default('pending');
 
             // ALASAN REJECT
-            $table->string('reject_reason')->nullable()->after('verification_status');
+            $table->string('reject_reason')->nullable();
 
             // WAKTU VERIFIKASI
             $table->timestamp('verified_at')->nullable();
 
             // ADMIN YANG VERIFIKASI
-            $table->foreignId('verified_by')->nullable()
+            $table->foreignId('verified_by')
+                  ->nullable()
                   ->constrained('users')
                   ->nullOnDelete();
 

@@ -317,6 +317,33 @@
 
         </div>
 
+        <!-- ================= INFO REKENING ================= -->
+        <div id="transferInfo" class="mt-4 hidden">
+
+            <p class="text-sm font-semibold mb-2">
+                Informasi Rekening
+            </p>
+
+            @foreach($payments as $pay)
+            <div class="border rounded-lg p-3 mb-2 bg-gray-50">
+
+                <p class="text-sm font-semibold">
+                    {{ $pay->bank_name }}
+                </p>
+
+                <p class="text-sm">
+                    No Rek: {{ $pay->account_number }}
+                </p>
+
+                <p class="text-xs text-gray-500">
+                    a.n {{ $pay->account_holder }}
+                </p>
+
+            </div>
+            @endforeach
+
+        </div>
+
 
         <!-- TOTAL -->
         <div class="mt-6 bg-gray-100 rounded-lg p-4 flex justify-between items-center">
@@ -418,6 +445,28 @@ function closeCheckoutSheet(){
         .add("hidden");
 
 }
+
+/* ================= PAYMENT TOGGLE ================= */
+
+document.querySelectorAll('input[name="payment_method"]').forEach(el => {
+
+    el.addEventListener("change", function(){
+
+        const transferBox = document.getElementById("transferInfo");
+
+        if(this.value === "transfer"){
+
+            transferBox.classList.remove("hidden");
+
+        }else{
+
+            transferBox.classList.add("hidden");
+
+        }
+
+    });
+
+});
 
 
 /* ================= TOTAL ADDITIONAL ================= */
@@ -529,6 +578,8 @@ function confirmCheckout(){
     });
 
 }
+
+
 
 
 /* ================= TOAST ================= */

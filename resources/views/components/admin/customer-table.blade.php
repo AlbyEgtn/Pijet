@@ -74,7 +74,7 @@
                     <td class="px-4 py-3 text-center">
 
                         <a href="{{ route('admin.customer.detail', $item->customer_phone) }}"
-                           class="px-3 py-1.5 text-xs rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100">
+                        class="px-3 py-1.5 text-xs rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100">
                             Detail
                         </a>
 

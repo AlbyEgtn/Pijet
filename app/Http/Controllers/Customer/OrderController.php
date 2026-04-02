@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Models\Transaction;
 use App\Models\Payment;
+use App\Models\PaymentAccount;
 
 class OrderController extends Controller
 {
@@ -20,19 +21,35 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
-
         $status = $request->status ?? 'belum_lunas';
 
         $orders = Transaction::with('services')
             ->where('customer_id', Auth::id())
-            ->where('status', $status)
+
+            ->when($status === 'belum_lunas', function ($q) {
+                $q->whereIn('payment_status', ['pending','uploaded']);
+            })
+
+            ->when($status === 'proses', function ($q) {
+                $q->where('order_status', 'process');
+            })
+
+            ->when($status === 'lunas', function ($q) {
+                $q->where('payment_status', 'verified');
+            })
+
+            ->when($status === 'reschedule', function ($q) {
+                $q->where('order_status', 'reschedule');
+            })
+
+            ->when($status === 'dibatalkan', function ($q) {
+                $q->where('order_status', 'cancelled');
+            })
+
             ->latest()
             ->get();
 
-        return view('pages.customer.orders.index', [
-            'orders' => $orders
-        ]);
-
+        return view('pages.customer.orders.index', compact('orders','status'));
     }
 
 
@@ -42,30 +59,17 @@ class OrderController extends Controller
     |--------------------------------------------------------------------------
     */
 
+
     public function show($id)
     {
+        $order = Transaction::with('services')->findOrFail($id);
 
-        $order = Transaction::with('services','payment')
-            ->where('customer_id', Auth::id())
-            ->findOrFail($id);
-
-        /*
-        |--------------------------------------------------------------------------
-        | JIKA SUDAH MASUK PROSES DAN TRANSFER
-        | LANGSUNG KE HALAMAN PAYMENT
-        |--------------------------------------------------------------------------
-        */
-
-        if ($order->status === 'proses' && $order->payment_method === 'transfer') {
-
-            return redirect()->route('customer.payment', $order->id);
-
-        }
+        $accounts = PaymentAccount::where('is_active', true)->get();
 
         return view('pages.customer.orders.show', [
-            'order' => $order
+            'order' => $order,
+            'accounts' => $accounts
         ]);
-
     }
 
 
@@ -77,7 +81,6 @@ class OrderController extends Controller
 
     public function payment(Request $request, $id)
     {
-
         $request->validate([
             'payment_method' => 'required|in:cash,transfer',
             'bank' => 'required_if:payment_method,transfer'
@@ -86,128 +89,64 @@ class OrderController extends Controller
         $order = Transaction::where('customer_id', Auth::id())
             ->findOrFail($id);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE ORDER
-        |--------------------------------------------------------------------------
-        */
-
         $order->payment_method = $request->payment_method;
-        $order->status = 'proses';
 
+        // 🔥 STATUS BARU
+        $order->payment_status = 'pending';
+        $order->order_status   = 'waiting';
 
-        /*
-        |--------------------------------------------------------------------------
-        | CASH PAYMENT
-        |--------------------------------------------------------------------------
-        */
-
+        // ================= CASH =================
         if ($request->payment_method === 'cash') {
 
+            // langsung dianggap verified
+            $order->payment_status = 'verified';
+            $order->order_status   = 'ready';
             $order->payment_expired_at = null;
-            $order->save();
 
-            Payment::where('transaction_id', $order->id)->delete();
+            $order->save();
 
             return response()->json([
                 'success' => true,
-                'redirect' => route('customer.payment', $order->id)
+                'redirect' => route('customer.orders.show', $order->id)
             ]);
-
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | BANK LIST
-        |--------------------------------------------------------------------------
-        */
-
+        // ================= TRANSFER =================
         $banks = [
-
-            'BCA' => [
-                'account_number' => '4272022855',
-                'account_holder' => 'PT Pijetin Indonesia'
-            ],
-
-            'BRI' => [
-                'account_number' => '1129987710',
-                'account_holder' => 'PT Pijetin Indonesia'
-            ],
-
-            'BNI' => [
-                'account_number' => '8892210092',
-                'account_holder' => 'PT Pijetin Indonesia'
-            ],
-
-            'MANDIRI' => [
-                'account_number' => '1338842291',
-                'account_holder' => 'PT Pijetin Indonesia'
-            ]
-
+            'BCA' => ['account_number' => '4272022855','account_holder' => 'PT Pijetin Indonesia'],
+            'BRI' => ['account_number' => '1129987710','account_holder' => 'PT Pijetin Indonesia'],
+            'BNI' => ['account_number' => '8892210092','account_holder' => 'PT Pijetin Indonesia'],
+            'MANDIRI' => ['account_number' => '1338842291','account_holder' => 'PT Pijetin Indonesia']
         ];
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATE BANK
-        |--------------------------------------------------------------------------
-        */
-
         if (!isset($banks[$request->bank])) {
-
             return response()->json([
                 'success' => false,
                 'message' => 'Bank tidak valid'
             ], 422);
-
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | SET PAYMENT EXPIRED (ONLY FIRST TIME)
-        |--------------------------------------------------------------------------
-        */
-
         if (!$order->payment_expired_at) {
-
             $order->payment_expired_at = now()->addHours(24);
-
         }
 
         $order->save();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | CREATE / UPDATE PAYMENT
-        |--------------------------------------------------------------------------
-        */
-
         $bank = $banks[$request->bank];
 
         Payment::updateOrCreate(
-
-            [
-                'transaction_id' => $order->id
-            ],
-
+            ['transaction_id' => $order->id],
             [
                 'bank_name' => $request->bank,
                 'account_number' => $bank['account_number'],
                 'account_holder' => $bank['account_holder']
             ]
-
         );
-
 
         return response()->json([
             'success' => true,
             'redirect' => route('customer.payment', $order->id)
         ]);
-
     }
 
 
@@ -219,113 +158,56 @@ class OrderController extends Controller
 
     public function paymentPage($id)
     {
-        $order = Transaction::with(['services', 'payment'])
+        $order = Transaction::with(['services'])
             ->where('customer_id', Auth::id())
             ->findOrFail($id);
 
-        // 🔥 FIX 2: pastikan expired tidak null
         if (!$order->payment_expired_at) {
             $order->payment_expired_at = now()->addHours(24);
             $order->save();
         }
 
+        $accounts = \App\Models\PaymentAccount::where('is_active', true)->get();
+
         return view('pages.customer.orders.payment', [
-            'order' => $order
+            'order' => $order,
+            'accounts' => $accounts
         ]);
     }
 
     public function uploadPaymentProof(Request $request, $id)
     {
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI FILE
-        |--------------------------------------------------------------------------
-        */
-
         $request->validate([
             'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | AMBIL TRANSAKSI
-        |--------------------------------------------------------------------------
-        */
-
         $order = Transaction::where('customer_id', auth()->id())
             ->findOrFail($id);
 
-        /*
-        |--------------------------------------------------------------------------
-        | CEK METODE PEMBAYARAN
-        |--------------------------------------------------------------------------
-        */
-
         if ($order->payment_method !== 'transfer') {
-
-            return redirect()
-                ->back()
-                ->with('error','Metode pembayaran tidak valid');
-
+            return back()->with('error','Metode pembayaran tidak valid');
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | HAPUS FILE LAMA (JIKA ADA)
-        |--------------------------------------------------------------------------
-        */
 
         if ($order->payment_proof) {
-
             \Storage::disk('public')->delete($order->payment_proof);
-
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN FILE BARU
-        |--------------------------------------------------------------------------
-        */
 
         $file = $request->file('payment_proof');
 
-        $filename =
-            'payment_' .
-            $order->transaction_code .
-            '_' .
-            time() .
-            '.' .
-            $file->getClientOriginalExtension();
+        $filename = 'payment_'.$order->transaction_code.'_'.time().'.'.$file->getClientOriginalExtension();
 
-        $path = $file->storeAs(
-            'payment_proofs',
-            $filename,
-            'public'
-        );
+        $path = $file->storeAs('payment_proofs', $filename, 'public');
 
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE DATABASE
-        |--------------------------------------------------------------------------
-        */
-
+        // 🔥 UPDATE STATUS BARU
         $order->payment_proof = $path;
-
         $order->payment_uploaded_at = now();
+        $order->payment_status = 'uploaded';
 
         $order->save();
-
-        /*
-        |--------------------------------------------------------------------------
-        | REDIRECT
-        |--------------------------------------------------------------------------
-        */
 
         return redirect()
             ->route('customer.payment',$order->id)
             ->with('success','Bukti pembayaran berhasil diupload');
-
     }
 }
 

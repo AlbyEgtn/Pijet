@@ -8,14 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-
         Schema::create('transactions', function (Blueprint $table) {
 
             $table->id();
 
             $table->string('transaction_code')->unique();
 
-            // relasi customer
+            // =========================
+            // RELASI
+            // =========================
             $table->foreignId('customer_id')
                 ->nullable()
                 ->constrained('users')
@@ -26,62 +27,81 @@ return new class extends Migration
                 ->constrained('terapis')
                 ->nullOnDelete();
 
-            // data customer snapshot
+            // =========================
+            // SNAPSHOT CUSTOMER
+            // =========================
             $table->string('customer_name');
-
             $table->string('customer_phone')->nullable();
-
             $table->text('customer_address')->nullable();
-
             $table->string('customer_city')->nullable();
 
-            // pemesan
             $table->string('orderer_name')->nullable();
 
-            // jadwal layanan
+            // =========================
+            // JADWAL
+            // =========================
             $table->date('service_date');
-
             $table->time('service_time');
 
-            // metode pembayaran
-            $table->enum('payment_method',[
+            // =========================
+            // PAYMENT
+            // =========================
+            $table->enum('payment_method', [
                 'transfer',
                 'cash'
             ]);
 
-            $table->timestamp('payment_expired_at')->nullable();
+            $table->enum('payment_status', [
+                'pending',      // belum bayar
+                'uploaded',     // bukti sudah upload
+                'verified',     // sudah dikonfirmasi admin
+                'failed',       // ditolak
+                'expired'       // kadaluarsa
+            ])->default('pending');
 
             $table->timestamp('payment_uploaded_at')->nullable();
+            $table->timestamp('payment_verified_at')->nullable();
+            $table->timestamp('payment_expired_at')->nullable();
 
             $table->string('payment_proof')->nullable();
 
-            // status transaksi
-            $table->enum('status',[
-                'lunas',
-                'proses',
-                'belum_lunas',
-                'dibatalkan',
-                'reschedule'
-            ])->default('belum_lunas');
+            // =========================
+            // ORDER STATUS (CORE FLOW)
+            // =========================
+            $table->enum('order_status', [
+                'waiting',      // menunggu pembayaran
+                'ready',        // siap diambil terapis
+                'assigned',     // sudah diambil terapis
+                'on_the_way',   // terapis menuju lokasi
+                'ongoing',      // sedang pijat
+                'completed',    // selesai
+                'cancelled',    // dibatalkan
+                'rescheduled'   // dijadwal ulang
+            ])->default('waiting');
 
-            // total harga
+            // =========================
+            // HARGA
+            // =========================
             $table->integer('total_price')->default(0);
 
-            // reschedule
+            // =========================
+            // RESCHEDULE
+            // =========================
             $table->date('reschedule_date')->nullable();
-
             $table->time('reschedule_time')->nullable();
 
-            // cancel reason
+            // =========================
+            // CANCEL
+            // =========================
             $table->text('cancel_reason')->nullable();
 
-            $table->timestamps();
-
+            // =========================
+            // EXPIRED ORDER
+            // =========================
             $table->timestamp('expired_at')->nullable();
 
-
+            $table->timestamps();
         });
-
     }
 
     public function down(): void

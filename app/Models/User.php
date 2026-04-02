@@ -26,11 +26,8 @@ class User extends Authenticatable
         'gender',
         'birth_date',
         'phone',
-
-        'city',
+        'city_id',
         'address',
-
-        'work_area',
         'ktp',
         'skck',
         'email_otp',
@@ -69,6 +66,11 @@ class User extends Authenticatable
     public function terapis()
     {
         return $this->hasOne(Terapis::class, 'user_id', 'id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
     }
 
 }

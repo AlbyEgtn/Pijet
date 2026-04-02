@@ -4,11 +4,9 @@
 
 <!-- ================= HEADER ================= -->
 <div class="bg-gradient-to-r from-teal-700 to-teal-600 text-white p-6">
-
     <h1 class="text-lg font-semibold">
         Riwayat Pesanan
     </h1>
-
 </div>
 
 
@@ -17,50 +15,40 @@
 
     <div class="flex gap-3 overflow-x-auto pb-2">
 
-        <a
-            href="{{ route('customer.orders',['status'=>'belum_lunas']) }}"
+        <!-- BELUM BAYAR -->
+        <a href="{{ route('customer.orders',['status'=>'belum_lunas']) }}"
             class="px-4 py-2 rounded-full text-sm whitespace-nowrap
-            {{ request('status','belum_lunas') == 'belum_lunas'
+            {{ $status == 'belum_lunas'
                 ? 'bg-teal-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }}">
             Belum Bayar
         </a>
 
-        <a
-            href="{{ route('customer.orders',['status'=>'proses']) }}"
+        <!-- SELESAI -->
+        <a href="{{ route('customer.orders',['status'=>'lunas']) }}"
             class="px-4 py-2 rounded-full text-sm whitespace-nowrap
-            {{ request('status') == 'proses'
-                ? 'bg-teal-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }}">
-            Proses
-        </a>
-
-        <a
-            href="{{ route('customer.orders',['status'=>'lunas']) }}"
-            class="px-4 py-2 rounded-full text-sm whitespace-nowrap
-            {{ request('status') == 'lunas'
+            {{ $status == 'lunas'
                 ? 'bg-teal-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }}">
             Selesai
         </a>
 
-        <a
-            href="{{ route('customer.orders',['status'=>'reschedule']) }}"
+        <!-- RESCHEDULE -->
+        <a href="{{ route('customer.orders',['status'=>'reschedule']) }}"
             class="px-4 py-2 rounded-full text-sm whitespace-nowrap
-            {{ request('status') == 'reschedule'
+            {{ $status == 'reschedule'
                 ? 'bg-teal-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }}">
             Reschedule
         </a>
 
-        <a
-            href="{{ route('customer.orders',['status'=>'dibatalkan']) }}"
+        <!-- DIBATALKAN -->
+        <a href="{{ route('customer.orders',['status'=>'dibatalkan']) }}"
             class="px-4 py-2 rounded-full text-sm whitespace-nowrap
-            {{ request('status') == 'dibatalkan'
+            {{ $status == 'dibatalkan'
                 ? 'bg-teal-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }}">
@@ -77,13 +65,40 @@
 
 @forelse($orders as $order)
 
+@php
+    // 🔥 STATUS LOGIC (SINGLE SOURCE OF TRUTH)
+    if(in_array($order->payment_status, ['pending','uploaded'])){
+        $label = 'Belum Bayar';
+        $color = 'bg-yellow-100 text-yellow-700';
+    }
+    elseif($order->order_status == 'process'){
+        $label = 'Proses';
+        $color = 'bg-blue-100 text-blue-700';
+    }
+    elseif($order->payment_status == 'verified'){
+        $label = 'Selesai';
+        $color = 'bg-green-100 text-green-700';
+    }
+    elseif($order->order_status == 'reschedule'){
+        $label = 'Reschedule';
+        $color = 'bg-purple-100 text-purple-700';
+    }
+    elseif($order->order_status == 'cancelled'){
+        $label = 'Dibatalkan';
+        $color = 'bg-red-100 text-red-700';
+    }
+    else{
+        $label = 'Unknown';
+        $color = 'bg-gray-100 text-gray-600';
+    }
+@endphp
+
 <div class="bg-white rounded-xl shadow-sm border hover:shadow-md transition p-5">
 
     <!-- ORDER HEADER -->
     <div class="flex justify-between items-start mb-4">
 
         <div>
-
             <p class="font-semibold text-gray-800">
                 {{ $order->transaction_code }}
             </p>
@@ -91,36 +106,11 @@
             <p class="text-xs text-gray-500 mt-1">
                 {{ $order->created_at->format('d M Y H:i') }}
             </p>
-
         </div>
 
-
         <!-- STATUS BADGE -->
-        <span
-            class="text-xs px-3 py-1 rounded-full font-medium
-
-            @if($order->status == 'belum_lunas')
-                bg-yellow-100 text-yellow-700
-
-            @elseif($order->status == 'proses')
-                bg-blue-100 text-blue-700
-
-            @elseif($order->status == 'lunas')
-                bg-green-100 text-green-700
-
-            @elseif($order->status == 'reschedule')
-                bg-purple-100 text-purple-700
-
-            @elseif($order->status == 'dibatalkan')
-                bg-red-100 text-red-700
-
-            @else
-                bg-gray-100 text-gray-600
-            @endif
-        ">
-
-            {{ ucfirst(str_replace('_',' ',$order->status)) }}
-
+        <span class="text-xs px-3 py-1 rounded-full font-medium {{ $color }}">
+            {{ $label }}
         </span>
 
     </div>
@@ -161,10 +151,8 @@
                 Rp {{ number_format($order->total_price) }}
             </span>
 
-            <a
-                href="{{ route('customer.orders.show',$order->id) }}"
-                class="text-sm bg-teal-600 hover:bg-teal-700 text-white px-4 py-1.5 rounded-lg transition"
-            >
+            <a href="{{ route('customer.orders.show',$order->id) }}"
+                class="text-sm bg-teal-600 hover:bg-teal-700 text-white px-4 py-1.5 rounded-lg transition">
                 Detail
             </a>
 
@@ -189,4 +177,3 @@
 </div>
 
 @endsection
-

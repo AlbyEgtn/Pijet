@@ -72,45 +72,45 @@
     <div class="bg-white rounded-xl shadow p-4">
 
         <p class="text-sm text-gray-500 mb-2">
-            Transfer ke rekening berikut
+            Pilih rekening tujuan
         </p>
 
-        <div class="space-y-2">
+        <!-- DROPDOWN -->
+        <select 
+            id="rekeningSelect"
+            class="w-full border rounded px-3 py-2 text-sm"
+        >
+            <option value="">-- Pilih Rekening --</option>
+
+            @foreach($accounts as $acc)
+                <option 
+                    value="{{ $acc->account_number }}"
+                    data-bank="{{ $acc->bank_name }}"
+                    data-number="{{ $acc->account_number }}"
+                    data-holder="{{ $acc->account_holder }}"
+                >
+                    {{ $acc->bank_name }} - {{ $acc->account_number }}
+                </option>
+            @endforeach
+
+        </select>
+
+        <!-- DETAIL -->
+        <div id="rekeningDetail" class="mt-3 hidden border rounded p-3 bg-gray-50">
 
             <div class="flex justify-between text-sm">
-
-                <span class="text-gray-500">
-                    Bank
-                </span>
-
-                <span class="font-semibold">
-                    {{ $order->payment->bank_name ?? '-' }}
-                </span>
-
+                <span class="text-gray-500">Bank</span>
+                <span id="rekBank" class="font-semibold"></span>
             </div>
 
             <div class="flex justify-between text-sm">
-
-                <span class="text-gray-500">
-                    No Rekening
-                </span>
-
-                <span class="font-semibold">
-                    {{ $order->payment->account_number ?? '-' }}
-                </span>
-
+                <span class="text-gray-500">No Rekening</span>
+                <span id="rekNumber" class="font-semibold"></span>
             </div>
 
             <div class="flex justify-between text-sm">
-
-                <span class="text-gray-500">
-                    Atas Nama
-                </span>
-
-                <span class="font-semibold">
-                    {{ $order->payment->account_holder ?? '-' }}
-                </span>
-
+                <span class="text-gray-500">Atas Nama</span>
+                <span id="rekHolder" class="font-semibold"></span>
             </div>
 
         </div>
@@ -299,20 +299,54 @@
 
 <script>
 
+/* ================= REKENING SELECT ================= */
+
+let selectedRek = "";
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const select = document.getElementById("rekeningSelect");
+
+    if(!select) return;
+
+    select.addEventListener("change", function(){
+
+        const selected = this.options[this.selectedIndex];
+        const detailBox = document.getElementById("rekeningDetail");
+
+        if(!this.value){
+            detailBox.classList.add("hidden");
+            selectedRek = "";
+            return;
+        }
+
+        const bank = selected.dataset.bank;
+        const number = selected.dataset.number;
+        const holder = selected.dataset.holder;
+
+        document.getElementById("rekBank").innerText = bank;
+        document.getElementById("rekNumber").innerText = number;
+        document.getElementById("rekHolder").innerText = holder;
+
+        selectedRek = number;
+
+        detailBox.classList.remove("hidden");
+
+    });
+
+});
+
+
 /* ================= COPY REKENING ================= */
 
 function copyRek(){
 
-    const rek = "{{ $order->payment->account_number ?? '' }}";
-
-    if(!rek){
-
-        alert("Nomor rekening belum tersedia");
+    if(!selectedRek){
+        alert("Pilih rekening terlebih dahulu");
         return;
-
     }
 
-    navigator.clipboard.writeText(rek);
+    navigator.clipboard.writeText(selectedRek);
 
     alert("Nomor rekening berhasil disalin");
 
@@ -329,26 +363,17 @@ const expiredTimestamp =
 function updateCountdown(){
 
     const now = Date.now();
-
     const distance = expiredTimestamp - now;
-
     const el = document.getElementById("countdown");
 
     if(distance <= 0){
-
         el.innerText = "Waktu habis";
         return;
-
     }
 
-    const hours =
-        Math.floor(distance / (1000 * 60 * 60));
-
-    const minutes =
-        Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-
-    const seconds =
-        Math.floor((distance % (1000 * 60)) / 1000);
+    const hours = Math.floor(distance / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
     el.innerText =
         String(hours).padStart(2,'0') + " : " +
@@ -358,7 +383,6 @@ function updateCountdown(){
 }
 
 updateCountdown();
-
 setInterval(updateCountdown,1000);
 
 @endif
@@ -373,7 +397,6 @@ if(inputFile){
     inputFile.addEventListener("change", function(){
 
         const file = this.files[0];
-
         if(!file) return;
 
         const reader = new FileReader();
@@ -386,9 +409,10 @@ if(inputFile){
             const previewImage =
                 document.getElementById("previewImage");
 
-            previewImage.src = e.target.result;
-
-            previewContainer.classList.remove("hidden");
+            if(previewContainer && previewImage){
+                previewImage.src = e.target.result;
+                previewContainer.classList.remove("hidden");
+            }
 
         };
 
@@ -401,4 +425,3 @@ if(inputFile){
 </script>
 
 @endpush
-

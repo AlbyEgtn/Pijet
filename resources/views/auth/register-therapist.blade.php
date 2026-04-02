@@ -177,29 +177,25 @@
 
 
                     <div class="col-span-3">
+                        <label class="text-sm text-gray-600">
+                            Area Kerja
+                        </label>
 
-                        <div class="col-span-3">
-                            <label class="text-sm text-gray-600">
-                                Area Kerja
-                            </label>
+                        <select
+                            name="city_id"
+                            required
+                            class="w-full border rounded-lg px-4 py-2 mt-1"
+                        >
+                            <option value="">-- Pilih Kota --</option>
 
-                            <select
-                                name="work_area"
-                                required
-                                class="w-full border rounded-lg px-4 py-2 mt-1"
-                            >
-                                <option value="">-- Pilih Kota --</option>
+                            @foreach($cities as $city)
+                                <option value="{{ $city->id }}"
+                                    {{ old('city_id') == $city->id ? 'selected' : '' }}>
+                                    {{ $city->name }}
+                                </option>
+                            @endforeach
 
-                                @foreach($cities as $city)
-                                    <option value="{{ $city->name }}"
-                                        {{ old('work_area') == $city->name ? 'selected' : '' }}>
-                                        {{ $city->name }}
-                                    </option>
-                                @endforeach
-
-                            </select>
-                        </div>
-
+                        </select>
                     </div>
 
 

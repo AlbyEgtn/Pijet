@@ -19,27 +19,25 @@ class OrderController extends Controller
 
     public function waiting()
     {
-        $transactions = Transaction::where('status','belum_lunas')
+        $transactions = Transaction::where('payment_status','uploaded')
             ->latest()
             ->paginate(10);
 
         return view('pages.admin.orders.waiting', compact('transactions'));
     }
 
-
     public function finished()
     {
-        $transactions = Transaction::where('status','lunas')
+        $transactions = Transaction::where('payment_status','verified')
             ->latest()
             ->paginate(10);
 
         return view('pages.admin.orders.finished', compact('transactions'));
     }
 
-
     public function reschedule()
     {
-        $transactions = Transaction::where('status','reschedule')
+        $transactions = Transaction::where('order_status','rescheduled')
             ->latest()
             ->paginate(10);
 
@@ -116,7 +114,8 @@ class OrderController extends Controller
         $transaction = Transaction::findOrFail($id);
 
         $transaction->update([
-            'status' => 'lunas'
+            'payment_status' => 'verified',
+            'order_status'   => 'ready'
         ]);
 
         return back()->with('success','Pesanan dikonfirmasi');
@@ -135,8 +134,9 @@ class OrderController extends Controller
         $transaction = Transaction::findOrFail($id);
 
         $transaction->update([
-            'status' => 'dibatalkan',
-            'cancel_reason' => $request->cancel_reason
+            'payment_status' => 'failed',
+            'order_status'   => 'cancelled',
+            'cancel_reason'  => $request->cancel_reason
         ]);
 
         return back()->with('success','Pesanan ditolak');

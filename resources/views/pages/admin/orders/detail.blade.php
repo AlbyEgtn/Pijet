@@ -36,7 +36,7 @@
                 <p class="text-sm mt-1">
                     Status :
                     <span class="px-2 py-1 text-xs rounded {{ $transaction->status_badge }}">
-                        {{ ucfirst(str_replace('_',' ',$transaction->status)) }}
+                        {{ ucfirst($transaction->payment_status) }} / {{ ucfirst($transaction->order_status) }}
                     </span>
                 </p>
 
@@ -60,7 +60,7 @@
 
 
         <!-- ACTION -->
-        @if(in_array($transaction->status, ['belum_lunas','proses']))
+        @if($transaction->payment_status === 'uploaded')
         <div class="flex gap-3 mt-4">
 
             <form method="POST" action="{{ route('admin.orders.approve',$transaction->id) }}">

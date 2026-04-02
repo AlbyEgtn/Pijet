@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Transaction;
 
 class CustomerController extends Controller
 {
@@ -27,5 +28,17 @@ class CustomerController extends Controller
         $customers = $query->paginate(10);
 
         return view('pages.admin.customer.index', compact('customers'));
+    }
+
+    public function show($phone)
+    {
+        $transactions = Transaction::with('services')
+            ->where('customer_phone', $phone)
+            ->latest()
+            ->get();
+
+        $customer = $transactions->first();
+
+        return view('pages.admin.customer.detail', compact('transactions', 'customer'));
     }
 }

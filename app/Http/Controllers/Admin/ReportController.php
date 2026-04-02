@@ -27,4 +27,5 @@ class ReportController extends Controller
 
         return view('pages.admin.report.index', compact('reports'));
     }
+    
 }
