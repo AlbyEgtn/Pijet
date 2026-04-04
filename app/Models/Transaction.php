@@ -23,7 +23,10 @@ class Transaction extends Model
         'customer_city',
 
         'orderer_name',
-
+        'company_account_id',
+        'company_income',
+        'therapist_income',
+        
         'service_date',
         'service_time',
 

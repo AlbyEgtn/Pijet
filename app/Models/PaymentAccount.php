@@ -10,9 +10,12 @@ class PaymentAccount extends Model
     use HasFactory;
 
     protected $fillable = [
+        'type',
+        'terapis_id',       // ← tambahkan kolom ini via migration (lihat catatan)
         'bank_name',
         'account_number',
         'account_holder',
+        'balance',
         'is_active'
     ];
 
@@ -25,5 +28,10 @@ class PaymentAccount extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function terapis()
+    {
+        return $this->belongsTo(Terapis::class);
     }
 }

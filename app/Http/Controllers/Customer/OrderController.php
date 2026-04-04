@@ -26,22 +26,27 @@ class OrderController extends Controller
         $orders = Transaction::with('services')
             ->where('customer_id', Auth::id())
 
+            // 🔥 BELUM BAYAR
             ->when($status === 'belum_lunas', function ($q) {
                 $q->whereIn('payment_status', ['pending','uploaded']);
             })
 
-            ->when($status === 'proses', function ($q) {
-                $q->where('order_status', 'process');
+            // 🔥 DIPROSES (semua yang belum selesai)
+            ->when($status === 'diproses', function ($q) {
+                $q->whereIn('order_status', [
+                    'ready',
+                    'assigned',
+                    'on_the_way',
+                    'ongoing'
+                ]);
             })
 
-            ->when($status === 'lunas', function ($q) {
-                $q->where('payment_status', 'verified');
+            // 🔥 SELESAI
+            ->when($status === 'selesai', function ($q) {
+                $q->where('order_status', 'completed');
             })
 
-            ->when($status === 'reschedule', function ($q) {
-                $q->where('order_status', 'reschedule');
-            })
-
+            // 🔥 DIBATALKAN
             ->when($status === 'dibatalkan', function ($q) {
                 $q->where('order_status', 'cancelled');
             })

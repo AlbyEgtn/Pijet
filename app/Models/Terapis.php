@@ -28,5 +28,14 @@ class Terapis extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function paymentAccounts()
+    {
+        return $this->hasMany(\App\Models\PaymentAccount::class);
+    }
+
+    public function activePaymentAccount()
+    {
+        return $this->hasOne(\App\Models\PaymentAccount::class)->where('is_active', true);
+    }
 
 }

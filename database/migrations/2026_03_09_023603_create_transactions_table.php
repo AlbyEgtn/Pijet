@@ -98,6 +98,14 @@ return new class extends Migration
             // =========================
             // EXPIRED ORDER
             // =========================
+            $table->foreignId('company_account_id')
+                ->nullable()
+                ->after('terapis_id')
+                ->constrained('payment_accounts')
+                ->nullOnDelete();
+
+            $table->integer('company_income')->nullable();   // isi saat selesai
+            $table->integer('therapist_income')->nullable(); // isi saat selesai
             $table->timestamp('expired_at')->nullable();
 
             $table->timestamps();

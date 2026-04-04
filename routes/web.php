@@ -423,6 +423,24 @@ Route::middleware(['auth','role:terapis'])
         Route::post('/terapis/update-informasi', [TerapisController::class, 'updateInformasi'])
             ->name('update.informasi');
 
+        Route::post('/pesanan/{id}/mulai', [TerapisController::class, 'mulaiPesanan'])->name('pesanan.mulai');
+        Route::post('/pesanan/{id}/selesai', [TerapisController::class, 'selesaiPesanan'])->name('pesanan.selesai');
+        Route::post('/pesanan/{id}/batal', [TerapisController::class, 'batalPesanan'])->name('pesanan.batal');
+
+        Route::post('/profile/update', [TerapisController::class, 'update'])
+            ->name('profile.update');
+
+        Route::get('/rekening', [TerapisController::class, 'paymentAccounts'])
+            ->name('rekening');
+
+        Route::post('/rekening', [TerapisController::class, 'storePaymentAccount'])
+            ->name('rekening.store');
+
+        Route::post('/rekening/{id}/aktif', [TerapisController::class, 'setActivePaymentAccount'])
+            ->name('rekening.aktif');
+
+        Route::delete('/rekening/{id}', [TerapisController::class, 'deletePaymentAccount'])
+            ->name('rekening.delete');
 });
 
 

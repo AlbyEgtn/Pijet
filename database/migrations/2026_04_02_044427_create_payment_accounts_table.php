@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('payment_accounts', function (Blueprint $table) {
             $table->id();
+            $table->enum('type', ['terapis', 'company']);
+            $table->foreignId('terapis_id')->nullable()->constrained()->nullOnDelete();
             $table->string('bank_name');
             $table->string('account_number');
             $table->string('account_holder');
+            // 🔥 TAMBAHAN SALDO
+            $table->bigInteger('balance')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

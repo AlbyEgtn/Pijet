@@ -44,6 +44,7 @@
             </div>
 
         </div>
+        
 
 
         <!-- LIST PESANAN -->
@@ -121,10 +122,17 @@
                             <!-- ✅ ROUTE FIX -->
                             <form method="POST" action="{{ route('terapis.pesanan.ambil',$trx->id) }}">
                                 @csrf
-                                <button
-                                    class="text-sm bg-teal-600 text-white px-3 py-1 rounded hover:bg-teal-700">
-                                    Ambil
-                                </button>
+                                @if($terapis->status != 1)
+                                    <button disabled
+                                        class="text-sm bg-gray-300 text-gray-500 px-3 py-1 rounded cursor-not-allowed">
+                                        Offline
+                                    </button>
+                                @else
+                                    <button
+                                        class="text-sm bg-teal-600 text-white px-3 py-1 rounded hover:bg-teal-700">
+                                        Ambil
+                                    </button>
+                                @endif
                             </form>
 
                         </div>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use App\Models\PaymentAccount;
+use Illuminate\Support\Facades\DB;
 
 class FinanceController extends Controller
 {
@@ -26,7 +28,6 @@ class FinanceController extends Controller
     }
 
 
-
     /*
     |--------------------------------------------------------------------------
     | TRANSAKSI TRANSFER
@@ -35,24 +36,15 @@ class FinanceController extends Controller
 
     public function transfer(Request $request)
     {
-
         $query = Transaction::with(['services','payment'])
-                    ->where('payment_method','transfer');
+            ->where('payment_method','transfer');
 
         $this->applySearch($query,$request);
 
-        $transactions = $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $transactions = $query->latest()->paginate(10)->withQueryString();
 
-        return view(
-            'pages.finance.transaction.transfer',
-            compact('transactions')
-        );
-
+        return view('pages.finance.transaction.transfer', compact('transactions'));
     }
-
 
 
     /*
@@ -63,24 +55,15 @@ class FinanceController extends Controller
 
     public function cash(Request $request)
     {
-
         $query = Transaction::with(['services','payment'])
-                    ->where('payment_method','cash');
+            ->where('payment_method','cash');
 
         $this->applySearch($query,$request);
 
-        $transactions = $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $transactions = $query->latest()->paginate(10)->withQueryString();
 
-        return view(
-            'pages.finance.transaction.cash',
-            compact('transactions')
-        );
-
+        return view('pages.finance.transaction.cash', compact('transactions'));
     }
-
 
 
     /*
@@ -91,24 +74,15 @@ class FinanceController extends Controller
 
     public function cancelled(Request $request)
     {
-
         $query = Transaction::with(['services','payment'])
-                    ->where('status','dibatalkan');
+            ->where('order_status','cancelled');
 
         $this->applySearch($query,$request);
 
-        $transactions = $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $transactions = $query->latest()->paginate(10)->withQueryString();
 
-        return view(
-            'pages.finance.transaction.cancelled',
-            compact('transactions')
-        );
-
+        return view('pages.finance.transaction.cancelled', compact('transactions'));
     }
-
 
 
     /*
@@ -119,24 +93,15 @@ class FinanceController extends Controller
 
     public function reschedule(Request $request)
     {
-
         $query = Transaction::with(['services','payment'])
-                    ->where('status','reschedule');
+            ->where('order_status','rescheduled');
 
         $this->applySearch($query,$request);
 
-        $transactions = $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $transactions = $query->latest()->paginate(10)->withQueryString();
 
-        return view(
-            'pages.finance.transaction.reschedule',
-            compact('transactions')
-        );
-
+        return view('pages.finance.transaction.reschedule', compact('transactions'));
     }
-
 
 
     /*
@@ -151,7 +116,6 @@ class FinanceController extends Controller
     }
 
 
-
     /*
     |--------------------------------------------------------------------------
     | GAJI TERAPIS
@@ -164,18 +128,36 @@ class FinanceController extends Controller
     }
 
 
-
     /*
     |--------------------------------------------------------------------------
-    | PENGATURAN
+    | PENGATURAN (🔥 CORE FIX)
     |--------------------------------------------------------------------------
     */
 
     public function setting()
     {
-        return view('pages.finance.setting');
-    }
+        // ambil rekening company aktif
+        $companyAccounts = PaymentAccount::where('type','company')
+            ->where('is_active', true)
+            ->get();
 
+        // 🔥 ambil saldo sekaligus (no N+1)
+        $balances = Transaction::select(
+                'company_account_id',
+                DB::raw('SUM(total_price) as total_balance')
+            )
+            ->whereNotNull('company_account_id')
+            ->where('payment_status','verified')
+            ->groupBy('company_account_id')
+            ->pluck('total_balance','company_account_id');
+
+        // inject ke collection
+        foreach ($companyAccounts as $account) {
+            $account->balance = $balances[$account->id] ?? 0;
+        }
+
+        return view('pages.finance.setting', compact('companyAccounts'));
+    }
 
 
     /*
@@ -186,7 +168,6 @@ class FinanceController extends Controller
 
     private function applySearch($query, Request $request)
     {
-
         if(!$request->search){
             return;
         }
@@ -199,8 +180,14 @@ class FinanceController extends Controller
               ->orWhere('customer_city','like','%'.$request->search.'%');
 
         });
-
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DETAIL
+    |--------------------------------------------------------------------------
+    */
 
     public function detail($id)
     {
@@ -214,5 +201,4 @@ class FinanceController extends Controller
             compact('transaction')
         );
     }
-
 }

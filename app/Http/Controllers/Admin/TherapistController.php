@@ -161,7 +161,7 @@ class TherapistController extends Controller
      */
     public function verify($id)
     {
-        $user = User::with('therapistProfile')->where('role', 'terapis')->findOrFail($id);
+        $user = User::with('terapis')->where('role', 'terapis')->findOrFail($id);
 
         // 1. Update status
         $user->update([
@@ -175,8 +175,6 @@ class TherapistController extends Controller
         $exists = Terapis::where('user_id', $user->id)->exists();
 
         if (!$exists) {
-
-            $profile = $user->therapistProfile;
 
             Terapis::create([
                 'user_id' => $user->id,

@@ -10,14 +10,14 @@
 </div>
 
 
-<!-- ================= STATUS MENU ================= -->
+<!-- ================= FILTER ================= -->
 <div class="max-w-5xl mx-auto px-6 pt-6">
 
     <div class="flex gap-3 overflow-x-auto pb-2">
 
         <!-- BELUM BAYAR -->
         <a href="{{ route('customer.orders',['status'=>'belum_lunas']) }}"
-            class="px-4 py-2 rounded-full text-sm whitespace-nowrap
+            class="px-4 py-2 rounded-full text-sm whitespace-nowrap transition
             {{ $status == 'belum_lunas'
                 ? 'bg-teal-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -25,31 +25,31 @@
             Belum Bayar
         </a>
 
+        <!-- DIPROSES -->
+        <a href="{{ route('customer.orders',['status'=>'diproses']) }}"
+            class="px-4 py-2 rounded-full text-sm whitespace-nowrap transition
+            {{ $status == 'diproses'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }}">
+            Diproses
+        </a>
+
         <!-- SELESAI -->
-        <a href="{{ route('customer.orders',['status'=>'lunas']) }}"
-            class="px-4 py-2 rounded-full text-sm whitespace-nowrap
-            {{ $status == 'lunas'
-                ? 'bg-teal-600 text-white'
+        <a href="{{ route('customer.orders',['status'=>'selesai']) }}"
+            class="px-4 py-2 rounded-full text-sm whitespace-nowrap transition
+            {{ $status == 'selesai'
+                ? 'bg-green-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }}">
             Selesai
         </a>
 
-        <!-- RESCHEDULE -->
-        <a href="{{ route('customer.orders',['status'=>'reschedule']) }}"
-            class="px-4 py-2 rounded-full text-sm whitespace-nowrap
-            {{ $status == 'reschedule'
-                ? 'bg-teal-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }}">
-            Reschedule
-        </a>
-
         <!-- DIBATALKAN -->
         <a href="{{ route('customer.orders',['status'=>'dibatalkan']) }}"
-            class="px-4 py-2 rounded-full text-sm whitespace-nowrap
+            class="px-4 py-2 rounded-full text-sm whitespace-nowrap transition
             {{ $status == 'dibatalkan'
-                ? 'bg-teal-600 text-white'
+                ? 'bg-red-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }}">
             Dibatalkan
@@ -66,36 +66,32 @@
 @forelse($orders as $order)
 
 @php
-    // 🔥 STATUS LOGIC (SINGLE SOURCE OF TRUTH)
+    // 🔥 SINGLE SOURCE OF TRUTH (FINAL)
     if(in_array($order->payment_status, ['pending','uploaded'])){
         $label = 'Belum Bayar';
         $color = 'bg-yellow-100 text-yellow-700';
     }
-    elseif($order->order_status == 'process'){
-        $label = 'Proses';
+    elseif(in_array($order->order_status, ['ready','assigned','on_the_way','ongoing'])){
+        $label = 'Diproses';
         $color = 'bg-blue-100 text-blue-700';
     }
-    elseif($order->payment_status == 'verified'){
+    elseif($order->order_status == 'completed'){
         $label = 'Selesai';
         $color = 'bg-green-100 text-green-700';
-    }
-    elseif($order->order_status == 'reschedule'){
-        $label = 'Reschedule';
-        $color = 'bg-purple-100 text-purple-700';
     }
     elseif($order->order_status == 'cancelled'){
         $label = 'Dibatalkan';
         $color = 'bg-red-100 text-red-700';
     }
     else{
-        $label = 'Unknown';
+        $label = ucfirst(str_replace('_',' ',$order->order_status));
         $color = 'bg-gray-100 text-gray-600';
     }
 @endphp
 
 <div class="bg-white rounded-xl shadow-sm border hover:shadow-md transition p-5">
 
-    <!-- ORDER HEADER -->
+    <!-- ================= HEADER ================= -->
     <div class="flex justify-between items-start mb-4">
 
         <div>
@@ -116,7 +112,7 @@
     </div>
 
 
-    <!-- SERVICES -->
+    <!-- ================= SERVICES ================= -->
     <div class="space-y-2">
 
         @foreach($order->services as $service)
@@ -138,7 +134,7 @@
     </div>
 
 
-    <!-- FOOTER -->
+    <!-- ================= FOOTER ================= -->
     <div class="flex justify-between items-center mt-4 pt-3 border-t">
 
         <span class="text-sm text-gray-500">
@@ -148,7 +144,7 @@
         <div class="flex items-center gap-4">
 
             <span class="font-semibold text-teal-600">
-                Rp {{ number_format($order->total_price) }}
+                Rp {{ number_format($order->total_price,0,',','.') }}
             </span>
 
             <a href="{{ route('customer.orders.show',$order->id) }}"
