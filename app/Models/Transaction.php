@@ -23,10 +23,15 @@ class Transaction extends Model
         'customer_city',
 
         'orderer_name',
+
         'company_account_id',
+
         'company_income',
         'therapist_income',
-        
+
+        'is_balance_recorded',   // ✅ tambahan
+        'is_profit_shared',      // ✅ tambahan
+
         'service_date',
         'service_time',
 
@@ -47,19 +52,27 @@ class Transaction extends Model
 
         'cancel_reason',
 
-        'expired_at'
+        'expired_at',
+
+        'started_at',   // ✅ tambahan
+        'completed_at', // ✅ tambahan
     ];
 
     protected $casts = [
         'service_date' => 'date',
         'service_time' => 'datetime:H:i',
+
         'payment_uploaded_at' => 'datetime',
         'payment_verified_at' => 'datetime',
         'payment_expired_at' => 'datetime',
         'expired_at' => 'datetime',
+
+        'started_at' => 'datetime',     // ✅ tambahan
+        'completed_at' => 'datetime',   // ✅ tambahan
+
+        'is_balance_recorded' => 'boolean', // ✅ tambahan
+        'is_profit_shared' => 'boolean',    // ✅ tambahan
     ];
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -72,7 +85,6 @@ class Transaction extends Model
         return $this->hasMany(TransactionService::class);
     }
 
-
     public function payment()
     {
         return $this->hasOne(Payment::class);
@@ -83,7 +95,6 @@ class Transaction extends Model
         return $this->belongsTo(User::class,'customer_id');
     }
 
-    // Transaction.php
     public function companyAccount()
     {
         return $this->belongsTo(PaymentAccount::class, 'company_account_id');
@@ -100,27 +111,18 @@ class Transaction extends Model
         return 'Rp' . number_format($this->total_price,0,',','.');
     }
 
-
     public function getStatusBadgeAttribute()
     {
-
         return match($this->status) {
 
             'lunas' => 'bg-blue-500 text-white',
-
             'belum_lunas' => 'bg-gray-400 text-white',
-
             'dibatalkan' => 'bg-red-500 text-white',
-
             'reschedule' => 'bg-yellow-500 text-white',
 
             default => 'bg-gray-200'
-
         };
-
     }
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -133,19 +135,16 @@ class Transaction extends Model
         return $this->services()->count();
     }
 
-    // jumlah layanan
     public function getServiceCountAttribute()
     {
         return $this->services->count();
     }
 
-    // terapis terisi
     public function getTherapistFilledAttribute()
     {
         return $this->services->whereNotNull('therapist_id')->count();
     }
 
-    // tanggal (ambil dari service pertama)
     public function getExecutionDateAttribute()
     {
         return $this->service_date
@@ -157,5 +156,4 @@ class Transaction extends Model
     {
         return $this->payment_status;
     }
-
 }

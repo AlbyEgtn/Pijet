@@ -1,6 +1,7 @@
 @extends('layouts.customer')
 
-@section('title', 'Dashboard Customer')
+@section('title','Dashboard  ')
+@section('header','Dashboard ')
 
 @section('content')
 <br>

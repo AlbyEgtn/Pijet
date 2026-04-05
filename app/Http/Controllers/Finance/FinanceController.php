@@ -16,15 +16,89 @@ class FinanceController extends Controller
     | DASHBOARD
     |--------------------------------------------------------------------------
     */
-
     public function dashboard()
     {
-        return view('pages.finance.dashboard');
-    }
+        // =========================
+        // TOTAL INCOME (GROSS)
+        // =========================
+        $totalIncome = Transaction::where('payment_status', 'verified')
+            ->sum('total_price');
 
-    public function overview()
-    {
-        return view('pages.finance.dashboard-overview');
+
+        // =========================
+        // TOTAL EXPENSE (THERAPIST 70%)
+        // =========================
+        $totalExpense = Transaction::where('order_status', 'completed')
+            ->sum('therapist_income');
+
+
+        // =========================
+        // COMPANY BALANCE (REAL)
+        // =========================
+        $companyAccount = PaymentAccount::whereNull('terapis_id')->first();
+
+        $balance = $companyAccount->balance ?? 0;
+
+
+        // =========================
+        // CHART (ORDER & INCOME)
+        // =========================
+
+        $orders = Transaction::selectRaw("
+                CAST(strftime('%m', created_at) AS INTEGER) as month,
+                COUNT(*) as total
+            ")
+            ->groupBy('month')
+            ->pluck('total','month')
+            ->toArray();
+
+
+        $incomePerMonth = Transaction::selectRaw("
+                CAST(strftime('%m', created_at) AS INTEGER) as month,
+                SUM(company_income) as total
+            ")
+            ->where('order_status','completed')
+            ->groupBy('month')
+            ->pluck('total','month')
+            ->toArray();
+
+
+        $ordersChart = [];
+        $incomeChart = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $ordersChart[] = $orders[$i] ?? 0;
+            $incomeChart[] = $incomePerMonth[$i] ?? 0;
+        }
+
+
+        // =========================
+        // ORDER STATUS
+        // =========================
+
+        $completed = Transaction::where('order_status','completed')->count();
+        $cancelled = Transaction::where('order_status','cancelled')->count();
+
+
+        // =========================
+        // SERVICE POPULAR (SIMPLE)
+        // =========================
+
+        $serviceLabels = ['Full Body','Traditional','Deep Tissue','Thai','Hot Stone','Swedish'];
+        $serviceData   = [40,30,20,10,5,2];
+
+
+        return view('pages.finance.dashboard', compact(
+            'totalIncome',
+            'totalExpense',
+            'balance',
+            'ordersChart',
+            'incomeChart',
+            'completed',
+            'cancelled',
+            'serviceLabels',
+            'serviceData'
+        ));
     }
 
 
@@ -110,9 +184,36 @@ class FinanceController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function recap()
+    public function recap(Request $request)
     {
-        return view('pages.finance.recap');
+        $query = \App\Models\Transaction::query();
+
+        // ================= FILTER =================
+        if ($request->status) {
+            $query->where('order_status', $request->status);
+        }
+
+        if ($request->date_from && $request->date_to) {
+            $query->whereBetween('created_at', [
+                $request->date_from,
+                $request->date_to
+            ]);
+        }
+
+        // ================= DATA =================
+        $transactions = $query->latest()->paginate(10);
+
+        // ================= SUMMARY =================
+        $totalIncome = $query->sum('total_price');
+        $totalTherapist = $query->sum('therapist_income');
+        $totalCompany = $query->sum('company_income');
+
+        return view('pages.finance.recap.index', compact(
+            'transactions',
+            'totalIncome',
+            'totalTherapist',
+            'totalCompany'
+        ));
     }
 
 

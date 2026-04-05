@@ -1,5 +1,8 @@
 @extends('layouts.finance')
 
+@section('title','Pengaturan  ')
+@section('header','Pengaturan ')
+
 @section('content')
 
 <div class="p-6 max-w-4xl mx-auto space-y-6">

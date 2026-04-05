@@ -1,5 +1,8 @@
 @extends('layouts.customer')
 
+@section('title','Keranjang  ')
+@section('header','Keranjang ')
+
 @section('content')
 
 <!-- ================= HEADER ================= -->

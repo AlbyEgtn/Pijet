@@ -1,5 +1,8 @@
 @extends('layouts.terapis')
 
+@section('title','Detail Pesanan')
+@section('header',' Detail Pesanan ')
+
 @section('content')
 
 <div class="p-6 max-w-4xl mx-auto space-y-6">
@@ -126,6 +129,18 @@
     </div>
 
     <!-- TIMER -->
+    @php
+        $duration = 0;
+
+        if ($transaction->started_at) {
+            $end = $transaction->completed_at ?? now();
+            $duration = \Carbon\Carbon::parse($transaction->started_at)
+                ->diffInSeconds($end, false);
+
+            $duration = intval($duration);
+        }
+    @endphp
+
     <div class="bg-white p-5 rounded-2xl shadow text-center">
 
         <p class="text-sm text-gray-500">Durasi Layanan</p>
@@ -173,7 +188,7 @@
 
 <!-- TIMER SCRIPT -->
 <script>
-    let seconds = 0;
+    let seconds = Math.floor({{ $duration }});
 
     function formatTime(sec) {
         let h = String(Math.floor(sec / 3600)).padStart(2, '0');
@@ -181,6 +196,9 @@
         let s = String(sec % 60).padStart(2, '0');
         return `${h}:${m}:${s}`;
     }
+
+    document.getElementById('timer').innerText = formatTime(seconds);
+
 
     @if($transaction->order_status == 'ongoing')
     setInterval(() => {

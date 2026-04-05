@@ -1,6 +1,7 @@
 @extends('layouts.superadmin')
 
-@section('title', 'Landing Page')
+@section('title','Landing Page  ')
+@section('header','Landing Page ')
 
 @section('content')
 

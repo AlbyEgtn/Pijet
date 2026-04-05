@@ -1,14 +1,14 @@
-<aside class="w-64 bg-[#4C9A8B] text-white flex flex-col min-h-screen">
+<aside class="w-64 bg-gradient-to-b from-teal-700 to-teal-900 text-white flex flex-col min-h-screen shadow-lg">
 
     <!-- LOGO -->
-    <div class="px-6 py-7 flex items-center gap-3">
+    <div class="px-6 py-7 flex items-center gap-3 border-b border-white/10">
         <img
             src="{{ asset('images/logo-pth.png') }}"
             alt="Logo Pijat.in"
-            class="h-12 object-contain"
+            class="w-10 h-10 object-contain"
         >
 
-        <span class="text-2xl font-semibold tracking-wide">
+        <span class="text-xl font-semibold tracking-wide">
             Pijat.in
         </span>
 

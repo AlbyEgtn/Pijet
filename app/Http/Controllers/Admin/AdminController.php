@@ -23,9 +23,9 @@ class AdminController extends Controller
 
         $totalTherapists = User::where('role', 'terapis')->count();
 
-        $totalCompletedOrders = Transaction::where('status', 'lunas')->count();
+        $totalCompletedOrders = Transaction::where('order_status', 'completed')->count();
 
-        $totalCancelledOrders = Transaction::where('status', 'dibatalkan')->count();
+        $totalCancelledOrders = Transaction::where('order_status', 'cancelled')->count();
 
 
 
@@ -36,11 +36,11 @@ class AdminController extends Controller
         */
 
         $ordersPerMonth = Transaction::selectRaw("
-                strftime('%m', created_at) as month,
+                CAST(strftime('%m', created_at) AS INTEGER) as month,
                 COUNT(*) as total
             ")
+            ->where('order_status', 'completed')
             ->groupBy('month')
-            ->orderBy('month')
             ->pluck('total', 'month')
             ->toArray();
 
@@ -48,14 +48,8 @@ class AdminController extends Controller
         $chartData = [];
 
         for ($i = 1; $i <= 12; $i++) {
-
-            $monthKey = str_pad($i, 2, '0', STR_PAD_LEFT);
-
-            $chartData[] = $ordersPerMonth[$monthKey] ?? 0;
-
+            $chartData[] = $ordersPerMonth[$i] ?? 0;
         }
-
-
 
         /*
         |--------------------------------------------------------------------------

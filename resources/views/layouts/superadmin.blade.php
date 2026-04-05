@@ -44,19 +44,6 @@
 
                     </span>
 
-
-                    <form method="POST" action="{{ route('logout') }}">
-
-                        @csrf
-
-                        <button class="text-sm text-red-500 hover:underline">
-
-                            Logout
-
-                        </button>
-
-                    </form>
-
                 </div>
 
             </div>

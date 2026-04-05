@@ -16,6 +16,7 @@
 
 </head>
 
+
 <body class="bg-[#EEF6F3] text-gray-800">
 
 <div class="flex min-h-screen">
@@ -40,14 +41,6 @@
                 <div class="text-sm text-gray-600">
                     {{ auth()->user()->name ?? 'Admin' }}
                 </div>
-
-                <!-- LOGOUT -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button class="text-sm text-red-500 hover:underline">
-                        Logout
-                    </button>
-                </form>
 
             </div>
 
@@ -74,6 +67,8 @@
     </div>
 
 </div>
+
+@yield('script')
 
 </body>
 </html>

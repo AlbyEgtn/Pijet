@@ -1,6 +1,7 @@
 @extends('layouts.terapis')
 
-@section('title', 'Bantuan')
+@section('title','Bantuan  ')
+@section('header','Bantuan ')
 
 @section('content')
 

@@ -74,6 +74,9 @@ return new class extends Migration
             $table->boolean('is_profit_shared')->default(false);
             $table->timestamp('expired_at')->nullable();
 
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
+
             $table->timestamps();
         });
     }

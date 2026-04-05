@@ -1,5 +1,8 @@
 @extends('layouts.finance')
 
+@section('title','Detail Pesanan  ')
+@section('header','Detail Pesanan ')
+
 @section('content')
 
 <div class="p-6" x-data="{ openModal:false }">

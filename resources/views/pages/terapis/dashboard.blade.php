@@ -1,6 +1,7 @@
 @extends('layouts.terapis')
 
 @section('title','Dashboard')
+@section('header',' Dashboard ')
 
 @section('content')
 
@@ -9,43 +10,51 @@
     <!-- ================= LEFT ================= -->
     <div class="col-span-8 space-y-6">
 
-        <!-- HEADER -->
-        <div class="bg-teal-600 text-white p-6 rounded-2xl shadow">
+    <!-- HEADER -->
+    <div class="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-6 rounded-2xl shadow">
 
-            <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center">
 
-                <div>
-                    <h2 class="text-lg font-semibold">
-                        Halo, {{ $user->name }} 👋
-                    </h2>
-                    <p class="text-sm opacity-80">
-                        Siap menerima pesanan hari ini?
-                    </p>
-                </div>
-
-                <!-- STATUS -->
-                <form method="POST" action="{{ route('terapis.update.informasi') }}">
-                    @csrf
-
-                    <input type="hidden" name="status" value="0">
-
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" name="status" value="1"
-                            onchange="this.form.submit()"
-                            {{ $terapis->status ? 'checked' : '' }}
-                            class="sr-only peer">
-
-                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 relative">
-                            <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
-                        </div>
-                    </label>
-                </form>
-
+            <!-- LEFT -->
+            <div>
+                <h2 class="text-lg font-semibold">
+                    Halo, {{ $user->name }} 👋
+                </h2>
+                <p class="text-sm text-teal-100">
+                    Siap menerima pesanan hari ini?
+                </p>
             </div>
 
-        </div>
-        
+            <!-- RIGHT (STATUS) -->
+            <form method="POST" action="{{ route('terapis.update.informasi') }}">
+                @csrf
 
+                <input type="hidden" name="status" value="0">
+
+                <label class="inline-flex items-center cursor-pointer gap-3">
+
+                    <!-- LABEL STATUS -->
+                    <span class="text-sm font-medium">
+                        {{ $terapis->status ? 'Online' : 'Offline' }}
+                    </span>
+
+                    <!-- TOGGLE -->
+                    <input type="checkbox" name="status" value="1"
+                        onchange="this.form.submit()"
+                        {{ $terapis->status ? 'checked' : '' }}
+                        class="sr-only peer">
+
+                    <div class="w-11 h-6 bg-white/30 rounded-full peer peer-checked:bg-green-400 transition relative">
+
+                        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
+
+                    </div>
+                </label>
+            </form>
+
+        </div>
+
+    </div>
 
         <!-- LIST PESANAN -->
         <div class="bg-white rounded-2xl shadow p-6">

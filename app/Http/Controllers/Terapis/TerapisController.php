@@ -368,7 +368,8 @@ class TerapisController extends Controller
             ->firstOrFail();
 
         $transaction->update([
-            'order_status' => 'ongoing'
+            'order_status' => 'ongoing',
+            'started_at' => now() // 🔥 TAMBAH INI
         ]);
 
         return back()->with('success', 'Layanan dimulai');
@@ -384,7 +385,8 @@ class TerapisController extends Controller
             ->firstOrFail();
 
         $transaction->update([
-            'order_status' => 'completed'
+            'order_status' => 'completed',
+            'completed_at' => now() // 🔥 TAMBAH INI
         ]);
 
         return back()->with('success', 'Pesanan selesai');

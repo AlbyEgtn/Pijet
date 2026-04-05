@@ -1,5 +1,8 @@
 @extends('layouts.admin')
 
+@section('title','Review  ')
+@section('header','Review ')
+
 @section('content')
 <div class="p-6">
     <h1 class="text-2xl font-semibold mb-6">

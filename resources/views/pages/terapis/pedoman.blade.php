@@ -1,6 +1,7 @@
 @extends('layouts.terapis')
 
 @section('title', 'Pedoman Terapis')
+@section('header',' Pedoman Terapis ')
 
 @section('content')
 

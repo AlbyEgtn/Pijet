@@ -1,6 +1,7 @@
 @extends('layouts.terapis')
 
 @section('title', 'Konfirmasi Password')
+@section('header','Konfirmasi Password ')
 
 @section('content')
 

@@ -1,5 +1,8 @@
 @extends('layouts.terapis')
 
+@section('title','Detail Pesanan')
+@section('header',' Detail Pesanan ')
+
 @section('content')
 
 <div class="p-6 max-w-4xl mx-auto space-y-6">

@@ -1,5 +1,8 @@
 @extends('layouts.customer')
 
+@section('title','Layanan  ')
+@section('header','Layanan ')
+
 @section('content')
 
 <!-- HEADER -->
