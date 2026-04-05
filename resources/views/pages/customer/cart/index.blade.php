@@ -290,57 +290,31 @@
 
             <div class="space-y-2 mt-2">
 
+                {{-- Opsi Transfer --}}
+                @if(!isset($therapistId) || !$therapistId)
                 <label class="flex justify-between border rounded-lg p-3">
-
-                    Cash
-
-                    <input
-                        type="radio"
-                        name="payment_method"
-                        value="cash"
-                        checked>
-
-                </label>
-
-                <label class="flex justify-between border rounded-lg p-3">
-
                     Transfer
-
-                    <input
-                        type="radio"
-                        name="payment_method"
-                        value="transfer">
-
+                    <input type="radio" name="payment_method" value="transfer">
                 </label>
 
-            </div>
+                {{-- Dropdown rekening muncul saat pilih transfer --}}
+                <div id="transferInfo" class="hidden mt-3 space-y-2">
 
-        </div>
+                    <p class="text-sm font-semibold">Pilih Rekening Tujuan</p>
 
-        <!-- ================= INFO REKENING ================= -->
-        <div id="transferInfo" class="mt-4 hidden">
+                    <select id="selectedAccountId" class="w-full border rounded-lg px-3 py-2 text-sm">
+                        <option value="">-- Pilih Rekening --</option>
+                        @foreach($payments as $pay)
+                        <option value="{{ $pay->id }}">
+                            {{ $pay->bank_name }} — {{ $pay->account_number }} (a.n {{ $pay->account_holder }})
+                        </option>
+                        @endforeach
+                    </select>
 
-            <p class="text-sm font-semibold mb-2">
-                Informasi Rekening
-            </p>
-
-            @foreach($payments as $pay)
-            <div class="border rounded-lg p-3 mb-2 bg-gray-50">
-
-                <p class="text-sm font-semibold">
-                    {{ $pay->bank_name }}
-                </p>
-
-                <p class="text-sm">
-                    No Rek: {{ $pay->account_number }}
-                </p>
-
-                <p class="text-xs text-gray-500">
-                    a.n {{ $pay->account_holder }}
-                </p>
+                </div>
+                @endif
 
             </div>
-            @endforeach
 
         </div>
 
@@ -387,12 +361,12 @@
 
 /* ================= UPDATE QTY ================= */
 
-function updateQty(cartId,type){
+function updateQty(cartId, type){
 
-    fetch(`/customer/cart/${type}/${cartId}`,{
-        method:"GET",
-        headers:{
-            "X-Requested-With":"XMLHttpRequest"
+    fetch(`/customer/cart/${type}/${cartId}`, {
+        method: "GET",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
         }
     })
     .then(res => res.json())
@@ -446,7 +420,11 @@ function closeCheckoutSheet(){
 
 }
 
+
 /* ================= PAYMENT TOGGLE ================= */
+
+{{-- Hanya daftarkan listener jika tidak ada therapist_id (elemen transfer ada) --}}
+@if(!isset($therapistId) || !$therapistId)
 
 document.querySelectorAll('input[name="payment_method"]').forEach(el => {
 
@@ -467,6 +445,8 @@ document.querySelectorAll('input[name="payment_method"]').forEach(el => {
     });
 
 });
+
+@endif
 
 
 /* ================= TOTAL ADDITIONAL ================= */
@@ -501,85 +481,71 @@ const userPhone = @json(auth()->user()->phone);
 const userCity = @json(auth()->user()->city);
 const userAddress = @json(auth()->user()->address);
 
+/* ================= THERAPIST FLAG ================= */
+
+const hasTherapist = @json(isset($therapistId) && $therapistId ? true : false);
+
 
 /* ================= CHECKOUT ================= */
 
 function confirmCheckout(){
 
-    const payment =
-        document.querySelector(
-            'input[name="payment_method"]:checked'
-        ).value;
+    const paymentEl = document.querySelector('input[name="payment_method"]:checked');
+    const payment   = paymentEl ? paymentEl.value : "cash";
 
-    const date =
-        document.getElementById("service_date").value;
-
-    const time =
-        document.getElementById("service_time").value;
-
-    const phone = @json(auth()->user()->phone);
-    const city = @json(auth()->user()->city);
-    const address = @json(auth()->user()->address);
+    const date = document.getElementById("service_date").value;
+    const time = document.getElementById("service_time").value;
 
     if(!date || !time){
-
         showToast("Silakan pilih jadwal layanan");
         return;
-
     }
 
+    const accountId = document.getElementById("selectedAccountId")?.value ?? "";
+
+    if(payment === "transfer" && !accountId){
+        showToast("Pilih rekening tujuan transfer");
+        return;
+    }
+
+    const finalPayment = (hasTherapist && payment === "transfer") ? "cash" : payment;
+
     const formData = new FormData();
+    formData.append("payment_method",     finalPayment);
+    formData.append("service_date",       date);
+    formData.append("service_time",       time);
+    formData.append("phone",              userPhone);
+    formData.append("city",              userCity);
+    formData.append("address",            userAddress);
+    formData.append("company_account_id", accountId);
 
-    formData.append('payment_method', payment);
-    formData.append('service_date', date);
-    formData.append('service_time', time);
-
-    formData.append('phone', phone);
-    formData.append('city', city);
-    formData.append('address', address);
-
-    fetch("{{ route('customer.cart.checkout') }}",{
-
-        method:"POST",
-
-        headers:{
-            "X-CSRF-TOKEN":"{{ csrf_token() }}",
-            "X-Requested-With":"XMLHttpRequest"
+    fetch("{{ route('customer.cart.checkout') }}", {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN":     "{{ csrf_token() }}",
+            "X-Requested-With": "XMLHttpRequest"
         },
-
         body: formData
-
     })
     .then(res => res.json())
     .then(data => {
 
         if(data.success){
-
             showToast("Pesanan anda sedang diproses");
-
-            setTimeout(()=>{
-
+            setTimeout(() => {
                 window.location.href = data.redirect;
-
-            },1500);
-
+            }, 1500);
         }else{
-
             showToast(data.message ?? "Checkout gagal");
-
         }
 
     })
     .catch(err => {
-
         console.error(err);
         showToast("Terjadi kesalahan sistem");
-
     });
 
 }
-
-
 
 
 /* ================= TOAST ================= */
@@ -601,15 +567,14 @@ function showToast(message){
 
     document.body.appendChild(toast);
 
-    setTimeout(()=>{
+    setTimeout(() => {
 
         toast.remove();
 
-    },2500);
+    }, 2500);
 
 }
 
 </script>
 
 @endpush
-

@@ -1,48 +1,57 @@
-<nav class="bg-gradient-to-r from-teal-600 to-teal-500 text-white border-b">
+@php
+    $user = auth()->user();
+@endphp
+
+<nav class="bg-gradient-to-r from-teal-600 to-teal-500 text-white border-b shadow-sm">
 
     <div class="max-w-7xl mx-auto px-6">
 
-        <div class="flex justify-between items-center h-14">
+        <div class="flex justify-between items-center h-16">
 
-            <!-- LOGO -->
+            <!-- ================= LOGO ================= -->
             <div class="flex items-center gap-3">
 
-                <img src="/images/logo-pth.png" class="w-8 h-8">
+                <img src="{{ asset('images/logo-pth.png') }}"
+                     class="w-9 h-9 object-contain">
 
                 <span class="font-semibold text-lg tracking-wide">
-                    Pijetin
+                    Pijat.in
                 </span>
 
             </div>
 
 
-            <!-- MENU -->
-            <div class="flex items-center gap-6 text-sm font-medium">
+            <!-- ================= MENU ================= -->
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
 
                 <a href="{{ route('customer.dashboard') }}"
-                   class="hover:text-teal-100 transition">
+                   class="hover:text-teal-100 transition
+                   {{ request()->routeIs('customer.dashboard') ? 'underline underline-offset-4' : '' }}">
                     Home
                 </a>
 
                 <a href="{{ route('customer.services') }}"
-                   class="hover:text-teal-100 transition">
+                   class="hover:text-teal-100 transition
+                   {{ request()->routeIs('customer.services*') ? 'underline underline-offset-4' : '' }}">
                     Layanan
                 </a>
 
                 <a href="{{ route('customer.cart') }}"
-                   class="hover:text-teal-100 transition">
+                   class="hover:text-teal-100 transition
+                   {{ request()->routeIs('customer.cart') ? 'underline underline-offset-4' : '' }}">
                     Keranjang
                 </a>
 
                 <a href="{{ route('customer.orders') }}"
-                   class="hover:text-teal-100 transition">
+                   class="hover:text-teal-100 transition
+                   {{ request()->routeIs('customer.orders*') ? 'underline underline-offset-4' : '' }}">
                     Riwayat
                 </a>
 
             </div>
 
 
-            <!-- RIGHT SIDE -->
+            <!-- ================= RIGHT SIDE ================= -->
             <div class="flex items-center gap-5">
 
                 <!-- CART -->
@@ -68,40 +77,107 @@
 
                     </div>
 
-                    @if($cartCount > 0)
-                    <span id="cart-count"
-                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">
-                        {{ $cartCount }}
-                    </span>
-                    @endif
+                    {{-- CART COUNT --}}
+                    @isset($cartCount)
+                        @if($cartCount > 0)
+                            <span
+                                id="cart-count"
+                                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full shadow">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    @endisset
 
                 </a>
 
-                <!-- USER -->
-                <div class="flex items-center gap-2">
 
-                    <img
-                        src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}"
-                        class="w-7 h-7 rounded-full border border-white"
+                <!-- USER DROPDOWN -->
+                <div x-data="{ open: false }" class="relative">
+
+                    <button @click="open = !open"
+                        class="flex items-center gap-2 hover:opacity-90 transition">
+
+                        <img
+                            src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}"
+                            class="w-8 h-8 rounded-full border border-white"
+                        >
+
+                        <span class="text-sm hidden sm:block">
+                            {{ $user->name }}
+                        </span>
+
+                    </button>
+
+
+                    <!-- DROPDOWN -->
+                    <div
+                        x-show="open"
+                        @click.outside="open = false"
+                        x-transition
+                        class="absolute right-0 mt-3 w-48 bg-white text-gray-700 rounded-lg shadow-lg py-2 z-50"
                     >
 
-                    <span class="text-sm">
-                        {{ auth()->user()->name }}
-                    </span>
+                        <a href="#"
+                           class="block px-4 py-2 text-sm hover:bg-gray-100">
+                            Profile
+                        </a>
+
+                        <a href="{{ route('customer.orders') }}"
+                           class="block px-4 py-2 text-sm hover:bg-gray-100">
+                            Riwayat Pesanan
+                        </a>
+
+                        <hr class="my-2">
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button
+                                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                Logout
+                            </button>
+                        </form>
+
+                    </div>
 
                 </div>
 
-                <!-- LOGOUT -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
 
-                    <button
-                        type="submit"
-                        class="text-xs bg-white text-teal-600 px-3 py-1 rounded-md hover:bg-gray-100 transition">
-                        Logout
+                <!-- ================= MOBILE MENU BUTTON ================= -->
+                <div class="md:hidden" x-data="{ open: false }">
+
+                    <button @click="open = !open"
+                        class="bg-white/20 p-2 rounded hover:bg-white/30">
+
+                        ☰
+
                     </button>
 
-                </form>
+                    <!-- MOBILE MENU -->
+                    <div
+                        x-show="open"
+                        x-transition
+                        class="absolute left-0 top-16 w-full bg-teal-600 px-6 py-4 space-y-3 text-sm z-40"
+                    >
+
+                        <a href="{{ route('customer.dashboard') }}" class="block">
+                            Home
+                        </a>
+
+                        <a href="{{ route('customer.services') }}" class="block">
+                            Layanan
+                        </a>
+
+                        <a href="{{ route('customer.cart') }}" class="block">
+                            Keranjang
+                        </a>
+
+                        <a href="{{ route('customer.orders') }}" class="block">
+                            Riwayat
+                        </a>
+
+                    </div>
+
+                </div>
 
             </div>
 

@@ -13,10 +13,6 @@ return new class extends Migration
             $table->id();
 
             $table->string('transaction_code')->unique();
-
-            // =========================
-            // RELASI
-            // =========================
             $table->foreignId('customer_id')
                 ->nullable()
                 ->constrained('users')
@@ -26,26 +22,14 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('terapis')
                 ->nullOnDelete();
-
-            // =========================
-            // SNAPSHOT CUSTOMER
-            // =========================
             $table->string('customer_name');
             $table->string('customer_phone')->nullable();
             $table->text('customer_address')->nullable();
             $table->string('customer_city')->nullable();
 
             $table->string('orderer_name')->nullable();
-
-            // =========================
-            // JADWAL
-            // =========================
             $table->date('service_date');
             $table->time('service_time');
-
-            // =========================
-            // PAYMENT
-            // =========================
             $table->enum('payment_method', [
                 'transfer',
                 'cash'
@@ -64,10 +48,6 @@ return new class extends Migration
             $table->timestamp('payment_expired_at')->nullable();
 
             $table->string('payment_proof')->nullable();
-
-            // =========================
-            // ORDER STATUS (CORE FLOW)
-            // =========================
             $table->enum('order_status', [
                 'waiting',      // menunggu pembayaran
                 'ready',        // siap diambil terapis
@@ -78,26 +58,10 @@ return new class extends Migration
                 'cancelled',    // dibatalkan
                 'rescheduled'   // dijadwal ulang
             ])->default('waiting');
-
-            // =========================
-            // HARGA
-            // =========================
             $table->integer('total_price')->default(0);
-
-            // =========================
-            // RESCHEDULE
-            // =========================
             $table->date('reschedule_date')->nullable();
             $table->time('reschedule_time')->nullable();
-
-            // =========================
-            // CANCEL
-            // =========================
             $table->text('cancel_reason')->nullable();
-
-            // =========================
-            // EXPIRED ORDER
-            // =========================
             $table->foreignId('company_account_id')
                 ->nullable()
                 ->after('terapis_id')
@@ -106,6 +70,8 @@ return new class extends Migration
 
             $table->integer('company_income')->nullable();   // isi saat selesai
             $table->integer('therapist_income')->nullable(); // isi saat selesai
+            $table->boolean('is_balance_recorded')->default(false);
+            $table->boolean('is_profit_shared')->default(false);
             $table->timestamp('expired_at')->nullable();
 
             $table->timestamps();

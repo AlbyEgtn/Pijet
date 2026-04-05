@@ -69,7 +69,9 @@ class OrderController extends Controller
     {
         $order = Transaction::with('services')->findOrFail($id);
 
-        $accounts = PaymentAccount::where('is_active', true)->get();
+        $accounts = PaymentAccount::where('is_active', true)
+            ->where('type', 'company')
+            ->get();
 
         return view('pages.customer.orders.show', [
             'order' => $order,
@@ -172,7 +174,9 @@ class OrderController extends Controller
             $order->save();
         }
 
-        $accounts = \App\Models\PaymentAccount::where('is_active', true)->get();
+        $accounts = \App\Models\PaymentAccount::where('is_active', true)
+            ->where('type', 'company')
+            ->get();
 
         return view('pages.customer.orders.payment', [
             'order' => $order,

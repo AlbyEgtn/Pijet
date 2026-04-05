@@ -13,18 +13,6 @@
     </div>
 
 
-    <!-- KOTA -->
-    <div class="px-6 py-4 text-sm text-white/80 flex items-center justify-between cursor-pointer hover:text-white transition">
-
-        Seluruh Kota
-
-        <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor">
-            <path stroke-width="2" d="M19 9l-7 7-7-7"/>
-        </svg>
-
-    </div>
-
-
     <!-- MENU -->
     <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
 
@@ -39,17 +27,14 @@
 
 
         <!-- ORDER -->
-        <div x-data="{ open: true }">
+        <div x-data="{ open: false  }">
 
             <button @click="open = !open"
                 class="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white/10">
 
                 <span>Order</span>
 
-                <svg :class="open ? 'rotate-180' : ''"
-                     class="w-4 h-4 transition">
-                    <path stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
+                <span class="text-xs">▾</span>
 
             </button>
 
@@ -88,7 +73,7 @@
 
 
         <!-- TERAPIS -->
-        <div x-data="{ open: true }">
+        <div x-data="{ open: false  }">
 
             <button @click="open = !open"
                 class="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white/10">

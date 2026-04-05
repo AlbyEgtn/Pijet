@@ -15,30 +15,6 @@
     </div>
 
 
-    <!-- CABANG SELECT -->
-    <div class="px-6 py-4 text-sm text-white/80 flex items-center justify-between cursor-pointer">
-
-        Seluruh Cabang
-
-        <svg
-            class="w-4 h-4 opacity-70"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-            />
-
-        </svg>
-
-    </div>
-
-
     <!-- MENU -->
     <nav class="flex-1 px-3 py-4 space-y-1 text-[15px]">
 
@@ -103,7 +79,7 @@
         </a>
 
 
-        <!-- Pesanan -->
+        {{--<!-- Pesanan -->
         <a
             href="#"
             class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition"
@@ -184,7 +160,7 @@
 
             Karyawan
 
-        </a>
+        </a>--}}
 
 
         <!-- Landing Page -->

@@ -83,6 +83,11 @@ class Transaction extends Model
         return $this->belongsTo(User::class,'customer_id');
     }
 
+    // Transaction.php
+    public function companyAccount()
+    {
+        return $this->belongsTo(PaymentAccount::class, 'company_account_id');
+    }
 
     /*
     |--------------------------------------------------------------------------

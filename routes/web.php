@@ -507,4 +507,8 @@ Route::middleware(['auth','role:customer'])
 
         })->middleware('auth');
 
+        Route::get('/order/status/{id}', function($id){
+            return \App\Models\Transaction::findOrFail($id);
+        });
+
 });

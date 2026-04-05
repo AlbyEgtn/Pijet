@@ -34,8 +34,10 @@ class CartController extends Controller
             ->get();
 
         // 🔥 TAMBAHAN: ambil data rekening (tanpa transaction_id)
-        $payments = PaymentAccount::where('is_active', 1)->get();
-        
+        $payments = PaymentAccount::where('is_active', 1)
+            ->where('type', 'company')
+            ->get();   
+                 
         return view('pages.customer.cart.index', [
             'carts' => $carts,
             'total' => $total,
@@ -190,6 +192,11 @@ class CartController extends Controller
 
                 // 🔥 TIMER LANGSUNG JALAN
                 'payment_expired_at' => now()->addHours(24),
+
+                // ✅ Simpan rekening tujuan (null kalau cash)
+                'company_account_id' => $request->payment_method === 'transfer'
+                    ? $request->company_account_id
+                    : null,
             ]);
 
 
