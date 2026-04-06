@@ -93,6 +93,18 @@ class TerapisController extends Controller
         return view('pages.terapis.pesanan_saya_detail', compact('transaction'));
     }
 
+    public function batalkanPesanan(Request $request, $id)
+    {
+        $trx = Transaction::findOrFail($id);
+
+        $trx->update([
+            'status' => 'dibatalkan',
+            'cancel_reason' => $request->reason . ' - ' . $request->note
+        ]);
+
+        return back()->with('success','Pesanan dibatalkan');
+    }
+
     public function detail()
     {
         $user = Auth::user();

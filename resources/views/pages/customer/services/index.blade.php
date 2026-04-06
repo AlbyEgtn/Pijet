@@ -192,3 +192,79 @@
 </div>
 
 @endsection
+@push('scripts')
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    console.log("Services JS Loaded ✅");
+
+    /* ================= GLOBAL FUNCTION ================= */
+    window.addToCart = function(id){
+
+        console.log("Tambah layanan:", id);
+
+        fetch(`/customer/cart/add/${id}`,{
+            method:"GET",
+            headers:{
+                "X-Requested-With":"XMLHttpRequest"
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if(data.success){
+
+                updateCartBadge(data.count);
+                showToast("Layanan berhasil masuk ke keranjang");
+
+            }
+
+        })
+        .catch(err => {
+            console.error(err);
+            showToast("Terjadi kesalahan");
+        });
+
+    }
+
+
+    /* ================= BACKUP EVENT ================= */
+    document.addEventListener("click", function(e){
+
+        let btn = e.target.closest(".btn-add");
+
+        if(btn){
+            let id = btn.dataset.id;
+            addToCart(id);
+        }
+
+    });
+
+
+    /* ================= UPDATE BADGE ================= */
+    window.updateCartBadge = function(count){
+
+        let badge = document.getElementById("cart-count");
+        const cartIcon = document.querySelector('a[href="{{ route('customer.cart') }}"]');
+
+        if(badge){
+
+            badge.innerText = count;
+
+        }else{
+
+            const span = document.createElement("span");
+
+            span.id = "cart-count";
+            span.className = "absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full";
+            span.innerText = count;
+
+            cartIcon.appendChild(span);
+        }
+
+    }
+
+});
+</script>
+@endpush

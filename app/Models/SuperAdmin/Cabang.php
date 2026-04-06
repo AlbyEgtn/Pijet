@@ -20,4 +20,9 @@ class Cabang extends Model
         'status'
     ];
 
+    public function users()
+    {
+        return $this->hasMany(\App\Models\User::class);
+    }
+
 }

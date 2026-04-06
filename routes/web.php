@@ -17,6 +17,7 @@ use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\ServiceCustController;
 use App\Http\Controllers\Customer\OrderController;
 
+
 //Superadmin
 use App\Http\Controllers\SuperAdmin\ServiceController as SuperAdminServiceController;
 use App\Http\Controllers\SuperAdmin\CabangController;
@@ -24,6 +25,8 @@ use App\Http\Controllers\SuperAdmin\LandingPageController;
 use App\Http\Controllers\SuperAdmin\LandingBenefitController;
 use App\Http\Controllers\Superadmin\ServiceController;
 use App\Http\Controllers\Superadmin\SuperadminController;
+use App\Http\Controllers\SuperAdmin\KaryawanController;
+use \App\Http\Controllers\SuperAdmin\PenggunaController;
 
 // Terapis
 use App\Http\Controllers\Terapis\TerapisController;
@@ -179,6 +182,53 @@ Route::middleware(['auth','role:super_admin'])
             [LandingPageController::class,'destroyBenefit']
         )->name('benefit.destroy');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Karyawan
+    |--------------------------------------------------------------------------
+    */
+
+        Route::get('/karyawan', [KaryawanController::class, 'index'])
+            ->name('superadmin.karyawan.index');
+
+        Route::get('/karyawan/create', 
+            [KaryawanController::class, 'create']
+        )->name('superadmin.karyawan.create');
+
+        Route::post('/karyawan/store', 
+            [KaryawanController::class, 'store']
+        )->name('superadmin.karyawan.store');
+
+        Route::get('/karyawan/{id}', 
+            [KaryawanController::class, 'show']
+        )->name('superadmin.karyawan.show');
+
+        Route::delete('/karyawan/{id}', 
+            [KaryawanController::class, 'destroy']
+        )->name('superadmin.karyawan.destroy');
+
+        Route::get('/cabang-by-provinsi/{provinsi}', 
+            [KaryawanController::class, 'getCabangByProvinsi']);
+
+        Route::get('/pengguna/{type}', 
+            [PenggunaController::class, 'index']
+        )->name('superadmin.pengguna');
+
+        Route::get('/pengguna/{type}/{id}', 
+            [PenggunaController::class, 'show']
+        )->name('superadmin.pengguna.detail');
+
+        Route::post('/pengguna/{id}/suspend', 
+            [PenggunaController::class, 'suspend']
+        )->name('superadmin.pengguna.suspend');
+
+        Route::get('/penangguhan/{type}', 
+            [PenggunaController::class, 'penangguhan']
+        )->name('superadmin.penangguhan');
+
+        Route::get('/penangguhan/aduan/{id}', 
+            [PenggunaController::class, 'detailAduan']
+        )->name('superadmin.penangguhan.detail');
 });
 
 
@@ -322,7 +372,6 @@ Route::middleware(['auth','role:terapis'])
     ->group(function () {
 
         Route::get('/dashboard', [TerapisController::class, 'dashboard'])
-            ->name('terapis.dashboard');
             ->name('dashboard');
 
         Route::get('/profile', [TerapisController::class, 'profile'])
@@ -342,6 +391,9 @@ Route::middleware(['auth','role:terapis'])
 
         Route::get('/pesanan-saya/{id}', [TerapisController::class, 'detailPesananSaya'])
             ->name('pesanan.saya.detail');
+        
+        Route::post('/pesanan/{id}/batal', [TerapisController::class, 'batalkanPesanan'])
+            ->name('pesanan.batal');
 
         Route::get('/profile/confirm', [TerapisController::class,'confirmPassword'])
             ->name('confirm.password');

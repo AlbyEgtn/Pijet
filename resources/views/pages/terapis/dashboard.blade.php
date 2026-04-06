@@ -6,17 +6,16 @@
 
 <div class="grid grid-cols-12 gap-6">
 
-    {{-- LEFT SIDE --}}
+    {{-- ================= LEFT SIDE ================= --}}
     <div class="col-span-8 space-y-6">
 
         {{-- HEADER --}}
         <div class="bg-teal-600 text-white p-6 rounded-2xl shadow">
-
             <div class="flex justify-between items-center">
 
                 <div>
                     <h2 class="text-lg font-semibold">
-                        Selamat Bergabung
+                        Selamat Datang
                     </h2>
                     <p class="text-sm opacity-80">
                         {{ $user->name }}
@@ -32,141 +31,110 @@
                 </label>
 
             </div>
-
         </div>
+
 
         {{-- LIST PESANAN --}}
         <div class="bg-white rounded-2xl shadow p-6">
 
-            <div class="flex justify-between mb-4">
-                <h2 class="font-semibold">
-                    Pesanan Layanan
-                </h2>
-                <a href="#" class="text-sm text-blue-500">
-                    Selengkapnya
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="font-semibold">Pesanan Terbaru</h2>
+
+                <a href="{{ route('terapis.pesanan') }}"
+                   class="text-sm text-teal-600 hover:underline">
+                    Lihat Semua
                 </a>
             </div>
 
-            {{-- ITEM --}}
-            @for ($i = 0; $i < 5; $i++)
+            @forelse($transactions->take(5) as $trx)
             <div class="flex items-center justify-between py-3 border-b">
 
-                <div class="flex items-center gap-3">
-
-                    <div class="w-10 h-10 rounded-full bg-gray-200"></div>
-
-                    <div>
-                        <p class="font-medium">
-                            Matt Shadow
-                        </p>
-                        <p class="text-xs text-gray-500">
-                            Menunggu
-                        </p>
-                    </div>
-
+                <div>
+                    <p class="font-medium">
+                        {{ $trx->customer_name }}
+                    </p>
+                    <p class="text-xs text-gray-500">
+                        {{ \Carbon\Carbon::parse($trx->service_date)->format('d M Y') }}
+                    </p>
                 </div>
 
-                <span class="text-blue-500 text-sm">
-                    Menunggu
+                <span class="text-xs px-2 py-1 rounded
+                    @if($trx->status == 'belum_lunas') bg-yellow-100 text-yellow-700
+                    @elseif($trx->status == 'proses') bg-blue-100 text-blue-700
+                    @elseif($trx->status == 'lunas') bg-green-100 text-green-700
+                    @elseif($trx->status == 'dibatalkan') bg-red-100 text-red-700
+                    @else bg-gray-100 text-gray-700
+                    @endif
+                ">
+                    {{ ucfirst(str_replace('_',' ',$trx->status)) }}
                 </span>
 
             </div>
-            @endfor
-{{-- PESANAN --}}
-<div class="bg-white mt-8 rounded-xl shadow">
-
-    <div class="p-6 border-b flex justify-between items-center">
+            @empty
+            <p class="text-center text-gray-500 py-6">
+                Belum ada pesanan
+            </p>
+            @endforelse
 
         </div>
-
-        <a href="{{ route('terapis.pesanan') }}"
-           class="text-sm text-teal-600 hover:underline">
-            Lihat Semua
-        </a>
 
     </div>
 
 
-    {{-- RIGHT SIDE --}}
+
+    {{-- ================= RIGHT SIDE ================= --}}
     <div class="col-span-4 space-y-6">
 
-        {{-- DETAIL --}}
+        {{-- DETAIL PESANAN --}}
         <div class="bg-white rounded-2xl shadow p-6">
 
             <h2 class="font-semibold mb-4">
                 Detail Pesanan
             </h2>
 
-            {{-- CARD --}}
-            <div class="border rounded-xl p-4 mb-4">
+            @if($transactions->first())
+            @php $trx = $transactions->first(); @endphp
+
+            <div class="border rounded-xl p-4">
 
                 <p class="font-medium">
-                    Matt Shadow
+                    {{ $trx->customer_name }}
                 </p>
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="p-4 text-left">Customer</th>
-                <th class="p-4 text-left">Tanggal</th>
-                <th class="p-4 text-left">Status</th>
-            </tr>
-        </thead>
 
                 <p class="text-sm text-gray-500 mt-1">
-                    Full Body Massage (90 menit)
+                    {{ $trx->service_date }} • {{ $trx->service_time }}
                 </p>
 
                 <div class="mt-3 text-sm text-gray-600">
-                    <p>Lokasi: Homecare</p>
-                    <p>Tanggal: 25 Agustus 2025</p>
+                    <p>Alamat: {{ $trx->customer_address }}</p>
                 </div>
 
                 <div class="mt-3 font-semibold text-right">
-                    Rp 170.000
+                    Rp {{ number_format($trx->total_price) }}
                 </div>
 
-                <button class="mt-3 w-full bg-teal-600 text-white py-2 rounded-lg">
-                    Ambil Pesanan
-                </button>
+                @if($trx->status == 'belum_lunas')
+                <form action="{{ route('terapis.pesanan.ambil', $trx->id) }}" method="POST">
+                    @csrf
+                    <button class="mt-3 w-full bg-teal-600 text-white py-2 rounded-lg">
+                        Ambil Pesanan
+                    </button>
+                </form>
+                @else
+                <div class="mt-3 w-full text-center bg-gray-200 py-2 rounded-lg text-gray-600">
+                    Tidak tersedia
+                </div>
+                @endif
 
             </div>
 
+            @else
+            <p class="text-center text-gray-500">
+                Tidak ada pesanan
+            </p>
+            @endif
+
         </div>
-            @forelse($transactions as $trx)
-            <tr class="border-t hover:bg-gray-50">
-
-                <td class="p-4">
-                    {{ $trx->customer_name }}
-                </td>
-
-                <td class="p-4">
-                    {{ \Carbon\Carbon::parse($trx->service_date)->format('d M Y') }}
-                </td>
-
-                <td class="p-4">
-
-                    <span class="px-2 py-1 rounded text-xs
-                        @if($trx->status == 'belum_lunas') bg-yellow-100 text-yellow-700
-                        @elseif($trx->status == 'proses') bg-blue-100 text-blue-700
-                        @elseif($trx->status == 'lunas') bg-green-100 text-green-700
-                        @elseif($trx->status == 'dibatalkan') bg-red-100 text-red-700
-                        @else bg-gray-100 text-gray-700
-                        @endif
-                    ">
-                        {{ ucfirst(str_replace('_',' ',$trx->status)) }}
-                    </span>
-
-                </td>
-
-            </tr>
-            @empty
-            <tr>
-                <td colspan="3" class="p-4 text-center text-gray-500">
-                    Belum ada pesanan
-                </td>
-            </tr>
-            @endforelse
-            
-        </tbody>
 
     </div>
 

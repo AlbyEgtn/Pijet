@@ -40,6 +40,12 @@ return new class extends Migration
 
             $table->string('work_area')->nullable();
 
+            $table->boolean('is_suspended')->default(false);
+
+            $table->integer('warning_count')->default(0);
+
+            $table->string('foto')->nullable();
+
             $table->string('ktp')->nullable();
 
             $table->string('skck')->nullable();

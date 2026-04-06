@@ -27,11 +27,13 @@ class User extends Authenticatable
         'gender',
         'birth_date',
         'phone',
+        'cabang_id',
 
         'city',
         'address',
 
         'work_area',
+        'foto',
         'ktp',
         'skck',
         'email_otp',
@@ -63,6 +65,23 @@ class User extends Authenticatable
 
     public function terapis()
     {
-        return $this->hasOne(Terapis::class);
+        return $this->hasMany(\App\Models\Transaction::class, 'customer_id');
+    }
+
+    public function getKodeAttribute()
+    {
+        if ($this->role === 'admin') {
+            return 'ADM' . str_pad($this->id, 3, '0', STR_PAD_LEFT);
+        }
+
+        if ($this->role === 'finance') {
+            return 'FNC' . str_pad($this->id, 3, '0', STR_PAD_LEFT);
+        }
+
+        return $this->id;
+    }
+    public function cabang()
+    {
+        return $this->belongsTo(\App\Models\SuperAdmin\Cabang::class);
     }
 }

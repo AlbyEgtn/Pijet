@@ -194,3 +194,68 @@
 </div>
 
 @endsection
+@push('scripts')
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    console.log("INDEX SERVICES JS READY ✅");
+
+    /* ================= FUNCTION GLOBAL ================= */
+    window.addToCart = function(id){
+
+        console.log("Tambah layanan:", id);
+
+        fetch(`/customer/cart/add/${id}`, {
+            method: "GET",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if(data.success){
+
+                showToast("Berhasil ditambahkan");
+
+                // update cart count (optional)
+                fetch("/customer/cart/count")
+                    .then(res => res.json())
+                    .then(res => {
+                        let el = document.getElementById("cart-count-global");
+                        if(el) el.innerText = res.count;
+                    });
+
+            }else{
+                showToast("Gagal menambahkan");
+            }
+
+        })
+        .catch(err => {
+            console.error(err);
+            showToast("Error sistem");
+        });
+
+    }
+
+
+    /* ================= BACKUP EVENT ================= */
+    document.addEventListener("click", function(e){
+
+        let btn = e.target.closest(".btn-add");
+
+        if(btn){
+
+            let id = btn.dataset.id;
+
+            console.log("Klik via delegation:", id);
+
+            addToCart(id);
+        }
+
+    });
+
+});
+</script>
+@endpush
