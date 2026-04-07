@@ -12,17 +12,18 @@ class CustomerController extends Controller
     {
 
         // layanan utama
-        $services = Service::where('is_active', true)
+        $services = Service::select('id','name','price','image')
+            ->where('is_active', true)
             ->where('is_additional', false)
             ->limit(8)
             ->get();
 
-        // layanan tambahan
-        $additionalServices = Service::where('is_active', true)
+        $additionalServices = Service::select('id','name','price','image','description')
+            ->where('is_active', true)
             ->where('is_additional', true)
             ->limit(4)
             ->get();
-
+            
         return view('pages.customer.dashboard',[
             'services' => $services,
             'additionalServices' => $additionalServices

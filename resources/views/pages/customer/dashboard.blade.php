@@ -1,7 +1,6 @@
 @extends('layouts.customer')
 
 @section('title','Dashboard  ')
-@section('header','Dashboard ')
 
 @section('content')
 <br>
@@ -108,8 +107,9 @@
 
                 <img
                     src="{{ $service->image_url }}"
+                    loading="lazy"
                     class="w-14 h-14 rounded-lg object-cover"
-                >
+                />
 
                 <div class="flex-1">
 

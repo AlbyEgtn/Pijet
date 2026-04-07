@@ -1,7 +1,7 @@
 @extends('layouts.finance')
 
-@section('title','Pengaturan  ')
-@section('header','Pengaturan ')
+@section('title','Pengaturan')
+@section('header','Pengaturan')
 
 @section('content')
 
@@ -24,7 +24,7 @@
             <div class="text-right">
                 <p class="text-xs opacity-80">Total Saldo</p>
                 <p class="text-lg font-semibold">
-                    Rp{{ number_format($companyAccounts->sum(fn($a) => $a->balance ?? 0),0,',','.') }}
+                    Rp {{ number_format($totalCompany,0,',','.') }}
                 </p>
             </div>
 
@@ -35,13 +35,23 @@
     <!-- LIST REKENING -->
     <div class="bg-white rounded-2xl shadow p-5 space-y-4">
 
-        <h2 class="font-semibold text-gray-700">
-            Rekening Perusahaan
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-gray-700">
+                Rekening Perusahaan
+            </h2>
+
+            <span class="text-xs text-gray-400">
+                {{ count($companyAccounts) }} rekening
+            </span>
+        </div>
 
         @forelse($companyAccounts as $account)
 
-            <div class="border-b pb-4 last:border-0">
+            @php
+                $balance = $account->balance ?? 0;
+            @endphp
+
+            <div class="border rounded-xl p-4 hover:shadow transition">
 
                 <div class="flex justify-between items-center">
 
@@ -63,18 +73,16 @@
                     <!-- SALDO -->
                     <div class="text-right">
 
-                        @php
-                            $balance = $account->balance ?? 0;
-                        @endphp
-
                         <p class="text-lg font-semibold 
                             {{ $balance > 0 ? 'text-teal-600' : 'text-gray-400' }}">
                             
-                            Rp{{ number_format($balance,0,',','.') }}
+                            Rp {{ number_format($balance,0,',','.') }}
                         </p>
 
-                        <span class="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700">
-                            Aktif
+                        <span class="text-xs px-3 py-1 rounded-full 
+                            {{ $account->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            
+                            {{ $account->is_active ? 'Aktif' : 'Nonaktif' }}
                         </span>
 
                     </div>
@@ -85,8 +93,12 @@
 
         @empty
 
-            <div class="text-center py-6 text-gray-500 text-sm">
-                Tidak ada rekening aktif
+            <div class="text-center py-10">
+
+                <p class="text-gray-400 text-sm">
+                    Tidak ada rekening aktif
+                </p>
+
             </div>
 
         @endforelse
@@ -105,7 +117,7 @@
         </p>
 
         <p>
-            • Payout ke terapis belum dikurangi dari saldo
+            • Saldo sudah merupakan <b>bagian perusahaan (company income)</b>
         </p>
 
     </div>

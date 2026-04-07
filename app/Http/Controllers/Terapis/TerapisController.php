@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Transaction;
 use App\Models\PaymentAccount;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\FinanceHelper;
 
 class TerapisController extends Controller
 {
@@ -386,10 +387,24 @@ class TerapisController extends Controller
 
         $transaction->update([
             'order_status' => 'completed',
-            'completed_at' => now() // 🔥 TAMBAH INI
+            'completed_at' => now()
         ]);
 
-        return back()->with('success', 'Pesanan selesai');
+        // 🔥 REFRESH DATA (PENTING!)
+        $transaction->refresh();
+
+        // ===============================
+        // 🔥 REDIRECT KE BAYAR HUTANG (CASH)
+        // ===============================
+        if (
+            $transaction->payment_method === 'cash' &&
+            !$transaction->is_company_paid
+        ) {
+            return redirect()->route('terapis.bayar.hutang', $transaction->id);
+        }
+
+        return redirect()->route('terapis.pesanan.saya')
+            ->with('success', 'Pesanan selesai');
     }
 
     public function batalPesanan($id)
@@ -490,4 +505,25 @@ class TerapisController extends Controller
         return back()->with('success', 'Rekening dihapus');
     }
 
+    public function hutang($id)
+    {
+        $order = Transaction::where('id', $id)
+            ->where('terapis_id', auth()->user()->terapis->id)
+            ->firstOrFail();
+
+        return view('pages.terapis.hutang', compact('order'));
+    }
+
+    public function prosesBayarHutang($id)
+    {
+        $order = Transaction::where('id', $id)
+            ->where('terapis_id', auth()->user()->terapis->id)
+            ->firstOrFail();
+
+        // 🔥 BAYAR HUTANG
+        FinanceHelper::payCompanyFee($order);
+
+        return redirect()->route('terapis.pesanan.saya')
+            ->with('success', 'Pembayaran berhasil');
+    }
 }

@@ -1,7 +1,6 @@
 @extends('layouts.customer')
 
 @section('title','Layanan  ')
-@section('header','Layanan ')
 
 @section('content')
 
@@ -181,26 +180,22 @@ function addToCart(id){
 
 function updateCartBadge(count){
 
-    let badge = document.getElementById("cart-count");
     const cartIcon = document.querySelector('a[href="{{ route('customer.cart') }}"]');
 
-    if(badge){
+    if(!cartIcon) return;
 
-        badge.innerText = count;
+    let badge = document.getElementById("cart-count");
 
-    }else{
+    if(!badge){
+        badge = document.createElement("span");
 
-        const span = document.createElement("span");
+        badge.id = "cart-count";
+        badge.className = "absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full";
 
-        span.id = "cart-count";
-        span.className = "absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full";
-
-        span.innerText = count;
-
-        cartIcon.appendChild(span);
-
+        cartIcon.appendChild(badge);
     }
 
+    badge.innerText = count;
 }
 
 function showToast(message){

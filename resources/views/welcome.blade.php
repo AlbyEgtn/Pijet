@@ -89,15 +89,15 @@
 
             <div class="hidden md:flex gap-8 text-sm font-medium">
 
-                <a href="#about" class="hover:text-emerald-400 transition">
+                <a  href="{{ route('login') }}" class="hover:text-emerald-400 transition">
                     Tentang Kami
                 </a>
 
-                <a href="#services" class="hover:text-emerald-400 transition">
+                <a  href="{{ route('login') }}" class="hover:text-emerald-400 transition">
                     Layanan
                 </a>
 
-                <a href="#benefit" class="hover:text-emerald-400 transition">
+                <a  href="{{ route('login') }}" class="hover:text-emerald-400 transition">
                     FAQ
                 </a>
 
@@ -403,7 +403,7 @@
             </p>
 
             <a
-                href="#"
+                href="{{ route('login') }}"
                 class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-xl shadow-lg transition duration-300"
             >
                 Selengkapnya →
@@ -440,14 +440,14 @@
             <div class="flex gap-4 flex-wrap">
 
                 <a
-                    href="#"
+                    href="{{ route('login') }}"
                     class="flex items-center gap-2 bg-black hover:bg-gray-900 text-white px-6 py-3 rounded-xl shadow transition"
                 >
                      App Store
                 </a>
 
                 <a
-                    href="#"
+                    href="{{ route('login') }}"
                     class="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl shadow transition"
                 >
                     ▶ Play Store

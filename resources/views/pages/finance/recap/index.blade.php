@@ -11,7 +11,7 @@
     <div class="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-6 rounded-2xl shadow">
 
         <h2 class="text-xl font-semibold">
-            Rekap Transaksi 📊
+            Rekap Transaksi 
         </h2>
 
         <p class="text-sm text-teal-100">

@@ -1,7 +1,6 @@
 @extends('layouts.customer')
 
 @section('title','Keranjang  ')
-@section('header','Keranjang ')
 
 @section('content')
 
@@ -292,6 +291,12 @@
             </p>
 
             <div class="space-y-2 mt-2">
+
+                {{-- CASH --}}
+                <label class="flex justify-between border rounded-lg p-3">
+                    Bayar di Tempat (Cash)
+                    <input type="radio" name="payment_method" value="cash">
+                </label>
 
                 {{-- Opsi Transfer --}}
                 @if(!isset($therapistId) || !$therapistId)

@@ -237,27 +237,41 @@ class FinanceController extends Controller
 
     public function setting()
     {
-        // ambil rekening company aktif
+        // =========================
+        // AMBIL REKENING PERUSAHAAN
+        // =========================
         $companyAccounts = PaymentAccount::where('type','company')
             ->where('is_active', true)
             ->get();
 
-        // 🔥 ambil saldo sekaligus (no N+1)
+        // =========================
+        // HITUNG SALDO PER REKENING
+        // =========================
         $balances = Transaction::select(
                 'company_account_id',
-                DB::raw('SUM(total_price) as total_balance')
+                DB::raw('SUM(company_income) as total_balance') // ✅ pakai company_income
             )
             ->whereNotNull('company_account_id')
             ->where('payment_status','verified')
             ->groupBy('company_account_id')
             ->pluck('total_balance','company_account_id');
 
-        // inject ke collection
+        // =========================
+        // INJECT KE MASING-MASING ACCOUNT
+        // =========================
         foreach ($companyAccounts as $account) {
             $account->balance = $balances[$account->id] ?? 0;
         }
 
-        return view('pages.finance.setting', compact('companyAccounts'));
+        // =========================
+        // TOTAL SALDO (AKURAT)
+        // =========================
+        $totalCompany = $companyAccounts->sum(fn($a) => $a->balance);
+
+        return view('pages.finance.setting', compact(
+            'companyAccounts',
+            'totalCompany'
+        ));
     }
 
 

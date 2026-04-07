@@ -1,7 +1,6 @@
 @extends('layouts.customer')
 
 @section('title','Pesanan  ')
-@section('header','Pesanan ')
 
 @section('content')
 

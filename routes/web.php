@@ -441,6 +441,12 @@ Route::middleware(['auth','role:terapis'])
 
         Route::delete('/rekening/{id}', [TerapisController::class, 'deletePaymentAccount'])
             ->name('rekening.delete');
+        
+        Route::get('/hutang/{id}', [TerapisController::class, 'hutang'])
+            ->name('terapis.bayar.hutang');
+        
+        Route::post('/terapis/hutang/{id}', [TerapisController::class, 'prosesBayarHutang'])
+            ->name('terapis.bayar.hutang.proses');
 });
 
 

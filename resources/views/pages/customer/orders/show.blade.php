@@ -1,7 +1,6 @@
 @extends('layouts.customer')
 
 @section('title','Pembayaran  ')
-@section('header','Pembayaran ')
 
 @section('content')
 
@@ -46,7 +45,11 @@
                         @if($isBelumBayar)
                             Menunggu Pembayaran
                         @elseif($isPaid)
-                            Pembayaran Berhasil
+                            @if($order->payment_method === 'cash')
+                                Siap Dibayar di Tempat
+                            @else
+                                Pembayaran Berhasil
+                            @endif
                         @elseif($isDiproses)
                             Sedang Diproses
                         @elseif($isSelesai)
@@ -87,11 +90,13 @@
                     ];
                 }else{
                     $steps = [
-                        'waiting'  => 'Order',
-                        'uploaded' => 'Upload',
-                        'verified' => 'Verifikasi',
-                        'ready'    => 'Siap',
-                        'assigned' => 'Ambil',
+                        'waiting'   => 'Order',
+                        'uploaded'  => 'Upload',
+                        'verified'  => 'Verifikasi',
+                        'ready'     => 'Siap',
+                        'assigned'  => 'Terapis Berangkat',
+                        'ongoing'   => 'Sedang Berlangsung',
+                        'completed' => 'Selesai',
                     ];
                 }
 
@@ -107,6 +112,12 @@
                 elseif($order->order_status == 'assigned'){
                     $current = 'assigned';
                 }
+                elseif($order->order_status == 'ongoing'){
+                    $current = 'ongoing';
+                }
+                elseif($order->order_status == 'completed'){
+                    $current = 'completed';
+                }
                 else{
                     $current = $hasTherapist ? 'waiting' : 'verified';
                 }
@@ -115,23 +126,34 @@
                 $currentIndex = array_search($current, $keys);
             @endphp
 
+        <div class="space-y-8">
+
+            @php
+                $keys = array_keys($steps);
+                $currentIndex = array_search($current, $keys);
+                $chunks = array_chunk($steps, 4, true);
+            @endphp
+
+            @foreach($chunks as $rowSteps)
+
             <div class="flex items-center justify-between">
 
-                @foreach($steps as $key => $label)
+                @foreach($rowSteps as $key => $label)
 
                 @php
-                    $index    = array_search($key, $keys);
+                    $index    = array_search($key, $keys); // GLOBAL index
                     $isDone   = $index < $currentIndex;
                     $isActive = $index == $currentIndex;
                 @endphp
 
                 <div class="flex-1 flex items-center">
 
-                    <!-- CIRCLE -->
-                    <div class="flex flex-col items-center text-center">
+                    <!-- ITEM -->
+                    <div class="flex flex-col items-center text-center w-full">
 
-                        <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs
-                            {{ $isDone   ? 'bg-green-500 text-white' : '' }}
+                        <!-- CIRCLE -->
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs
+                            {{ $isDone ? 'bg-green-500 text-white' : '' }}
                             {{ $isActive ? 'bg-blue-500 text-white animate-pulse' : '' }}
                             {{ (!$isDone && !$isActive) ? 'bg-gray-200 text-gray-400' : '' }}
                         ">
@@ -141,7 +163,8 @@
                             @endif
                         </div>
 
-                        <p class="text-[10px] mt-1
+                        <!-- LABEL -->
+                        <p class="text-xs mt-2
                             {{ $isActive ? 'text-blue-600 font-semibold' : 'text-gray-500' }}">
                             {{ $label }}
                         </p>
@@ -150,8 +173,17 @@
 
                     <!-- LINE -->
                     @if(!$loop->last)
-                    <div class="flex-1 h-1 mx-1
-                        {{ $isDone ? 'bg-green-500' : 'bg-gray-200' }}">
+                    @php
+                        // ambil next key di row ini
+                        $rowKeys = array_keys($rowSteps);
+                        $nextKey = $rowKeys[$loop->index + 1] ?? null;
+                        $nextIndex = $nextKey !== null ? array_search($nextKey, $keys) : null;
+
+                        $lineDone = $nextIndex !== null && $nextIndex <= $currentIndex;
+                    @endphp
+
+                    <div class="flex-1 h-1 mx-2
+                        {{ $lineDone ? 'bg-green-500' : 'bg-gray-200' }}">
                     </div>
                     @endif
 
@@ -160,6 +192,10 @@
                 @endforeach
 
             </div>
+
+            @endforeach
+
+        </div>
 
         </div>
 
