@@ -19,7 +19,7 @@ class CabangSeeder extends Seeder
                 'detail_lokasi' => 'Jl. ZA Pagar Alam No. 45, Rajabasa',
                 'email' => 'lampung@pijat.in',
                 'deskripsi' => 'Cabang utama Pijat.in di Bandar Lampung dengan layanan refleksi lengkap.',
-                'status' => 'aktif'
+                'status' => 'Aktif'
             ],
 
             [
@@ -30,7 +30,7 @@ class CabangSeeder extends Seeder
                 'detail_lokasi' => 'Jl. Sudirman No. 12, Jakarta Pusat',
                 'email' => 'jakarta@pijat.in',
                 'deskripsi' => 'Cabang Jakarta dengan fasilitas premium dan terapis profesional.',
-                'status' => 'aktif'
+                'status' => 'Aktif'
             ],
 
             [
@@ -41,7 +41,7 @@ class CabangSeeder extends Seeder
                 'detail_lokasi' => 'Jl. Dago No. 88, Bandung',
                 'email' => 'bandung@pijat.in',
                 'deskripsi' => 'Cabang Bandung dengan konsep relaksasi modern.',
-                'status' => 'aktif'
+                'status' => 'Aktif'
             ],
 
             [
@@ -52,7 +52,7 @@ class CabangSeeder extends Seeder
                 'detail_lokasi' => 'Jl. Malioboro No. 20',
                 'email' => 'jogja@pijat.in',
                 'deskripsi' => 'Cabang Yogyakarta yang fokus pada terapi tradisional.',
-                'status' => 'aktif'
+                'status' => 'Aktif'
             ]
 
         ]);

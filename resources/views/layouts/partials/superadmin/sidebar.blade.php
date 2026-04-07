@@ -79,7 +79,7 @@
         </a>
 
 
-        {{--<!-- Pesanan -->
+        
         <a
             href="#"
             class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition"
@@ -138,29 +138,27 @@
 
         <!-- Karyawan -->
         <a
-            href="#"
-            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition"
+            href="{{ route('superadmin.karyawan.index') }}"
+            class="flex items-center gap-3 px-4 py-3 rounded-lg transition {{ request()->routeIs('superadmin.karyawan*')
+                ? 'bg-white text-[#3E7F73] font-medium shadow-sm'
+                : 'hover:bg-white/10 text-white'}}"
         >
-
             <svg
                 class="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
             >
-
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
                     d="M17 20h5V4H2v16h5M12 12a4 4 0 100-8 4 4 0 000 8zm0 0v8"
                 />
-
             </svg>
 
             Karyawan
-
-        </a>--}}
+        </a>
 
 
         <!-- Landing Page -->
@@ -192,6 +190,99 @@
 
         </a>
 
+        <!-- Pengguna -->
+        <div x-data="{ open: {{ request()->is('superadmin/pengguna*') ? 'true' : 'false' }} }" x-transition.duration.200ms class="px-3">
+
+            <!-- HEADER -->
+            <div 
+                @click="open = !open"
+                class="flex items-center justify-between px-4 py-3 text-white/80 cursor-pointer hover:text-white"
+            >   
+                <span>Pengguna</span>
+
+                <!-- ICON ARROW -->
+                <svg 
+                    :class="{'rotate-180': open}" 
+                    class="w-4 h-4 transition-transform"
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </div>
+
+            <!-- SUB MENU -->
+            <div x-show="open" x-transition class="space-y-1 ml-3">
+
+                <!-- Pelanggan -->
+                <a href="{{ route('superadmin.pengguna', 'pelanggan') }}"
+                class="flex items-center gap-3 px-4 py-2 rounded-lg transition text-sm
+                {{ request()->is('superadmin/pengguna/pelanggan')
+                        ? 'bg-white text-[#3E7F73] font-medium'
+                        : 'hover:bg-white/10 text-white' }}">
+                    ↳ Pelanggan
+                </a>
+
+                <!-- Terapis -->
+                <a href="{{ route('superadmin.pengguna', 'terapis') }}"
+                class="flex items-center gap-3 px-4 py-2 rounded-lg transition text-sm
+                {{ request()->is('superadmin/pengguna/terapis')
+                        ? 'bg-white text-[#3E7F73] font-medium'
+                        : 'hover:bg-white/10 text-white' }}">
+                    ↳ Terapis
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- Penangguhan -->
+        <div x-data="{ open: {{ request()->is('superadmin/penangguhan*') ? 'true' : 'false' }} }" class="px-3">
+
+            <!-- HEADER -->
+            <div 
+                @click="open = !open"
+                class="flex items-center justify-between px-4 py-3 text-white/80 cursor-pointer hover:text-white"
+            >
+                <span>Penangguhan</span>
+
+                <svg 
+                    :class="{'rotate-180': open}" 
+                    class="w-4 h-4 transition-transform"
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </div>
+
+            <!-- SUB MENU -->
+            <div x-show="open" x-transition class="space-y-1 ml-3">
+
+                <!-- Aduan Pengguna -->
+                <a href="{{ route('superadmin.penangguhan', 'aduan') }}"
+                class="flex items-center gap-3 px-4 py-2 rounded-lg transition text-sm
+                {{ request()->is('superadmin/penangguhan/aduan')
+                    ? 'bg-white text-[#3E7F73] font-medium'
+                    : 'hover:bg-white/10 text-white' }}">
+                    ↳ Aduan Pengguna
+                </a>
+
+                <!-- Ditangguhkan -->
+                <a href="{{ route('superadmin.penangguhan', 'ditangguhkan') }}"
+                class="flex items-center gap-3 px-4 py-2 rounded-lg transition text-sm
+                {{ request()->is('superadmin/penangguhan/ditangguhkan')
+                    ? 'bg-white text-[#3E7F73] font-medium'
+                    : 'hover:bg-white/10 text-white' }}">
+                    ↳ Ditangguhkan
+                </a>
+
+            </div>
+
+        </div>
+        
 
     </nav>
 

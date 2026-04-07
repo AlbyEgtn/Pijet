@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\Terapis\Terapis;
+use App\Models\Terapis;
 
 class TerapisSeeder extends Seeder
 {
