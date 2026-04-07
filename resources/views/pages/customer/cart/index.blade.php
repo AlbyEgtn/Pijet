@@ -1,5 +1,8 @@
 @extends('layouts.customer')
 
+@section('title','Keranjang  ')
+@section('header','Keranjang ')
+
 @section('content')
 
 <!-- ================= HEADER ================= -->
@@ -11,7 +14,6 @@
     </h1>
 
 </div>
-
 
 
 <!-- ================= CART LIST ================= -->
@@ -45,7 +47,6 @@
             </p>
 
         </div>
-
 
         <!-- QTY CONTROL -->
         <div class="flex items-center gap-3">
@@ -89,7 +90,6 @@
 </div>
 
 
-
 <!-- ================= CHECKOUT BAR ================= -->
 <div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
 
@@ -124,14 +124,12 @@
 </div>
 
 
-
 <!-- ================= CHECKOUT SHEET ================= -->
 <div
     id="checkoutSheet"
     class="fixed inset-0 bg-black/40 hidden z-50">
 
     <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-w-xl mx-auto max-h-[90vh] overflow-y-auto p-6">
-
 
         <!-- HEADER -->
         <div class="flex items-center justify-between mb-4">
@@ -153,7 +151,6 @@
         </div>
 
 
-
         <!-- SERVICE INFO -->
         <div class="flex flex-col items-center text-center">
 
@@ -166,7 +163,6 @@
             </p>
 
         </div>
-
 
 
         <!-- DURASI -->
@@ -187,7 +183,6 @@
             </select>
 
         </div>
-
 
 
         <!-- GENDER TERAPIS -->
@@ -224,7 +219,6 @@
             </div>
 
         </div>
-
 
 
         <!-- ADDITIONAL SERVICES -->
@@ -266,7 +260,6 @@
         </div>
 
 
-
         <!-- JADWAL -->
         <div class="mt-6">
 
@@ -291,7 +284,6 @@
         </div>
 
 
-
         <!-- METODE PEMBAYARAN -->
         <div class="mt-6">
 
@@ -301,33 +293,33 @@
 
             <div class="space-y-2 mt-2">
 
+                {{-- Opsi Transfer --}}
+                @if(!isset($therapistId) || !$therapistId)
                 <label class="flex justify-between border rounded-lg p-3">
-
-                    Cash
-
-                    <input
-                        type="radio"
-                        name="payment_method"
-                        value="cash"
-                        checked>
-
-                </label>
-
-                <label class="flex justify-between border rounded-lg p-3">
-
                     Transfer
-
-                    <input
-                        type="radio"
-                        name="payment_method"
-                        value="transfer">
-
+                    <input type="radio" name="payment_method" value="transfer">
                 </label>
+
+                {{-- Dropdown rekening muncul saat pilih transfer --}}
+                <div id="transferInfo" class="hidden mt-3 space-y-2">
+
+                    <p class="text-sm font-semibold">Pilih Rekening Tujuan</p>
+
+                    <select id="selectedAccountId" class="w-full border rounded-lg px-3 py-2 text-sm">
+                        <option value="">-- Pilih Rekening --</option>
+                        @foreach($payments as $pay)
+                        <option value="{{ $pay->id }}">
+                            {{ $pay->bank_name }} — {{ $pay->account_number }} (a.n {{ $pay->account_holder }})
+                        </option>
+                        @endforeach
+                    </select>
+
+                </div>
+                @endif
 
             </div>
 
         </div>
-
 
 
         <!-- TOTAL -->
@@ -359,13 +351,11 @@
 
         </div>
 
-
     </div>
 
 </div>
 
 @endsection
-
 
 
 @push('scripts')
@@ -374,12 +364,12 @@
 
 /* ================= UPDATE QTY ================= */
 
-function updateQty(cartId,type){
+function updateQty(cartId, type){
 
-    fetch(`/customer/cart/${type}/${cartId}`,{
-        method:"GET",
-        headers:{
-            "X-Requested-With":"XMLHttpRequest"
+    fetch(`/customer/cart/${type}/${cartId}`, {
+        method: "GET",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
         }
     })
     .then(res => res.json())
@@ -413,7 +403,6 @@ function updateQty(cartId,type){
 }
 
 
-
 /* ================= CHECKOUT SHEET ================= */
 
 function openCheckoutSheet(){
@@ -434,6 +423,33 @@ function closeCheckoutSheet(){
 
 }
 
+
+/* ================= PAYMENT TOGGLE ================= */
+
+{{-- Hanya daftarkan listener jika tidak ada therapist_id (elemen transfer ada) --}}
+@if(!isset($therapistId) || !$therapistId)
+
+document.querySelectorAll('input[name="payment_method"]').forEach(el => {
+
+    el.addEventListener("change", function(){
+
+        const transferBox = document.getElementById("transferInfo");
+
+        if(this.value === "transfer"){
+
+            transferBox.classList.remove("hidden");
+
+        }else{
+
+            transferBox.classList.add("hidden");
+
+        }
+
+    });
+
+});
+
+@endif
 
 
 /* ================= TOTAL ADDITIONAL ================= */
@@ -462,93 +478,77 @@ function updateTotal(){
 }
 
 
-
 /* ================= USER DATA ================= */
 
 const userPhone = @json(auth()->user()->phone);
 const userCity = @json(auth()->user()->city);
 const userAddress = @json(auth()->user()->address);
 
+/* ================= THERAPIST FLAG ================= */
+
+const hasTherapist = @json(isset($therapistId) && $therapistId ? true : false);
 
 
 /* ================= CHECKOUT ================= */
 
 function confirmCheckout(){
 
-    const payment =
-        document.querySelector(
-            'input[name="payment_method"]:checked'
-        ).value;
+    const paymentEl = document.querySelector('input[name="payment_method"]:checked');
+    const payment   = paymentEl ? paymentEl.value : "cash";
 
-    const date =
-        document.getElementById("service_date").value;
-
-    const time =
-        document.getElementById("service_time").value;
-
-    const phone = @json(auth()->user()->phone);
-    const city = @json(auth()->user()->city);
-    const address = @json(auth()->user()->address);
+    const date = document.getElementById("service_date").value;
+    const time = document.getElementById("service_time").value;
 
     if(!date || !time){
-
         showToast("Silakan pilih jadwal layanan");
         return;
-
     }
 
+    const accountId = document.getElementById("selectedAccountId")?.value ?? "";
+
+    if(payment === "transfer" && !accountId){
+        showToast("Pilih rekening tujuan transfer");
+        return;
+    }
+
+    const finalPayment = (hasTherapist && payment === "transfer") ? "cash" : payment;
+
     const formData = new FormData();
+    formData.append("payment_method",     finalPayment);
+    formData.append("service_date",       date);
+    formData.append("service_time",       time);
+    formData.append("phone",              userPhone);
+    formData.append("city",              userCity);
+    formData.append("address",            userAddress);
+    formData.append("company_account_id", accountId);
 
-    formData.append('payment_method', payment);
-    formData.append('service_date', date);
-    formData.append('service_time', time);
-
-    formData.append('phone', phone);
-    formData.append('city', city);
-    formData.append('address', address);
-
-
-    fetch("{{ route('customer.cart.checkout') }}",{
-
-        method:"POST",
-
-        headers:{
-            "X-CSRF-TOKEN":"{{ csrf_token() }}",
-            "X-Requested-With":"XMLHttpRequest"
+    fetch("{{ route('customer.cart.checkout') }}", {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN":     "{{ csrf_token() }}",
+            "X-Requested-With": "XMLHttpRequest"
         },
-
         body: formData
-
     })
     .then(res => res.json())
     .then(data => {
 
         if(data.success){
-
             showToast("Pesanan anda sedang diproses");
-
-            setTimeout(()=>{
-
+            setTimeout(() => {
                 window.location.href = data.redirect;
-
-            },1500);
-
+            }, 1500);
         }else{
-
             showToast(data.message ?? "Checkout gagal");
-
         }
 
     })
     .catch(err => {
-
         console.error(err);
         showToast("Terjadi kesalahan sistem");
-
     });
 
 }
-
 
 
 /* ================= TOAST ================= */
@@ -570,11 +570,11 @@ function showToast(message){
 
     document.body.appendChild(toast);
 
-    setTimeout(()=>{
+    setTimeout(() => {
 
         toast.remove();
 
-    },2500);
+    }, 2500);
 
 }
 

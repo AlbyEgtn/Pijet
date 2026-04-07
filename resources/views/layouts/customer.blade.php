@@ -20,7 +20,6 @@
     @include('layouts.partials.customer.navbar')
 
 
-
     {{-- ================= MAIN CONTENT ================= --}}
     <main class="flex-1 flex flex-col">
 
@@ -31,7 +30,6 @@
             </div>
         @endif
 
-
         {{-- ===== PAGE CONTENT ===== --}}
         <div class="flex-1 w-full">
             @yield('content')
@@ -40,12 +38,10 @@
     </main>
 
 
-
     {{-- ================= FOOTER ================= --}}
     <footer class="p-4 text-sm text-center text-gray-500 bg-white border-t">
         © {{ date('Y') }} pijet.in
     </footer>
-
 
 
     {{-- ================= GLOBAL SCRIPT ================= --}}
@@ -75,9 +71,9 @@
     </script>
 
 
-
     {{-- ================= STACK SCRIPT ================= --}}
     @stack('scripts')
 
 </body>
 </html>
+

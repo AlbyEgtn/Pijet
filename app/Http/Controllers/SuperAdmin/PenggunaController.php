@@ -87,10 +87,10 @@ class PenggunaController extends Controller
     }
 
 
-
-    public function detailAduan($id)
+    public function detail($reportId)
     {
-        $report = Report::with(['user', 'reportedUser'])->findOrFail($id);
+        $report = Report::with(['user','reportedUser'])
+            ->findOrFail($reportId);
 
         return view('pages.superadmin.penangguhan.detail', compact('report'));
     }

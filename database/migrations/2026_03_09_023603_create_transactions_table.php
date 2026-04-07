@@ -8,14 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-
         Schema::create('transactions', function (Blueprint $table) {
 
             $table->id();
 
             $table->string('transaction_code')->unique();
 
-            // relasi customer
             $table->foreignId('customer_id')
                 ->nullable()
                 ->constrained('users')
@@ -26,59 +24,58 @@ return new class extends Migration
                 ->constrained('terapis')
                 ->nullOnDelete();
 
-            // data customer snapshot
+            // ❌ HAPUS after()
+            $table->foreignId('company_account_id')
+                ->nullable()
+                ->constrained('payment_accounts')
+                ->nullOnDelete();
+
             $table->string('customer_name');
-
             $table->string('customer_phone')->nullable();
-
             $table->text('customer_address')->nullable();
-
             $table->string('customer_city')->nullable();
 
-            // pemesan
             $table->string('orderer_name')->nullable();
 
-            // jadwal layanan
             $table->date('service_date');
-
             $table->time('service_time');
 
-            // metode pembayaran
-            $table->enum('payment_method',[
-                'transfer',
-                'cash'
-            ]);
+            $table->enum('payment_method', ['transfer','cash']);
 
-            $table->timestamp('payment_expired_at')->nullable();
+            $table->enum('payment_status', [
+                'pending','uploaded','verified','failed','expired'
+            ])->default('pending');
 
             $table->timestamp('payment_uploaded_at')->nullable();
+            $table->timestamp('payment_verified_at')->nullable();
+            $table->timestamp('payment_expired_at')->nullable();
 
             $table->string('payment_proof')->nullable();
 
-            // status transaksi
-            $table->enum('status',[
-                'lunas',
-                'proses',
-                'belum_lunas',
-                'dibatalkan',
-                'reschedule'
-            ])->default('belum_lunas');
+            $table->enum('order_status', [
+                'waiting','ready','assigned','on_the_way',
+                'ongoing','completed','cancelled','rescheduled'
+            ])->default('waiting');
 
-            // total harga
             $table->integer('total_price')->default(0);
 
-            // reschedule
             $table->date('reschedule_date')->nullable();
-
             $table->time('reschedule_time')->nullable();
 
-            // cancel reason
             $table->text('cancel_reason')->nullable();
 
+            // 🔥 TAMBAHAN BISNIS
+            $table->integer('company_income')->nullable();
+            $table->integer('therapist_income')->nullable();
+            $table->boolean('is_balance_recorded')->default(false);
+            $table->boolean('is_profit_shared')->default(false);
+
+            $table->timestamp('expired_at')->nullable();
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
+
             $table->timestamps();
-
         });
-
     }
 
     public function down(): void

@@ -1,4 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('title','Review  ')
+@section('header','Review ')
 
 @section('content')
 <div class="p-6">

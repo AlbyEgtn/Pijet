@@ -1,6 +1,7 @@
 @extends('layouts.terapis')
 
 @section('title', 'Ganti Password')
+@section('header',' Ganti Password ')
 
 @section('content')
 

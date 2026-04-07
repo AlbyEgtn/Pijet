@@ -1,5 +1,6 @@
 <?php
-namespace App\Models\Terapis;
+
+namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
@@ -16,6 +17,7 @@ class Terapis extends Model
         'address',
         'bank_name',
         'bank_number',
+        'account_holder',        
         'total_orders',
         'balance',
         'status'
@@ -26,5 +28,14 @@ class Terapis extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function paymentAccounts()
+    {
+        return $this->hasMany(\App\Models\PaymentAccount::class);
+    }
+
+    public function activePaymentAccount()
+    {
+        return $this->hasOne(\App\Models\PaymentAccount::class)->where('is_active', true);
+    }
 
 }

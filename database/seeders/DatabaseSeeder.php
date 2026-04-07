@@ -22,8 +22,8 @@ class DatabaseSeeder extends Seeder
             LandingStatisticSeeder::class,
             LandingBenefitSeeder::class,
             ServiceSeeder::class,
-            CabangSeeder::class,
-            TerapisSeeder::class,
+            CitySeeder::class,
+            PaymentAccountSeeder::class
         ]);
     }
 }

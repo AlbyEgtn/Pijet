@@ -61,12 +61,28 @@
                         </td>
 
                         <td class="text-center">
-                            <form action="{{ route('superadmin.pengguna.suspend', $user->id) }}" method="POST">
-                                @csrf
-                                <button class="{{ $user->is_suspended ? 'bg-green-500' : 'bg-red-500' }} text-white px-3 py-1 rounded-lg text-xs">
-                                    {{ $user->is_suspended ? 'Aktifkan' : 'Suspend' }}
-                                </button>
-                            </form>
+                            <div class="flex justify-center gap-2">
+
+                                @if($user->latestReport)
+                                    <a href="{{ route('superadmin.penangguhan.detail', $user->latestReport->id) }}"
+                                    class="bg-blue-500 text-white px-3 py-1 rounded-lg text-xs">
+                                        Detail
+                                    </a>
+                                @else
+                                    <span class="text-gray-400 text-xs italic">
+                                        Tidak ada laporan
+                                    </span>
+                                @endif
+
+                                <!-- SUSPEND / AKTIFKAN -->
+                                <form action="{{ route('superadmin.pengguna.suspend', $user->id) }}" method="POST">
+                                    @csrf
+                                    <button class="{{ $user->is_suspended ? 'bg-green-500' : 'bg-red-500' }} text-white px-3 py-1 rounded-lg text-xs">
+                                        {{ $user->is_suspended ? 'Aktifkan' : 'Suspend' }}
+                                    </button>
+                                </form>
+
+                            </div>
                         </td>
 
                     </tr>

@@ -2,14 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\RegisterController; 
+use App\Http\Controllers\Auth\TherapistAssessmentController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\FinanceController;
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\Admin\TherapistController;
+use App\Http\Controllers\Admin\TherapistController; 
+use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\Admin\ReportController;
 
 /// Customer
 use App\Http\Controllers\Customer\CustomerController;
@@ -62,12 +65,17 @@ Route::get('/register',[RegisterController::class,'index'])->name('register');
 // proses register
 Route::post('/register',[RegisterController::class,'store'])->name('register.store');
 
-Route::get('/register/therapist', function () {
-    return view('auth.register-therapist');
-})->name('register.therapist');
+Route::get('/register/therapist', [RegisterController::class, 'index'])
+    ->name('register.therapist');
 
 Route::post('/register/therapist', [RegisterController::class, 'store'])
     ->name('register.therapist.store');
+
+Route::get('/terapis/assessment', [TherapistAssessmentController::class, 'index'])
+    ->name('therapist.assessment');
+
+Route::post('/terapis/assessment', [TherapistAssessmentController::class, 'store'])
+    ->name('terapis.assessment.store');
 
 Route::get('/verify-email', function(){
 
@@ -226,8 +234,8 @@ Route::middleware(['auth','role:super_admin'])
             [PenggunaController::class, 'penangguhan']
         )->name('superadmin.penangguhan');
 
-        Route::get('/penangguhan/aduan/{id}', 
-            [PenggunaController::class, 'detailAduan']
+        Route::get('/penangguhan/{report}', 
+            [PenggunaController::class, 'detail']
         )->name('superadmin.penangguhan.detail');
 });
 
@@ -313,11 +321,45 @@ Route::middleware(['auth','role:admin'])
             Route::post('/{id}/reject', [TherapistController::class, 'reject'])
                 ->name('admin.therapist.reject');
 
+            Route::get('/admin/therapist/{id}', [TherapistController::class, 'show'])
+                ->name('admin.therapist.show'); 
+
 
             // 🔹 RATING & ULASAN
             Route::get('/review', [TherapistController::class, 'review'])
                 ->name('admin.therapist.review');
         });
+
+        /*
+        |--------------------------------------------------------------------------
+        | REPORT
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('report')->group(function () {
+
+            // 🔹 AKUN (CRUD)
+            Route::get('/', [ReportController::class, 'index'])
+                ->name('admin.report.index');
+
+        });
+
+                /*
+        |--------------------------------------------------------------------------
+        | CUSTOMER
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('customer')->group(function () {
+
+            // 🔹 AKUN (CRUD)
+            Route::get('/', [AdminCustomerController::class, 'index'])
+                ->name('admin.customer.index');
+
+            Route::get('/admin/detail/{id}', [AdminCustomerController::class, 'show'])
+                ->name('admin.customer.detail');
+
+        });
+
+
 
 });
 
@@ -431,6 +473,27 @@ Route::middleware(['auth','role:terapis'])
         Route::post('/terapis/password/update', [TerapisController::class,'updatePassword'])
             ->name('password.update');
 
+        Route::post('/terapis/update-informasi', [TerapisController::class, 'updateInformasi'])
+            ->name('update.informasi');
+
+        Route::post('/pesanan/{id}/mulai', [TerapisController::class, 'mulaiPesanan'])->name('pesanan.mulai');
+        Route::post('/pesanan/{id}/selesai', [TerapisController::class, 'selesaiPesanan'])->name('pesanan.selesai');
+        Route::post('/pesanan/{id}/batal', [TerapisController::class, 'batalPesanan'])->name('pesanan.batal');
+
+        Route::post('/profile/update', [TerapisController::class, 'update'])
+            ->name('profile.update');
+
+        Route::get('/rekening', [TerapisController::class, 'paymentAccounts'])
+            ->name('rekening');
+
+        Route::post('/rekening', [TerapisController::class, 'storePaymentAccount'])
+            ->name('rekening.store');
+
+        Route::post('/rekening/{id}/aktif', [TerapisController::class, 'setActivePaymentAccount'])
+            ->name('rekening.aktif');
+
+        Route::delete('/rekening/{id}', [TerapisController::class, 'deletePaymentAccount'])
+            ->name('rekening.delete');
 });
 
 
@@ -496,5 +559,9 @@ Route::middleware(['auth','role:customer'])
             ]);
 
         })->middleware('auth');
+
+        Route::get('/order/status/{id}', function($id){
+            return \App\Models\Transaction::findOrFail($id);
+        });
 
 });

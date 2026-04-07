@@ -1,40 +1,16 @@
-<aside class="w-64 bg-[#4C9A8B] text-white flex flex-col min-h-screen">
+<aside class="w-64 bg-gradient-to-b from-teal-700 to-teal-900 text-white flex flex-col min-h-screen shadow-lg">
 
     <!-- LOGO -->
-    <div class="px-6 py-7 flex items-center gap-3">
+    <div class="px-6 py-7 flex items-center gap-3 border-b border-white/10">
         <img
             src="{{ asset('images/logo-pth.png') }}"
             alt="Logo Pijat.in"
-            class="h-12 object-contain"
+            class="w-10 h-10 object-contain"
         >
 
-        <span class="text-2xl font-semibold tracking-wide">
+        <span class="text-xl font-semibold tracking-wide">
             Pijat.in
         </span>
-
-    </div>
-
-
-    <!-- CABANG SELECT -->
-    <div class="px-6 py-4 text-sm text-white/80 flex items-center justify-between cursor-pointer">
-
-        Seluruh Cabang
-
-        <svg
-            class="w-4 h-4 opacity-70"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-            />
-
-        </svg>
 
     </div>
 
@@ -103,7 +79,7 @@
         </a>
 
 
-        <!-- Pesanan -->
+        
         <a
             href="#"
             class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition"
@@ -215,15 +191,29 @@
         </a>
 
         <!-- Pengguna -->
-        <div class="px-3">
+        <div x-data="{ open: {{ request()->is('superadmin/pengguna*') ? 'true' : 'false' }} }" x-transition.duration.200ms class="px-3">
 
-            <!-- HEADER (CLICKABLE) -->
-            <div class="flex items-center justify-between px-4 py-3 text-white/80 cursor-pointer">
+            <!-- HEADER -->
+            <div 
+                @click="open = !open"
+                class="flex items-center justify-between px-4 py-3 text-white/80 cursor-pointer hover:text-white"
+            >   
                 <span>Pengguna</span>
+
+                <!-- ICON ARROW -->
+                <svg 
+                    :class="{'rotate-180': open}" 
+                    class="w-4 h-4 transition-transform"
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
             </div>
 
             <!-- SUB MENU -->
-            <div class="space-y-1 ml-3">
+            <div x-show="open" x-transition class="space-y-1 ml-3">
 
                 <!-- Pelanggan -->
                 <a href="{{ route('superadmin.pengguna', 'pelanggan') }}"

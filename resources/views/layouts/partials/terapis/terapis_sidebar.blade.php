@@ -1,4 +1,5 @@
 <div class="h-full flex flex-col bg-teal-800 text-white">
+<aside class="w-64 bg-gradient-to-b from-teal-700 to-teal-900 text-white flex flex-col min-h-screen shadow-lg">
 
     <!-- LOGO -->
     <div class="px-6 py-7 flex items-center gap-3 border-b border-white/10">
@@ -6,6 +7,7 @@
             src="{{ asset('images/logo-pth.png') }}"
             alt="Logo Pijat.in"
             class="h-10 object-contain"
+            class="w-10 h-10 object-contain"
         >
 
         <span class="text-xl font-semibold tracking-wide">

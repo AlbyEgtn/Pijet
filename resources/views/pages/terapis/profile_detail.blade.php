@@ -1,6 +1,7 @@
 @extends('layouts.terapis')
 
 @section('title','Data Profile')
+@section('header','Data Profile')
 
 @section('content')
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Models\Cart;
 use App\Models\Service;
 use App\Models\Transaction;
+use App\Models\PaymentAccount;
 use App\Models\TransactionService;
 
 class CartController extends Controller
@@ -20,36 +21,36 @@ class CartController extends Controller
 
     public function index()
     {
-
         $carts = Cart::with('service')
             ->where('user_id', Auth::id())
             ->get();
 
         $total = $carts->sum(function ($cart) {
-
             return $cart->service->price * $cart->qty;
-
         });
 
-        $additionalServices = Service::where('is_additional',1)
-            ->where('is_active',1)
+        $additionalServices = Service::where('is_additional', 1)
+            ->where('is_active', 1)
             ->get();
 
-        return view('pages.customer.cart.index',[
+        // 🔥 TAMBAHAN: ambil data rekening (tanpa transaction_id)
+        $payments = PaymentAccount::where('is_active', 1)
+            ->where('type', 'company')
+            ->get();   
+                 
+        return view('pages.customer.cart.index', [
             'carts' => $carts,
             'total' => $total,
-            'additionalServices' => $additionalServices
+            'additionalServices' => $additionalServices,
+            'payments' => $payments // 🔥 kirim ke view
         ]);
-
     }
-
 
 
     /* ================= ADD TO CART ================= */
 
     public function add($id)
     {
-
         $service = Service::findOrFail($id);
 
         $cart = Cart::where('user_id', Auth::id())
@@ -57,271 +58,225 @@ class CartController extends Controller
             ->first();
 
         if ($cart) {
-
             $cart->increment('qty');
-
         } else {
-
             Cart::create([
                 'user_id' => Auth::id(),
                 'service_id' => $service->id,
                 'qty' => 1
             ]);
-
         }
 
-        $cartCount = Cart::where('user_id', Auth::id())->sum('qty');
-
-        if(request()->ajax()){
-
-            return response()->json([
-                'success' => true,
-                'count' => $cartCount
-            ]);
-
-        }
-
-        return back();
-
+        return $this->cartResponse();
     }
 
 
-
-    /* ================= INCREASE QTY ================= */
+    /* ================= INCREASE ================= */
 
     public function increase($id)
     {
-
         $cart = Cart::findOrFail($id);
-
-        $cart->qty += 1;
-        $cart->save();
+        $cart->increment('qty');
 
         return $this->cartResponse();
-
     }
 
 
-
-    /* ================= DECREASE QTY ================= */
+    /* ================= DECREASE ================= */
 
     public function decrease($id)
     {
-
         $cart = Cart::findOrFail($id);
 
-        $cart->qty -= 1;
-
-        if($cart->qty <= 0){
-
+        if ($cart->qty <= 1) {
             $cart->delete();
-
-        }else{
-
-            $cart->save();
-
+        } else {
+            $cart->decrement('qty');
         }
 
         return $this->cartResponse();
-
     }
 
 
-
-    /* ================= REMOVE ITEM ================= */
+    /* ================= REMOVE ================= */
 
     public function remove($id)
     {
-
-        $cart = Cart::where('user_id', Auth::id())
+        Cart::where('user_id', Auth::id())
             ->where('id', $id)
-            ->firstOrFail();
+            ->delete();
 
-        $cart->delete();
-
-        return back();
-
+        return $this->cartResponse();
     }
 
 
-
-    /* ================= RESPONSE CART ================= */
+    /* ================= CART RESPONSE ================= */
 
     private function cartResponse()
     {
-
         $carts = Cart::with('service')
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->get();
 
-        $total = $carts->sum(function($cart){
-
-            return $cart->qty * $cart->service->price;
-
+        $total = $carts->sum(function ($cart) {
+            return $cart->service->price * $cart->qty;
         });
 
         return response()->json([
-
             'success' => true,
             'total' => number_format($total),
-            'count' => $carts->count(),
-            'qty' => $carts->sum('qty')
-
+            'qty' => $carts->sum('qty'),
+            'count' => $carts->count()
         ]);
-
     }
-
 
 
     /* ================= CHECKOUT ================= */
 
     public function checkout(Request $request)
     {
-
-        $request->validate([
-
-            'service_date' => ['required','date'],
-            'service_time' => ['required'],
-            'payment_method' => ['required','in:cash,transfer'],
-
-            'phone'   => ['required'],
-            'city'    => ['required','string'],
-            'address' => ['required','string']
-
-        ]);
-
-
         $user = auth()->user();
 
-
-        /* ================= UPDATE DATA USER ================= */
-
-        $user->update([
-
-            'phone' => $request->phone,
-            'city' => $request->city,
-            'address' => $request->address
-
+        $request->validate([
+            'payment_method' => 'required|in:cash,transfer',
+            'service_date'   => 'required|date',
+            'service_time'   => 'required',
         ]);
-
 
         $carts = Cart::with('service')
             ->where('user_id', $user->id)
             ->get();
 
-
-        if($carts->isEmpty()){
-
+        if ($carts->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Keranjang kosong'
-            ]);
-
+            ], 422);
         }
 
+        $total = $carts->sum(function ($cart) {
+            return $cart->service->price * $cart->qty;
+        });
+
+        $code = 'TRX-' . strtoupper(Str::random(10));
 
         DB::beginTransaction();
 
-        try{
+        try {
 
-            /* ================= HITUNG TOTAL ================= */
-
-            $total = $carts->sum(function ($cart){
-
-                return $cart->service->price * $cart->qty;
-
-            });
-
-
-            /* ================= BUAT TRANSACTION ================= */
+            /* ================= CREATE TRANSACTION ================= */
 
             $transaction = Transaction::create([
 
-                'transaction_code' => 'TRX-'.Str::upper(Str::random(8)),
+                'transaction_code' => $code,
 
                 'customer_id' => $user->id,
 
-                'customer_name' => $user->name,
-
-                'customer_phone' => $request->phone,
-
-                'customer_address' => $request->address,
-
-                'customer_city' => $request->city,
+                'customer_name'    => $user->name,
+                'customer_phone'   => $user->phone,
+                'customer_address' => $request->address ?? $user->address,
+                'customer_city'    => optional($user->city)->name ?? '-',
 
                 'orderer_name' => $user->name,
 
                 'service_date' => $request->service_date,
-
                 'service_time' => $request->service_time,
+
+                'total_price' => $total,
 
                 'payment_method' => $request->payment_method,
 
-                'status' => 'belum_lunas',
+                // 🔥 STATUS
+                'payment_status' => 'pending',
+                'order_status'   => 'waiting',
 
-                'total_price' => $total
+                // 🔥 TIMER LANGSUNG JALAN
+                'payment_expired_at' => now()->addHours(24),
 
+                // ✅ Simpan rekening tujuan (null kalau cash)
+                'company_account_id' => $request->payment_method === 'transfer'
+                    ? $request->company_account_id
+                    : null,
             ]);
 
 
-            /* ================= SIMPAN SERVICES ================= */
+            /* ================= SNAPSHOT SERVICES ================= */
 
-            foreach($carts as $cart){
+            foreach ($carts as $cart) {
+
+                $service = $cart->service;
 
                 TransactionService::create([
 
                     'transaction_id' => $transaction->id,
 
-                    'service_name' => $cart->service->name,
+                    'service_name'   => $service->name,
+                    'duration'       => $service->duration,
+                    'service_price'  => $service->price,
 
-                    'duration' => $cart->service->duration,
-
-                    'service_price' => $cart->service->price,
-
-                    'therapist_id' => null,
+                    'therapist_id'   => null,
 
                     'additional_service' => null,
+                    'additional_price'   => 0,
 
-                    'additional_price' => null,
-
-                    'total_duration' => $cart->service->duration * $cart->qty
-
+                    'total_duration' => $service->duration * $cart->qty
                 ]);
-
             }
 
 
-            /* ================= HAPUS CART ================= */
+            /* ================= CLEAR CART ================= */
 
-            Cart::where('user_id',$user->id)->delete();
-
+            Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
 
-
             return response()->json([
-
                 'success' => true,
-
-                'redirect' => route('customer.orders')
-
+                'redirect' => route('customer.orders.show', $transaction->id)
             ]);
 
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
 
             DB::rollBack();
 
             return response()->json([
-
                 'success' => false,
-
                 'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 
-            ]);
 
+    /* ================= UPLOAD BUKTI ================= */
+
+    public function uploadPayment(Request $request, $id)
+    {
+        $request->validate([
+            'payment_proof' => 'required|image|max:2048'
+        ]);
+
+        $order = Transaction::where('customer_id', auth()->id())
+            ->findOrFail($id);
+
+        if ($order->payment_method !== 'transfer') {
+            return back()->with('error','Metode tidak valid');
         }
 
+        if ($order->payment_status === 'expired') {
+            return back()->with('error','Pembayaran sudah expired');
+        }
+
+        $file = $request->file('payment_proof');
+
+        $path = $file->store('payment_proofs','public');
+
+        $order->update([
+            'payment_proof' => $path,
+            'payment_uploaded_at' => now(),
+            'payment_status' => 'uploaded'
+        ]);
+
+        return back()->with('success','Bukti berhasil diupload');
     }
 
 }

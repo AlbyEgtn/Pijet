@@ -6,7 +6,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Terapis\Terapis;
 
 class User extends Authenticatable
 {
@@ -31,13 +30,12 @@ class User extends Authenticatable
 
         'city',
         'address',
-
-        'work_area',
         'foto',
         'ktp',
         'skck',
         'email_otp',
-        'otp_expired_at'
+        'otp_expired_at',
+        'verification_status'
     ];
 
     /**
@@ -63,6 +61,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function therapistProfile()
+    {
+        return $this->hasOne(TherapistProfile::class);
+    }
+
     public function terapis()
     {
         return $this->hasMany(\App\Models\Transaction::class, 'customer_id');
@@ -82,6 +85,22 @@ class User extends Authenticatable
     }
     public function cabang()
     {
-        return $this->belongsTo(\App\Models\SuperAdmin\Cabang::class);
+        return $this->belongsTo(\App\Models\SuperAdmin\Cabang::class, 'user_id', 'id');
     }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class, 'reported_user_id');
+    }
+
+    public function latestReport()
+    {
+        return $this->hasOne(Report::class, 'reported_user_id')->latestOfMany();
+    }
+
 }

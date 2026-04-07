@@ -1,6 +1,7 @@
 @extends('layouts.terapis')
 
 @section('title','Pesanan Saya')
+@section('header',' Pesanan Saya ')
 
 @section('content')
 
@@ -8,6 +9,36 @@
 
     <h1 class="text-lg font-semibold">Pesanan Saya</h1>
 
+    <!-- ================= FILTER ================= -->
+    <div class="flex gap-2 overflow-x-auto">
+
+        <a href="{{ route('terapis.pesanan.saya') }}"
+           class="px-3 py-1 rounded-full text-sm
+           {{ request('status') == null ? 'bg-teal-600 text-white' : 'bg-gray-200' }}">
+            Semua
+        </a>
+
+        <a href="{{ route('terapis.pesanan.saya', ['status'=>'assigned']) }}"
+           class="px-3 py-1 rounded-full text-sm
+           {{ request('status') == 'assigned' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}">
+            Diambil
+        </a>
+
+        <a href="{{ route('terapis.pesanan.saya', ['status'=>'cancelled']) }}"
+           class="px-3 py-1 rounded-full text-sm
+           {{ request('status') == 'cancelled' ? 'bg-red-500 text-white' : 'bg-gray-200' }}">
+            Dibatalkan
+        </a>
+
+        <a href="{{ route('terapis.pesanan.saya', ['status'=>'completed']) }}"
+           class="px-3 py-1 rounded-full text-sm
+           {{ request('status') == 'completed' ? 'bg-green-500 text-white' : 'bg-gray-200' }}">
+            Selesai
+        </a>
+
+    </div>
+
+    <!-- ================= LIST ================= -->
     @forelse($transactions as $trx)
     <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3 hover:shadow-md transition">
 
@@ -20,19 +51,40 @@
                 </p>
             </div>
 
+<<<<<<< HEAD
             <span class="text-xs px-3 py-1 rounded-full font-medium
                 @if($trx->status == 'proses') bg-blue-100 text-blue-600
                 @elseif($trx->status == 'lunas') bg-green-100 text-green-600
                 @else bg-gray-100 text-gray-600
                 @endif">
                 {{ ucfirst(str_replace('_',' ',$trx->status)) }}
+=======
+            <!-- ✅ FIX STATUS -->
+            <span class="text-xs px-2 py-1 rounded
+                @if($trx->order_status == 'assigned') bg-blue-100 text-blue-600
+                @elseif($trx->order_status == 'completed') bg-green-100 text-green-600
+                @elseif($trx->order_status == 'cancelled') bg-red-100 text-red-600
+                @else bg-gray-100 text-gray-600
+                @endif
+            ">
+                {{ ucfirst(str_replace('_',' ',$trx->order_status)) }}
+>>>>>>> df56f5da5624620b191301cd14ab1289247f314f
             </span>
         </div>
 
         <!-- DETAIL -->
+<<<<<<< HEAD
         <div class="text-sm text-gray-500 space-y-1">
             <p>📅 {{ $trx->service_date }} • {{ $trx->service_time }}</p>
             <p>📍 {{ $trx->customer_address }}</p>
+=======
+        <div class="text-sm text-gray-600">
+            <p>
+                {{ \Carbon\Carbon::parse($trx->service_date)->format('d M Y') }}
+                • {{ $trx->service_time }}
+            </p>
+            <p>{{ $trx->customer_address }}</p>
+>>>>>>> df56f5da5624620b191301cd14ab1289247f314f
         </div>
 
         <!-- TOTAL -->
@@ -51,6 +103,7 @@
                 Detail
             </a>
 
+<<<<<<< HEAD
             @if($trx->status == 'proses')
             <button 
                 type="button"
@@ -58,6 +111,16 @@
                 class="btn-cancel flex-1 border border-red-500 text-red-500 py-2 rounded-lg hover:bg-red-50 transition">
                 Batalkan
             </button>
+=======
+            <!-- ✅ BATALKAN -->
+            @if(in_array($trx->order_status, ['assigned','on_the_way']))
+            <form action="{{ route('terapis.pesanan.batal', $trx->id) }}" method="POST" class="flex-1">
+                @csrf
+                <button class="w-full border border-red-500 text-red-500 py-2 rounded-lg hover:bg-red-50">
+                    Batalkan
+                </button>
+            </form>
+>>>>>>> df56f5da5624620b191301cd14ab1289247f314f
             @endif
 
         </div>

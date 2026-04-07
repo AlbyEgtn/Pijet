@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\Terapis\Terapis;
+use App\Models\Terapis;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
@@ -20,35 +20,40 @@ class UserSeeder extends Seeder
                 'name' => 'Super Admin',
                 'email' => 'superadmin@pijet.in',
                 'password' => Hash::make('password'),
-                'role' => 'super_admin'
+                'role' => 'super_admin',
+                'verification_status' => 'approved'
             ],
 
             [
                 'name' => 'Admin',
                 'email' => 'admin@pijet.in',
                 'password' => Hash::make('password'),
-                'role' => 'admin'
+                'role' => 'admin',
+                'verification_status' => 'approved'
             ],
 
             [
                 'name' => 'Finance',
                 'email' => 'finance@pijet.in',
                 'password' => Hash::make('password'),
-                'role' => 'finance'
+                'role' => 'finance',
+                'verification_status' => 'approved'
             ],
 
             [
                 'name' => 'Terapis Default',
                 'email' => 'terapis@pijet.in',
                 'password' => Hash::make('password'),
-                'role' => 'terapis'
+                'role' => 'terapis',
+                'verification_status' => 'approved'
             ],
 
             [
                 'name' => 'Customer Default',
                 'email' => 'customer@pijet.in',
                 'password' => Hash::make('password'),
-                'role' => 'customer'
+                'role' => 'customer',
+                'verification_status' => 'approved'
             ],
 
         ];
@@ -60,6 +65,9 @@ class UserSeeder extends Seeder
             );
         }
 
+        // ======================
+        // CUSTOMER DUMMY
+        // ======================
         for ($i = 1; $i <= 6; $i++) {
 
             User::updateOrCreate(
@@ -77,12 +85,14 @@ class UserSeeder extends Seeder
                     'city' => 'Jakarta',
                     'address' => 'Jl. Customer No '.$i,
 
-                    // 🔥 TAMBAHAN BIAR MUNCUL DI DETAIL
                     'ktp' => 'ktp/sample.jpg',
                 ]
             );
         }
 
+        // ======================
+        // TERAPIS DUMMY
+        // ======================
         for ($i = 1; $i <= 6; $i++) {
 
             $user = User::updateOrCreate(
