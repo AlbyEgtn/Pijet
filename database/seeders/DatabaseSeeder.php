@@ -23,7 +23,9 @@ class DatabaseSeeder extends Seeder
             LandingBenefitSeeder::class,
             ServiceSeeder::class,
             CitySeeder::class,
-            PaymentAccountSeeder::class
+            CabangSeeder::class,
+            PaymentAccountSeeder::class,
+            KaryawanSeeder::class,
         ]);
     }
 }

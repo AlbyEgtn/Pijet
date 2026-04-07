@@ -73,4 +73,9 @@ class User extends Authenticatable
         return $this->belongsTo(City::class);
     }
 
+    public function cabang()
+    {
+        return $this->belongsTo(\App\Models\SuperAdmin\Cabang::class, 'cabang_id');
+    }
+
 }
