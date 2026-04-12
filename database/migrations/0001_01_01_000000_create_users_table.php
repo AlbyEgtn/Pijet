@@ -34,7 +34,14 @@ return new class extends Migration
 
             $table->string('phone')->nullable();
 
+            $table->integer('warning_count')->default(0);
+
+            $table->string('foto')->nullable();
+
+            $table->string('work_area')->nullable();
+
             // 🔥 RELASI KE CITIES (CABANG)
+            $table->string('city')->nullable();
             $table->foreignId('city_id')
                   ->nullable()
                   ->constrained('cities')
