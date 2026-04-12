@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\FinanceHelper;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\PaymentAccount;
@@ -315,5 +316,28 @@ class FinanceController extends Controller
             'pages.finance.transaction.detail',
             compact('transaction')
         );
+    }
+
+
+    public function withdraw(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1000',
+            'bank_id' => 'required|exists:payment_accounts,id'
+        ]);
+
+        try {
+
+            FinanceHelper::withdrawToBank(
+                $request->amount,
+                $request->bank_id
+            );
+
+            return back()->with('success', 'Withdraw berhasil');
+
+        } catch (\Exception $e) {
+
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

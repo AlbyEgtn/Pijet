@@ -44,6 +44,17 @@ class PaymentAccountSeeder extends Seeder
                 'updated_at' => now()
             ],
 
+            [
+                'type' => 'company',
+                'terapis_id' => null,
+                'bank_name' => 'SYSTEM',
+                'account_number' => '-',
+                'account_holder' => 'COMPANY WALLET',
+                'is_active' => true, // 🔥 ini jadi default utama
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+
         ]);
     }
 }

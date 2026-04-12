@@ -12,11 +12,16 @@ use App\Models\PaymentAccount;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\FinanceHelper;
 
+use Midtrans\Config;
+use Midtrans\Snap;
+use Midtrans\Notification;
+
 class TerapisController extends Controller
 {
 
     public function dashboard()
     {
+
         $user = auth()->user();
 
         $terapis = \App\Models\Terapis::firstOrCreate(
@@ -32,6 +37,7 @@ class TerapisController extends Controller
                 'status' => 1
             ]
         );
+        
 
         $transactions = \App\Models\Transaction::with('services')
             ->where('payment_status', 'verified')
@@ -123,6 +129,7 @@ class TerapisController extends Controller
 
     public function ambilPesanan($id)
     {
+        
         $user = auth()->user();
 
         if (!$user->terapis) {
@@ -390,6 +397,8 @@ class TerapisController extends Controller
             'completed_at' => now()
         ]);
 
+        \App\Helpers\FinanceHelper::handleOrderCompleted($transaction);
+
         // 🔥 REFRESH DATA (PENTING!)
         $transaction->refresh();
 
@@ -405,6 +414,35 @@ class TerapisController extends Controller
 
         return redirect()->route('terapis.pesanan.saya')
             ->with('success', 'Pesanan selesai');
+    }
+
+    public function snapHutang($id)
+    {
+        $order = Transaction::findOrFail($id);
+
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        $orderId = 'HUTANG-' . $order->id . '-' . time();
+
+        $order->update([
+            'midtrans_order_id' => $orderId
+        ]);
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $orderId,
+                'gross_amount' => (int) $order->company_income,
+            ],
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+
+        return response()->json([
+            'snap_token' => $snapToken
+        ]);
     }
 
     public function batalPesanan($id)
@@ -526,4 +564,88 @@ class TerapisController extends Controller
         return redirect()->route('terapis.pesanan.saya')
             ->with('success', 'Pembayaran berhasil');
     }
+
+    public function bayarHutangMidtrans($id)
+    {
+        $order = \App\Models\Transaction::where('id', $id)
+            ->where('terapis_id', auth()->user()->terapis->id)
+            ->firstOrFail();
+
+        // 🔐 config
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        // 🔑 order_id unik + bisa diparse
+        $midtransOrderId = 'HUTANG-' . $order->id . '-' . time();
+
+        DB::table('transactions')
+            ->where('id', $order->id)
+            ->update([
+                'midtrans_order_id' => $midtransOrderId
+            ]);
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $midtransOrderId,
+                'gross_amount' => (int) $order->company_income,
+            ],
+            // Snap akan menampilkan pilihan QRIS
+            // (tidak perlu set payment_type di Snap)
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+
+        // (opsional) simpan ke DB kalau kamu punya kolomnya
+
+        return view('pages.terapis.hutang_midtrans', compact('order','snapToken'));
+    }
+
+    public function midtransCallback()
+    {
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+
+        $notif = new Notification();
+
+        $orderId = $notif->order_id;               // HUTANG-{id}-{ts}
+        $status  = $notif->transaction_status;     // settlement, capture, pending, dll
+
+        // ekstrak ID transaksi kamu
+        if (!preg_match('/HUTANG-(\d+)-/', $orderId, $m)) {
+            return response()->json(['ok' => true]);
+        }
+        $transactionId = (int) $m[1];
+
+        $order = \App\Models\Transaction::find($transactionId);
+        if (!$order) return response()->json(['ok' => true]);
+
+        // hanya proses jika belum dibayar
+        if ($order->is_company_paid) {
+            return response()->json(['ok' => true]);
+        }
+
+        // QRIS sukses biasanya 'settlement'
+        if (in_array($status, ['settlement','capture'])) {
+            \App\Helpers\FinanceHelper::payCompanyFee($order);
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function successHutang($id)
+    {
+        $order = Transaction::findOrFail($id);
+
+        if (!$order->is_company_paid) {
+            \Log::info('🔥 SUCCESS PAGE TRIGGER PAY', ['order_id' => $id]);
+
+            \App\Helpers\FinanceHelper::payCompanyFee($order);
+        }
+
+        return redirect()->route('terapis.pesanan.saya')
+            ->with('success', 'Pembayaran berhasil');
+    }
+
 }

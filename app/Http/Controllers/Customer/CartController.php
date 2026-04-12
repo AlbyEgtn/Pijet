@@ -13,6 +13,8 @@ use App\Models\Service;
 use App\Models\Transaction;
 use App\Models\PaymentAccount;
 use App\Models\TransactionService;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class CartController extends Controller
 {
@@ -154,9 +156,7 @@ class CartController extends Controller
             ], 422);
         }
 
-        $total = $carts->sum(function ($cart) {
-            return $cart->service->price * $cart->qty;
-        });
+        $total = $carts->sum(fn($cart) => $cart->service->price * $cart->qty);
 
         $code = 'TRX-' . strtoupper(Str::random(10));
 
@@ -165,12 +165,9 @@ class CartController extends Controller
         try {
 
             /* ================= CREATE TRANSACTION ================= */
-
             $transaction = Transaction::create([
-
                 'transaction_code' => $code,
-
-                'customer_id' => $user->id,
+                'customer_id'      => $user->id,
 
                 'customer_name'    => $user->name,
                 'customer_phone'   => $user->phone,
@@ -183,53 +180,43 @@ class CartController extends Controller
                 'service_time' => $request->service_time,
 
                 'total_price' => $total,
-
                 'payment_method' => $request->payment_method,
 
-                // 🔥 STATUS
                 'payment_status' => 'pending',
                 'order_status'   => 'waiting',
 
-                // 🔥 TIMER LANGSUNG JALAN
                 'payment_expired_at' => now()->addHours(24),
-
-                // ✅ Simpan rekening tujuan (null kalau cash)
-                'company_account_id' => $request->payment_method === 'transfer'
-                    ? $request->company_account_id
-                    : null,
             ]);
 
+            /* ================= GENERATE MIDTRANS ID ================= */
+            $midtransOrderId = 'ORDER-' . $transaction->id . '-' . time();
 
-            /* ================= SNAPSHOT SERVICES ================= */
+            $transaction->update([
+                'midtrans_order_id' => $midtransOrderId
+            ]);
 
+            /* ================= SNAPSHOT ================= */
             foreach ($carts as $cart) {
-
                 $service = $cart->service;
 
                 TransactionService::create([
-
                     'transaction_id' => $transaction->id,
-
                     'service_name'   => $service->name,
                     'duration'       => $service->duration,
                     'service_price'  => $service->price,
-
                     'therapist_id'   => null,
-
                     'additional_service' => null,
                     'additional_price'   => 0,
-
                     'total_duration' => $service->duration * $cart->qty
                 ]);
             }
 
-
             /* ================= CLEAR CART ================= */
-
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
 
+            /* ================= RESPONSE ================= */
             return response()->json([
                 'success' => true,
                 'redirect' => route('customer.orders.show', $transaction->id)

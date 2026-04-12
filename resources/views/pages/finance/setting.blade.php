@@ -5,6 +5,18 @@
 
 @section('content')
 
+@if(session('success'))
+    <div class="bg-green-100 text-green-700 p-3 rounded">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="bg-red-100 text-red-700 p-3 rounded">
+        {{ session('error') }}
+    </div>
+@endif
+
 <div class="p-6 max-w-4xl mx-auto space-y-6">
 
     <!-- HEADER -->
@@ -29,6 +41,53 @@
             </div>
 
         </div>
+
+    </div>
+
+    <!-- 🔥 WITHDRAW -->
+    <div class="bg-white rounded-2xl shadow p-5 space-y-4">
+
+        <h2 class="font-semibold text-gray-700">
+            Tarik Dana (Withdraw)
+        </h2>
+
+        <form method="POST" action="{{ route('finance.withdraw') }}" class="grid grid-cols-3 gap-4">
+            @csrf
+
+            <!-- NOMINAL -->
+            <div class="col-span-1">
+                <label class="text-sm text-gray-500">Nominal</label>
+                <input type="number" name="amount" required
+                    class="w-full border rounded-lg px-3 py-2 mt-1"
+                    placeholder="Masukkan nominal">
+            </div>
+
+            <!-- PILIH BANK -->
+            <div class="col-span-1">
+                <label class="text-sm text-gray-500">Tujuan Bank</label>
+                <select name="bank_id" required
+                    class="w-full border rounded-lg px-3 py-2 mt-1">
+
+                    @foreach($companyAccounts as $account)
+                        @if($account->bank_name !== 'SYSTEM')
+                            <option value="{{ $account->id }}">
+                                {{ $account->bank_name }} - {{ $account->account_number }}
+                            </option>
+                        @endif
+                    @endforeach
+
+                </select>
+            </div>
+
+            <!-- BUTTON -->
+            <div class="col-span-1 flex items-end">
+                <button type="submit"
+                    class="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition">
+                    Withdraw
+                </button>
+            </div>
+
+        </form>
 
     </div>
 

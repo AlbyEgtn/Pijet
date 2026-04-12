@@ -52,10 +52,13 @@ class Transaction extends Model
 
         'cancel_reason',
 
+        'midtrans_order_id',
+
         'expired_at',
 
         'started_at',   // ✅ tambahan
         'completed_at', // ✅ tambahan
+        
     ];
 
     protected $casts = [
@@ -155,5 +158,23 @@ class Transaction extends Model
     public function getStatusAttribute()
     {
         return $this->payment_status;
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($transaction) {
+
+            // kalau belum ada company_account_id
+            if (!$transaction->company_account_id) {
+
+                $wallet = \App\Models\PaymentAccount::where('bank_name', 'SYSTEM')->first();
+
+                if (!$wallet) {
+                    throw new \Exception('Company wallet tidak ditemukan');
+                }
+
+                $transaction->company_account_id = $wallet->id;
+            }
+        });
     }
 }

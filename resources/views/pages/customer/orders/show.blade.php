@@ -1,333 +1,222 @@
 @extends('layouts.customer')
 
-@section('title','Pembayaran  ')
+@section('title', 'Detail Pesanan')
 
 @section('content')
 
-<!-- ================= HEADER ================= -->
-<div class="bg-gradient-to-r from-teal-700 to-teal-500 text-white p-5 shadow-md flex items-center gap-4">
-    <a href="{{ route('customer.orders') }}" class="text-xl">←</a>
-    <div>
-        <h1 class="font-semibold text-lg">Detail Pesanan</h1>
-        <p class="text-xs opacity-80">Monitoring status & pembayaran</p>
+<!-- ================= HERO ================= -->
+<section class="relative h-[220px] bg-gradient-to-r from-teal-800 via-teal-700 to-teal-600 overflow-hidden">
+
+    <div class="absolute inset-0 bg-black/20"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 h-full flex items-center gap-4 text-white">
+
+        <a href="{{ route('customer.orders') }}"
+           class="text-xl bg-white/20 p-2 rounded-full hover:bg-white/30 transition">
+            ←
+        </a>
+
+        <div>
+            <h1 class="text-2xl font-semibold">
+                Detail Pesanan
+            </h1>
+            <p class="text-sm opacity-90">
+                Monitoring status & pembayaran
+            </p>
+        </div>
+
     </div>
-</div>
+
+</section>
+
 
 @php
-    $isBelumBayar  = in_array($order->payment_status, ['pending','uploaded']);
-    $isPaid        = $order->payment_status == 'verified';
-    $isDiproses    = in_array($order->order_status, ['ready','assigned','on_the_way','ongoing']);
-    $isSelesai     = $order->order_status == 'completed';
-    $isBatal       = $order->order_status == 'cancelled';
-
-    // Flag utama: apakah pesanan ini milik terapis langsung
-    $hasTherapist  = isset($order->therapist_id) && $order->therapist_id;
+    $isPending   = $order->payment_status === 'pending';
+    $isUploaded  = $order->payment_status === 'uploaded';
+    $isVerified  = $order->payment_status === 'verified';
 @endphp
 
-<div class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
+<div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- ================= MAIN ================= -->
     <div class="lg:col-span-2 space-y-6">
 
-        <!-- ================= STATUS CARD ================= -->
-        <div class="bg-white rounded-2xl shadow p-4 border-l-4
-            @if($isBelumBayar) border-yellow-400
-            @elseif($isDiproses) border-blue-400
-            @elseif($isSelesai) border-green-400
-            @elseif($isBatal) border-red-400
-            @endif
-        ">
+        <!-- STATUS CARD -->
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-6 border-l-4
+            {{ $isVerified ? 'border-green-500' : ($isPending ? 'border-yellow-400' : 'border-blue-400') }}">
 
-            <div class="flex justify-between items-center">
+            <p class="text-xs text-gray-400">Status</p>
 
-                <div>
-                    <p class="text-sm text-gray-500">Status Pesanan</p>
-                    <p class="font-semibold text-lg">
-                        @if($isBelumBayar)
-                            Menunggu Pembayaran
-                        @elseif($isPaid)
-                            @if($order->payment_method === 'cash')
-                                Siap Dibayar di Tempat
-                            @else
-                                Pembayaran Berhasil
-                            @endif
-                        @elseif($isDiproses)
-                            Sedang Diproses
-                        @elseif($isSelesai)
-                            Selesai
-                        @elseif($isBatal)
-                            Dibatalkan
-                        @endif
-                    </p>
-                </div>
+            <p class="font-semibold text-lg text-gray-800 mt-1">
 
-                <div class="text-2xl">
-                    @if($isBelumBayar)
-                    @elseif($isDiproses)
-                    @elseif($isSelesai)
-                    @elseif($isBatal)
-                    @endif
-                </div>
+                @if($order->payment_method === 'cash')
+                    💰 Pembayaran di Tempat
+                @elseif($isPending)
+                    ⏳ Menunggu Pembayaran
+                @elseif($isUploaded)
+                    📤 Menunggu Verifikasi
+                @elseif($isVerified)
+                    ✅ Pembayaran Berhasil
+                @endif
 
-            </div>
+            </p>
 
         </div>
 
 
-        <!-- ================= PROGRESS TRACKER ================= -->
-        @if(!$isBatal)
+        <!-- ================= PAYMENT ================= -->
 
-        <div class="bg-white rounded-xl border shadow-sm p-4">
+        {{-- CASH --}}
+        @if($order->payment_method === 'cash')
 
-            <p class="text-sm font-semibold mb-4">Tracking Pesanan</p>
-
-            @php
-                // Jika ada therapist_id, skip step upload & verifikasi 
-                if($hasTherapist){
-                    $steps = [
-                        'waiting'  => 'Order',
-                        'ready'    => 'Siap',
-                        'assigned' => 'Ambil',
-                    ];
-                }else{
-                    $steps = [
-                        'waiting'   => 'Order',
-                        'uploaded'  => 'Upload',
-                        'verified'  => 'Verifikasi',
-                        'ready'     => 'Siap',
-                        'assigned'  => 'Terapis Berangkat',
-                        'ongoing'   => 'Sedang Berlangsung',
-                        'completed' => 'Selesai',
-                    ];
-                }
-
-                if($order->payment_status == 'pending'){
-                    $current = 'waiting';
-                }
-                elseif($order->payment_status == 'uploaded'){
-                    $current = $hasTherapist ? 'waiting' : 'uploaded';
-                }
-                elseif($order->payment_status == 'verified' && $order->order_status == 'ready'){
-                    $current = 'ready';
-                }
-                elseif($order->order_status == 'assigned'){
-                    $current = 'assigned';
-                }
-                elseif($order->order_status == 'ongoing'){
-                    $current = 'ongoing';
-                }
-                elseif($order->order_status == 'completed'){
-                    $current = 'completed';
-                }
-                else{
-                    $current = $hasTherapist ? 'waiting' : 'verified';
-                }
-
-                $keys         = array_keys($steps);
-                $currentIndex = array_search($current, $keys);
-            @endphp
-
-        <div class="space-y-8">
-
-            @php
-                $keys = array_keys($steps);
-                $currentIndex = array_search($current, $keys);
-                $chunks = array_chunk($steps, 4, true);
-            @endphp
-
-            @foreach($chunks as $rowSteps)
-
-            <div class="flex items-center justify-between">
-
-                @foreach($rowSteps as $key => $label)
-
-                @php
-                    $index    = array_search($key, $keys); // GLOBAL index
-                    $isDone   = $index < $currentIndex;
-                    $isActive = $index == $currentIndex;
-                @endphp
-
-                <div class="flex-1 flex items-center">
-
-                    <!-- ITEM -->
-                    <div class="flex flex-col items-center text-center w-full">
-
-                        <!-- CIRCLE -->
-                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs
-                            {{ $isDone ? 'bg-green-500 text-white' : '' }}
-                            {{ $isActive ? 'bg-blue-500 text-white animate-pulse' : '' }}
-                            {{ (!$isDone && !$isActive) ? 'bg-gray-200 text-gray-400' : '' }}
-                        ">
-                            @if($isDone) ✓
-                            @elseif($isActive) ●
-                            @else ○
-                            @endif
-                        </div>
-
-                        <!-- LABEL -->
-                        <p class="text-xs mt-2
-                            {{ $isActive ? 'text-blue-600 font-semibold' : 'text-gray-500' }}">
-                            {{ $label }}
-                        </p>
-
-                    </div>
-
-                    <!-- LINE -->
-                    @if(!$loop->last)
-                    @php
-                        // ambil next key di row ini
-                        $rowKeys = array_keys($rowSteps);
-                        $nextKey = $rowKeys[$loop->index + 1] ?? null;
-                        $nextIndex = $nextKey !== null ? array_search($nextKey, $keys) : null;
-
-                        $lineDone = $nextIndex !== null && $nextIndex <= $currentIndex;
-                    @endphp
-
-                    <div class="flex-1 h-1 mx-2
-                        {{ $lineDone ? 'bg-green-500' : 'bg-gray-200' }}">
-                    </div>
-                    @endif
-
-                </div>
-
-                @endforeach
-
-            </div>
-
-            @endforeach
-
-        </div>
-
+        <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-2xl text-sm">
+            💰 Pembayaran dilakukan langsung ke terapis saat layanan selesai.
         </div>
 
         @endif
 
 
-        <!-- ================= PAYMENT SECTION ================= -->
-        @if($isBelumBayar)
+        {{-- TRANSFER --}}
+        @if($order->payment_method === 'transfer')
 
-        <div class="bg-white rounded-2xl shadow p-4 space-y-4">
+            {{-- STEP 1 --}}
+            @if($isPending)
 
-            <h2 class="font-semibold">Pembayaran</h2>
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-6 space-y-4">
 
-            {{-- Transfer + tidak ada therapist_id: tampilkan countdown, rekening, upload --}}
-            @if($order->payment_method === 'transfer' && !$hasTherapist)
+                <h2 class="font-semibold text-gray-800">
+                    Pembayaran Transfer
+                </h2>
 
-            <!-- COUNTDOWN -->
-            <div class="bg-teal-600 text-white text-center rounded-xl p-4">
-                <p class="text-xs">Sisa Waktu</p>
-                <p id="countdown" class="text-2xl font-bold">00:00:00</p>
+                <button onclick="payNow('{{ $order->id }}')"
+                    class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl shadow transition font-medium">
+                    💳 Bayar Sekarang
+                </button>
+
             </div>
 
-            {{-- ================= BANK INFO ================= --}}
-            @if($order->payment_method === 'transfer' && (!isset($order->therapist_id) || !$order->therapist_id))
-            <div class="bg-white rounded-2xl shadow p-5 space-y-4">
+            @endif
 
-                <h2 class="font-semibold">Transfer Bank</h2>
 
-                @if($order->companyAccount)
-                <div class="bg-gray-50 p-4 rounded-lg text-sm space-y-1">
-                    <p><b>Bank:</b> {{ $order->companyAccount->bank_name }}</p>
-                    <p><b>No. Rekening:</b> {{ $order->companyAccount->account_number }}</p>
-                    <p><b>Atas Nama:</b> {{ $order->companyAccount->account_holder }}</p>
+            {{-- STEP 2 --}}
+            @if($isPending || $isUploaded)
+
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-6 space-y-4">
+
+                <h2 class="font-semibold text-gray-800">
+                    Upload Bukti Pembayaran
+                </h2>
+
+                @if($isUploaded)
+                <div class="text-blue-600 text-sm">
+                    Bukti sudah diupload. Silakan konfirmasi.
                 </div>
-
-                <button
-                    onclick="navigator.clipboard.writeText('{{ $order->companyAccount->account_number }}').then(() => alert('Nomor rekening berhasil disalin'))"
-                    class="text-sm bg-gray-100 px-3 py-1 rounded-lg">
-                    Salin Nomor Rekening
-                </button>
-                @else
-                <p class="text-sm text-red-500">Rekening tujuan tidak ditemukan.</p>
                 @endif
 
-                @if($order->payment_status === 'uploaded')
-                <p class="text-xs text-green-600">
-                    Bukti sudah diupload, menunggu verifikasi admin
-                </p>
-                @endif
+                <form action="{{ route('customer.upload.payment', $order->id) }}"
+                      method="POST" enctype="multipart/form-data">
+                    @csrf
 
-            </div>
-            @endif
+                    <input type="file" name="payment_proof"
+                        class="w-full border p-2 rounded-xl mb-2">
 
-            <!-- DETAIL REKENING -->
-            <div id="rekeningDetail" class="hidden bg-gray-50 p-3 rounded text-sm space-y-1">
-                <p><b>Bank:</b> <span id="rekBank"></span></p>
-                <p><b>No:</b> <span id="rekNumber"></span></p>
-                <p><b>Nama:</b> <span id="rekHolder"></span></p>
-            </div>
+                    <button class="w-full bg-gray-100 border py-2 rounded-xl hover:bg-gray-200 transition">
+                        Upload Bukti
+                    </button>
+                </form>
 
-            <!-- UPLOAD -->
-            <form action="{{ route('customer.upload.payment',$order->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <input type="file" id="payment_proof" name="payment_proof" class="w-full border p-2 rounded">
-                <button class="mt-3 w-full bg-teal-600 text-white py-2 rounded">
-                    Upload Bukti
+                <button onclick="confirmPayment({{ $order->id }})"
+                    class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl shadow transition">
+                    Konfirmasi Pembayaran
                 </button>
-            </form>
 
-            @endif
+                <p id="confirm-msg" class="text-sm text-center hidden"></p>
 
-            {{-- Cash ATAU ada therapist_id: tampilkan info bayar langsung --}}
-            @if($order->payment_method === 'cash' || $hasTherapist)
-            <div class="bg-yellow-50 p-3 rounded text-sm">
-                Bayar langsung ke terapis saat datang
             </div>
+
             @endif
 
-        </div>
+
+            {{-- STEP 3 --}}
+            @if($isVerified)
+
+            <div class="bg-green-50 border border-green-200 p-4 rounded-2xl text-sm">
+                ✅ Pembayaran telah diverifikasi. Menunggu terapis.
+            </div>
+
+            @endif
 
         @endif
 
     </div>
 
 
+    <!-- ================= SIDEBAR ================= -->
     <div class="space-y-6">
 
-        <!-- ================= ORDER SUMMARY ================= -->
-        <div class="bg-white rounded-2xl shadow p-4 space-y-3">
+        <!-- ACTION CARD -->
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 space-y-4">
 
-            <h2 class="font-semibold">Detail Pesanan</h2>
+            {{-- CANCEL --}}
+            @if(!in_array($order->order_status, ['completed','cancelled']))
+            <form action="{{ route('customer.orders.cancel', $order->id) }}" method="POST">
+                @csrf
 
-            <div class="text-sm space-y-1 text-gray-600">
-                <p>{{ $order->customer_address }}</p>
-                <p>{{ $order->customer_city }}</p>
-                <p>{{ $order->service_date }} • {{ $order->service_time }}</p>
-            </div>
+                <textarea name="cancel_reason"
+                    class="w-full border p-2 rounded-xl mb-2"
+                    placeholder="Alasan pembatalan..."
+                    required></textarea>
+
+                <button class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl transition">
+                    Batalkan Pesanan
+                </button>
+            </form>
+            @endif
+
+
+            {{-- RESCHEDULE --}}
+            @if(in_array($order->order_status, ['waiting','ready','assigned']))
+            <form action="{{ route('customer.orders.reschedule', $order->id) }}" method="POST">
+                @csrf
+
+                <input type="date" name="new_date"
+                    class="w-full border p-2 rounded-xl mb-2" required>
+
+                <input type="time" name="new_time"
+                    class="w-full border p-2 rounded-xl mb-2" required>
+
+                <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-xl transition">
+                    Reschedule
+                </button>
+            </form>
+            @endif
 
         </div>
 
-        <!-- ================= SERVICES ================= -->
-        <div class="bg-white rounded-2xl shadow p-4">
 
-            <h2 class="font-semibold mb-3">Layanan</h2>
+        <!-- DETAIL -->
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5">
 
-            @foreach($order->services as $service)
-            <div class="flex justify-between text-sm mb-2">
-                <span>{{ $service->service_name }}</span>
-                <span class="text-gray-500">{{ $service->duration }} menit</span>
-            </div>
-            @endforeach
+            <h3 class="font-semibold mb-3 text-gray-800">Detail</h3>
+
+            <p class="text-sm text-gray-500">{{ $order->transaction_code }}</p>
+            <p class="text-sm text-gray-500">{{ $order->customer_address }}</p>
+            <p class="text-sm text-gray-500">{{ $order->customer_city }}</p>
 
         </div>
 
-        <!-- ================= TOTAL ================= -->
-        <div class="bg-white rounded-2xl shadow p-4 flex justify-between font-semibold">
-            <span>Total</span>
-            <span class="text-teal-600">Rp {{ number_format($order->total_price) }}</span>
-        </div>
 
-        <!-- ================= FINAL STATE ================= -->
-        @if($isSelesai)
-        <div class="bg-green-100 text-green-700 p-4 rounded-xl text-center">
-            Terima kasih! Layanan selesai 🎉
-        </div>
-        @endif
+        <!-- TOTAL -->
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5">
 
-        @if($isBatal)
-        <div class="bg-red-100 text-red-700 p-4 rounded-xl text-center">
-            Pesanan dibatalkan
+            <p class="font-semibold text-gray-800">Total</p>
+
+            <p class="text-teal-600 font-semibold text-lg">
+                Rp {{ number_format($order->total_price) }}
+            </p>
+
         </div>
-        @endif
 
     </div>
 
@@ -335,96 +224,83 @@
 
 @endsection
 
-
 @push('scripts')
+
+<script src="https://app.sandbox.midtrans.com/snap/snap.js"
+data-client-key="{{ config('midtrans.client_key') }}"></script>
+
 <script>
 
-/* ================= SELECT REKENING ================= */
-{{-- Hanya jalankan jika tidak ada therapist_id --}}
-@if(!$hasTherapist)
+/* ================= MIDTRANS ================= */
 
-let selectedRek = "";
+function payNow(orderId){
 
-document.addEventListener("DOMContentLoaded", function(){
+    fetch(`/customer/orders/${orderId}/snap-token`)
+    .then(async res => {
+        const data = await res.json();
 
-    const select = document.getElementById("rekeningSelect");
-    if(!select) return;
+        if(!res.ok){
+            console.error(data);
+            alert(data.error || "Gagal ambil token");
+            return null;
+        }
 
-    select.addEventListener("change", function(){
+        return data;
+    })
+    .then(data => {
 
-        const selected = this.options[this.selectedIndex];
-        const detail   = document.getElementById("rekeningDetail");
+        if(!data) return;
 
-        if(!selected.value){
-            detail.classList.add("hidden");
+        if(!data.snap_token){
+            alert("Snap token kosong");
             return;
         }
 
-        document.getElementById("rekBank").innerText   = selected.dataset.bank;
-        document.getElementById("rekNumber").innerText = selected.dataset.number;
-        document.getElementById("rekHolder").innerText = selected.dataset.holder;
+        console.log("SNAP TOKEN:", data.snap_token);
 
-        selectedRek = selected.dataset.number;
-        detail.classList.remove("hidden");
+        snap.pay(data.snap_token, {
+            onSuccess: () => location.reload(),
+            onPending: () => alert("Menunggu pembayaran"),
+            onError:   () => alert("Pembayaran gagal")
+        });
+
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Error sistem");
+    });
+
+}
+
+
+/* ================= CONFIRM PAYMENT ================= */
+
+function confirmPayment(orderId){
+
+    const msg = document.getElementById('confirm-msg');
+
+    msg.innerText = "Mengecek pembayaran...";
+    msg.classList.remove('hidden');
+
+    fetch(`/customer/orders/${orderId}/confirm-payment`, {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        msg.innerText = data.message;
+
+        if(data.success){
+            setTimeout(()=>location.reload(), 1200);
+        }
 
     });
 
-});
-
-
-/* ================= COPY ================= */
-function copyRek(){
-
-    if(!selectedRek){
-        alert("Pilih rekening dulu");
-        return;
-    }
-
-    navigator.clipboard.writeText(selectedRek);
-    alert("Berhasil disalin");
-
 }
-
-@endif
-
-
-/* ================= COUNTDOWN ================= */
-{{-- Countdown hanya jalan jika transfer DAN tidak ada therapist_id --}}
-@if($order->payment_method === 'transfer' && !$hasTherapist)
-
-const el = document.getElementById("countdown");
-
-if(el){
-
-    const expired =
-        {{ \Carbon\Carbon::parse($order->payment_expired_at)->timestamp * 1000 }};
-
-    function update(){
-
-        let d = expired - Date.now();
-
-        if(d <= 0){
-            el.innerText = "Expired";
-            return;
-        }
-
-        let h = Math.floor(d / 3600000);
-        let m = Math.floor((d % 3600000) / 60000);
-        let s = Math.floor((d % 60000) / 1000);
-
-        el.innerText =
-            String(h).padStart(2,'0') + ":" +
-            String(m).padStart(2,'0') + ":" +
-            String(s).padStart(2,'0');
-
-    }
-
-    update();
-    setInterval(update, 1000);
-
-}
-
-@endif
 
 </script>
+
 @endpush

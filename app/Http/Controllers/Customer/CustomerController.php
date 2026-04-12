@@ -10,7 +10,6 @@ class CustomerController extends Controller
 {
     public function customer()
     {
-
         // layanan utama
         $services = Service::select('id','name','price','image')
             ->where('is_active', true)

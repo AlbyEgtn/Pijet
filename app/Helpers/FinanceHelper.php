@@ -4,101 +4,226 @@ namespace App\Helpers;
 
 use App\Models\PaymentAccount;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FinanceHelper
 {
     // ===============================
-    // 🔥 PAYMENT VERIFIED
+    // 🔥 GET COMPANY WALLET
+    // ===============================
+    public static function getCompanyWallet()
+    {
+        $wallet = PaymentAccount::where('bank_name', 'SYSTEM')->first();
+
+        if (!$wallet) {
+            throw new \Exception('SYSTEM WALLET NOT FOUND');
+        }
+
+        return $wallet;
+    }
+
+    // ===============================
+    // 🔥 SAFE ADD BALANCE + LEDGER
+    // ===============================
+    public static function addBalance($wallet, $amount, $order, $description)
+    {
+        // 💰 UPDATE BALANCE
+        $wallet->increment('balance', $amount);
+
+        // 🧾 INSERT LEDGER
+        DB::table('wallet_transactions')->insert([
+            'payment_account_id' => $wallet->id,
+            'type'               => 'income',
+            'amount'             => $amount,
+            'reference_type'     => 'transaction',
+            'reference_id'       => $order->id,
+            'description'        => $description,
+            'created_at'         => now(),
+            'updated_at'         => now()
+        ]);
+    }
+
+    // ===============================
+    // 🔥 PAYMENT VERIFIED (TRANSFER ONLY)
     // ===============================
     public static function handlePaymentVerified(Transaction $order)
     {
-        if($order->is_balance_recorded) return;
+        Log::info('PAYMENT VERIFIED START', [
+            'order_id' => $order->id
+        ]);
 
-        // ❌ CASH tidak masuk company
-        if($order->payment_method === 'cash'){
+        // ❌ SKIP CASH
+        if ($order->payment_method === 'cash') {
             return;
         }
 
-        $account = PaymentAccount::find($order->company_account_id);
+        // ❌ ANTI DOUBLE PAYMENT
+        $existing = DB::table('wallet_transactions')
+            ->where('reference_id', $order->id)
+            ->where('reference_type', 'transaction')
+            ->where('description', 'Pembayaran Midtrans')
+            ->first();
 
-        if($account){
-            $account->increment('balance', $order->total_price);
+        if ($existing) {
+            Log::warning('PAYMENT ALREADY RECORDED', ['order_id' => $order->id]);
+            return;
         }
 
-        $order->updateQuietly([
-            'is_balance_recorded' => true,
-            'payment_verified_at' => now()
-        ]);
+        $wallet = self::getCompanyWallet();
+
+        DB::transaction(function () use ($wallet, $order) {
+
+            // 💰 MASUKKAN UANG CUSTOMER
+            self::addBalance(
+                $wallet,
+                $order->total_price,
+                $order,
+                'Pembayaran Midtrans'
+            );
+
+            // 🔥 UPDATE ORDER
+            $order->updateQuietly([
+                'payment_verified_at' => now()
+            ]);
+        });
     }
 
-
     // ===============================
-    // 🔥 ORDER COMPLETED
+    // 🔥 ORDER COMPLETED (PROFIT SHARING)
     // ===============================
     public static function handleOrderCompleted(Transaction $order)
     {
-        if($order->is_profit_shared) return;
+        Log::info('ORDER COMPLETED START', [
+            'order_id' => $order->id
+        ]);
 
-        $company = PaymentAccount::find($order->company_account_id);
-        $terapis = PaymentAccount::where('terapis_id', $order->terapis_id)->first();
-
-        if(!$terapis) return;
-
-        $therapistShare = $order->total_price * 0.7;
-        $companyFee     = $order->total_price * 0.3;
-
-        // =========================================
-        // 🔥 CASE 1: CASH (DEBT SYSTEM)
-        // =========================================
-        if($order->payment_method === 'cash'){
-
-            // 💰 uang langsung ke terapis
-            $terapis->increment('balance', $therapistShare);
-
-            // 🧾 company jadi piutang
-            $order->updateQuietly([
-                'is_profit_shared' => true,
-                'company_income'   => $companyFee,
-                'therapist_income' => $therapistShare,
-                'is_company_paid'  => false
-            ]);
-
+        // ❌ ANTI DOUBLE SPLIT
+        if ($order->company_income !== null && $order->therapist_income !== null) {
+            Log::warning('ALREADY SPLIT', ['order_id' => $order->id]);
             return;
         }
 
-        // =========================================
-        // 🔥 CASE 2: TRANSFER (NORMAL FLOW)
-        // =========================================
-        if(!$company) return;
+        DB::transaction(function () use ($order) {
 
-        $company->decrement('balance', $therapistShare);
-        $terapis->increment('balance', $therapistShare);
+            // 🔥 WALLET TERAPIS
+            $terapisWallet = PaymentAccount::where('terapis_id', $order->terapis_id)
+                ->where('is_active', 1)
+                ->first();
 
-        $order->updateQuietly([
-            'is_profit_shared' => true,
-            'company_income'   => $companyFee,
-            'therapist_income' => $therapistShare,
-            'is_company_paid'  => true
-        ]);
+            if (!$terapisWallet) {
+                throw new \Exception('Wallet terapis tidak ditemukan');
+            }
+
+            // 🔥 WALLET COMPANY
+            $companyWallet = self::getCompanyWallet();
+
+            // ===============================
+            // 💰 HITUNG BAGI HASIL
+            // ===============================
+            $total = $order->total_price;
+
+            $companyFee     = $order->company_income ?? ($total * 0.2);
+            $terapisIncome  = $total - $companyFee;
+
+            // ===============================
+            // 💰 TERAPIS SELALU DAPAT
+            // ===============================
+            self::addBalance(
+                $terapisWallet,
+                $terapisIncome,
+                $order,
+                'Pendapatan Terapis'
+            );
+
+            // ===============================
+            // 💰 COMPANY LOGIC
+            // ===============================
+            if ($order->payment_method === 'cash') {
+
+                // CASH → belum masuk → hanya catat hutang
+                DB::table('wallet_transactions')->insert([
+                    'payment_account_id' => $companyWallet->id,
+                    'type'               => 'income',
+                    'amount'             => $companyFee,
+                    'reference_type'     => 'transaction',
+                    'reference_id'       => $order->id,
+                    'description'        => 'Fee Company (Belum Dibayar)',
+                    'created_at'         => now(),
+                    'updated_at'         => now()
+                ]);
+
+            } else {
+
+                // TRANSFER → uang sudah ada → tambah balance
+                self::addBalance(
+                    $companyWallet,
+                    $companyFee,
+                    $order,
+                    'Fee Company (Dari Saldo)'
+                );
+            }
+
+            // ===============================
+            // 🔥 UPDATE ORDER
+            // ===============================
+            $order->updateQuietly([
+                'company_income'    => $companyFee,
+                'therapist_income' => $terapisIncome
+            ]);
+        });
     }
 
-
     // ===============================
-    // 🔥 BAYAR HUTANG (QRIS)
+    // 🔥 BAYAR HUTANG COMPANY (CASH)
     // ===============================
     public static function payCompanyFee(Transaction $order)
     {
-        if($order->is_company_paid) return;
-
-        $company = PaymentAccount::find($order->company_account_id);
-
-        if(!$company) return;
-
-        $company->increment('balance', $order->company_income);
-
-        $order->update([
-            'is_company_paid' => true,
-            'company_paid_at' => now()
+        Log::info('PAY COMPANY FEE', [
+            'order_id' => $order->id
         ]);
+
+        // ❌ ANTI DOUBLE
+        if ($order->is_company_paid) {
+            return;
+        }
+
+        DB::transaction(function () use ($order) {
+
+            $companyWallet = self::getCompanyWallet();
+
+            $amount = $order->company_income;
+
+            if (!$amount || $amount <= 0) {
+                throw new \Exception('Invalid company income');
+            }
+
+            // 💰 TAMBAH SALDO
+            self::addBalance(
+                $companyWallet,
+                $amount,
+                $order,
+                'Pembayaran Hutang Terapis'
+            );
+
+            // 🔥 UPDATE FLAG
+            $order->updateQuietly([
+                'is_company_paid' => true,
+                'company_paid_at' => now()
+            ]);
+        });
+    }
+
+    // ===============================
+    // 🔥 RECONCILIATION (FIX DATA)
+    // ===============================
+    public static function syncBalance($walletId)
+    {
+        $total = DB::table('wallet_transactions')
+            ->where('payment_account_id', $walletId)
+            ->sum('amount');
+
+        PaymentAccount::where('id', $walletId)
+            ->update(['balance' => $total]);
     }
 }

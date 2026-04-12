@@ -30,6 +30,10 @@ use App\Http\Controllers\Superadmin\SuperadminController;
 
 // Terapis
 use App\Http\Controllers\Terapis\TerapisController;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use App\Http\Controllers\MidtransController;
+
+
 
 /*
 
@@ -97,6 +101,11 @@ Route::post('/forgot-password/reset', [ForgotPasswordController::class,'resetPas
 Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
+
+Route::get('/terapis/hutang/success/{id}', [TerapisController::class, 'successHutang']);
+
+Route::post('/midtrans/callback', [MidtransController::class, 'callback'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 /*
 |--------------------------------------------------------------------------
 | DASHBOARD SUPER ADMIN
@@ -349,6 +358,8 @@ Route::middleware(['auth','role:finance'])
 
         Route::get('/setting',[FinanceController::class,'setting'])->name('setting');
 
+        Route::post('/withdraw', [FinanceController::class, 'withdraw'])->name('withdraw');
+
 });
 
 
@@ -441,12 +452,21 @@ Route::middleware(['auth','role:terapis'])
 
         Route::delete('/rekening/{id}', [TerapisController::class, 'deletePaymentAccount'])
             ->name('rekening.delete');
+
+        Route::post('/rekening/withdraw', [TerapisController::class, 'withdraw']);
+
+        Route::get('/hutang/{id}/snap', [TerapisController::class, 'snapHutang'])
+            ->name('terapis.hutang.snap');
+
+        Route::get('/hutang/{id}/midtrans', [TerapisController::class, 'bayarHutangMidtrans'])
+            ->name('bayar.hutang.midtrans');
         
         Route::get('/hutang/{id}', [TerapisController::class, 'hutang'])
-            ->name('terapis.bayar.hutang');
+            ->name('bayar.hutang');
         
-        Route::post('/terapis/hutang/{id}', [TerapisController::class, 'prosesBayarHutang'])
-            ->name('terapis.bayar.hutang.proses');
+        Route::post('/hutang/{id}', [TerapisController::class, 'prosesBayarHutang'])
+            ->name('bayar.hutang.proses');
+
 });
 
 
@@ -499,8 +519,8 @@ Route::middleware(['auth','role:customer'])
         Route::post('/orders/{id}/payment', [OrderController::class,'payment'])
             ->name('customer.orders.payment');
 
-        Route::get('/payment/{id}', [OrderController::class,'paymentPage'])
-            ->name('customer.payment');
+        Route::get('/detail/{id}', [OrderController::class,'detailPage'])
+            ->name('customer.detail');
 
         Route::post('/customer/orders/{id}/upload-payment', [OrderController::class, 'uploadPaymentProof'])
             ->name('customer.upload.payment');
@@ -517,4 +537,20 @@ Route::middleware(['auth','role:customer'])
             return \App\Models\Transaction::findOrFail($id);
         });
 
+        Route::post('/orders/{id}/confirm-payment', [OrderController::class, 'confirmPayment'])
+            ->name('customer.orders.confirm-payment');
+
+        Route::get('/orders/{id}/snap-token', [OrderController::class, 'snapToken'])
+            ->name('customer.orders.snap-token');
+
+        Route::post('/orders/{id}/confirm-payment', [OrderController::class, 'confirmPayment'])
+            ->name('customer.orders.confirm-payment');
+        
+        Route::post('/customer/orders/{id}/cancel', [OrderController::class, 'cancel'])
+            ->name('customer.orders.cancel');
+
+        Route::post('/customer/orders/{id}/reschedule', [OrderController::class, 'reschedule'])
+            ->name('customer.orders.reschedule');
+
+        Route::get('/orders/{id}/status', [OrderController::class, 'status']);
 });

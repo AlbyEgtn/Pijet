@@ -68,6 +68,35 @@
                 setTimeout(() => toast.remove(), 300);
             }, 2000);
         }
+
+
+        async function loadCartCount(){
+
+            try{
+                const res = await fetch("/customer/cart/count", {
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                });
+
+                const data = await res.json();
+
+                const badge = document.getElementById("cart-count");
+
+                if(!badge) return;
+
+                if(data.count > 0){
+                    badge.innerText = data.count;
+                    badge.classList.remove("hidden");
+                }else{
+                    badge.classList.add("hidden");
+                }
+
+            }catch(e){
+                console.warn("Cart count gagal");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadCartCount);
+
     </script>
 
 

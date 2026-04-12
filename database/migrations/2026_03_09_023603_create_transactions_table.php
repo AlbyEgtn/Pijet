@@ -75,6 +75,7 @@ return new class extends Migration
             $table->timestamp('expired_at')->nullable();
             $table->boolean('is_company_paid')->default(false);
             $table->timestamp('company_paid_at')->nullable();
+            $table->string('midtrans_order_id')->nullable();
 
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
