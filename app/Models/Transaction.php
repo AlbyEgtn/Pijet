@@ -22,6 +22,8 @@ class Transaction extends Model
         'customer_address',
         'customer_city',
 
+        'therapist_gender',
+
         'orderer_name',
 
         'company_account_id',

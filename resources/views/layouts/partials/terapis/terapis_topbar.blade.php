@@ -1,3 +1,7 @@
+@php
+    $user = auth()->user();
+@endphp
+
 <header class="bg-white border-b px-8 py-4 flex justify-between items-center">
 
     <!-- TITLE -->
@@ -14,16 +18,30 @@
 
         <!-- USER NAME -->
         <span class="text-sm text-gray-600">
-            {{ auth()->user()->name }}
+            {{ $user->name }}
         </span>
 
 
         <!-- PROFILE ICON -->
         <button
             @click="open = !open"
-            class="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-white"
+            class="w-9 h-9 rounded-full overflow-hidden border flex items-center justify-center bg-gray-200"
         >
-            {{ strtoupper(substr(auth()->user()->name,0,1)) }}
+
+            @if($user->foto)
+                <img 
+                    src="{{ asset('storage/'.$user->foto) }}"
+                    class="w-full h-full object-cover"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+            @endif
+
+            <!-- FALLBACK -->
+            <span class="text-sm font-semibold text-white bg-gray-400 w-full h-full flex items-center justify-center"
+                  style="{{ $user->foto ? 'display:none' : '' }}">
+                {{ strtoupper(substr($user->name,0,1)) }}
+            </span>
+
         </button>
 
 
@@ -32,8 +50,18 @@
             x-show="open"
             @click.outside="open = false"
             x-transition
-            class="absolute right-0 top-12 w-48 bg-white border rounded-lg shadow-md py-2"
+            class="absolute right-0 top-12 w-52 bg-white border rounded-lg shadow-md py-2"
         >
+
+            <!-- USER INFO -->
+            <div class="px-4 py-2 border-b">
+                <p class="text-sm font-medium text-gray-800">
+                    {{ $user->name }}
+                </p>
+                <p class="text-xs text-gray-500">
+                    {{ $user->email }}
+                </p>
+            </div>
 
             <!-- PROFILE -->
             <a 
@@ -43,7 +71,6 @@
                 Profile
             </a>
 
-
             <!-- INFORMASI -->
             <a 
                 href="{{ route('terapis.informasi.confirm') }}"
@@ -51,7 +78,6 @@
             >
                 Informasi Akun
             </a>
-
 
             <!-- PEDOMAN -->
             <a 
@@ -61,9 +87,7 @@
                 Pedoman
             </a>
 
-
             <hr class="my-2">
-
 
             <!-- LOGOUT -->
             <form method="POST" action="{{ route('logout') }}">
@@ -75,7 +99,6 @@
                 >
                     Logout
                 </button>
-
             </form>
 
         </div>

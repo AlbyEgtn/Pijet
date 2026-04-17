@@ -6,8 +6,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
+use App\Models\WalletTransaction;
 use App\Models\Transaction;
 use App\Observers\TransactionObserver;
+use App\Observers\WalletTransactionObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Transaction::observe(TransactionObserver::class);
+        WalletTransaction::observe(WalletTransactionObserver::class);
 
     }
 }

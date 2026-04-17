@@ -13,7 +13,7 @@ use App\Models\PaymentAccount;
 use Midtrans\Config;
 use Midtrans\Snap;
 use App\Models\WalletTransaction;
-
+use App\Observers\WalletTransactionObserver;
 
 class OrderController extends Controller
 {
@@ -147,7 +147,7 @@ class OrderController extends Controller
 
         return response()->json([
             'success'  => true,
-            'redirect' => route('customer.payment', $order->id)
+            'redirect' => route('customer.orders.show', $order->id)
         ]);
     }
 
@@ -168,7 +168,7 @@ class OrderController extends Controller
         $isPending = in_array($order->payment_status, ['pending','uploaded']);
 
         if ($isPending) {
-            return redirect()->route('customer.payment', $order->id);
+            return redirect()->route('customer.orders.show', $order->id);
         }
 
         // 🔥 HALAMAN TRACKING
@@ -197,21 +197,57 @@ class OrderController extends Controller
             return back()->with('error', 'Metode pembayaran tidak valid');
         }
 
+        // 🔥 HAPUS FILE LAMA (JIKA ADA)
         if ($order->payment_proof) {
             \Storage::disk('public')->delete($order->payment_proof);
         }
 
+        // 🔥 UPLOAD FILE BARU
         $file     = $request->file('payment_proof');
         $filename = 'payment_' . $order->transaction_code . '_' . time() . '.' . $file->getClientOriginalExtension();
         $path     = $file->storeAs('payment_proofs', $filename, 'public');
 
-        $order->payment_proof       = $path;
-        $order->payment_uploaded_at = now();
-        $order->payment_status      = 'uploaded';
-        $order->save();
+        // 🔥 UPDATE ORDER → UPLOADED
+        $order->update([
+            'payment_proof'       => $path,
+            'payment_uploaded_at' => now(),
+            'payment_status'      => 'uploaded',
+        ]);
+
+        /*
+        |--------------------------------------------------
+        | 🔥 AUTO CREATE WALLET (TRIGGER OBSERVER)
+        |--------------------------------------------------
+        */
+
+        // ❗ CEGah DUPLIKAT
+        $existing = WalletTransaction::where('reference_id', $order->id)
+            ->where('reference_type', 'transaction')
+            ->where('type', 'income')
+            ->exists();
+
+        if (!$existing) {
+
+            $account = PaymentAccount::where('type', 'company')
+                ->where('is_active', 1)
+                ->first();
+
+            if ($account) {
+
+                WalletTransaction::create([
+                    'payment_account_id' => $account->id,
+                    'type' => 'income',
+                    'amount' => $order->total_price,
+                    'reference_type' => 'transaction',
+                    'reference_id' => $order->id,
+                    'description' => 'Auto payment from upload proof Order #' . $order->transaction_code,
+                ]);
+
+            }
+        }
 
         return redirect()
-            ->route('customer.payment', $order->id)
+            ->route('customer.orders.show', $order->id)
             ->with('success', 'Bukti pembayaran berhasil diupload');
     }
 
@@ -228,93 +264,45 @@ class OrderController extends Controller
     {
         $order = Transaction::findOrFail($id);
 
-        // 🔥 VALIDASI PENTING
         if(!$order->midtrans_order_id){
             return response()->json([
                 'error' => 'Order ID Midtrans belum dibuat'
             ], 400);
         }
 
-        // 🔥 SET CONFIG (INI YANG KURANG)
+        // 🔥 JANGAN GENERATE ULANG
+        if ($order->snap_token) {
+            return response()->json([
+                'snap_token' => $order->snap_token
+            ]);
+        }
+
         Config::$serverKey    = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized  = true;
         Config::$is3ds        = true;
 
-        try {
+        $params = [
+            'transaction_details' => [
+                'order_id'     => $order->midtrans_order_id,
+                'gross_amount' => (int) $order->total_price,
+            ],
+            'customer_details' => [
+                'first_name' => $order->customer_name,
+                'phone'      => $order->customer_phone,
+            ],
+        ];
 
-            $params = [
-                'transaction_details' => [
-                    'order_id'     => $order->midtrans_order_id,
-                    'gross_amount' => (int) $order->total_price,
-                ],
-                'customer_details' => [
-                    'first_name' => $order->customer_name,
-                    'phone'      => $order->customer_phone,
-                ],
-            ];
+        $snapToken = Snap::getSnapToken($params);
 
-            $snapToken = Snap::getSnapToken($params);
+        // 🔥 simpan
+        $order->update([
+            'snap_token' => $snapToken
+        ]);
 
-            return response()->json([
-                'snap_token' => $snapToken
-            ]);
-
-        } catch (\Exception $e) {
-
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 500);
-
-        }
-    }
-
-    public function confirmPayment($id)
-    {
-        $order = Transaction::findOrFail($id);
-
-        // 🔥 CEK SUDAH ADA WALLET ATAU BELUM
-        $existing = WalletTransaction::where('reference_id', $order->id)
-            ->where('reference_type', 'transaction')
-            ->first();
-
-        if ($existing) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Pembayaran sudah diverifikasi'
-            ]);
-        }
-
-        DB::transaction(function () use ($order) {
-
-            // 🔥 AMBIL ACCOUNT (misal company account)
-            $account = PaymentAccount::where('type', 'company')
-                ->where('is_active', 1)
-                ->first();
-
-            if (!$account) {
-                throw new \Exception('Payment account tidak ditemukan');
-            }
-
-            // 🔥 INSERT WALLET
-            WalletTransaction::create([
-                'payment_account_id' => $account->id,
-                'type' => 'income',
-                'amount' => $order->total_price,
-                'reference_type' => 'transaction',
-                'reference_id' => $order->id,
-                'description' => 'Pembayaran Order #' . $order->id,
-            ]);
-
-            // 🔥 UPDATE STATUS
-            $order->update([
-                'payment_status' => 'verified',
-                'order_status'   => 'ready'
-            ]);
-
-        });
-
-        return redirect()->route('customer.orders.detail', $order->id);
+        return response()->json([
+            'snap_token' => $snapToken
+        ]);
     }
 
     public function status($id)

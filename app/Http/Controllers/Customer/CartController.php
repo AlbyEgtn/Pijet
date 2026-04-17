@@ -160,6 +160,15 @@ class CartController extends Controller
 
         $code = 'TRX-' . strtoupper(Str::random(10));
 
+        $gender = $user->gender;
+
+        if(!in_array($gender, ['L','P'])){
+            return response()->json([
+                'success' => false,
+                'message' => 'Gender user tidak valid'
+            ], 422);
+        }
+
         DB::beginTransaction();
 
         try {
@@ -170,6 +179,7 @@ class CartController extends Controller
                 'customer_id'      => $user->id,
 
                 'customer_name'    => $user->name,
+                'therapist_gender' => $gender,
                 'customer_phone'   => $user->phone,
                 'customer_address' => $request->address ?? $user->address,
                 'customer_city'    => optional($user->city)->name ?? '-',

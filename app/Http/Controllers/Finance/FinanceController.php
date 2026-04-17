@@ -19,26 +19,35 @@ class FinanceController extends Controller
     */
     public function dashboard()
     {
-        // =========================
-        // TOTAL INCOME (GROSS)
-        // =========================
-        $totalIncome = Transaction::where('payment_status', 'verified')
+        $grossIncome = Transaction::where('payment_status', 'verified')
             ->sum('total_price');
+        
+        // =========================
+        // COMPANY INCOME (30%)
+        // =========================
+        $companyIncome = Transaction::where('payment_status', 'verified')
+            ->sum('company_income');
 
 
         // =========================
-        // TOTAL EXPENSE (THERAPIST 70%)
+        // THERAPIST EXPENSE (70%)
         // =========================
         $totalExpense = Transaction::where('order_status', 'completed')
             ->sum('therapist_income');
 
 
         // =========================
-        // COMPANY BALANCE (REAL)
+        // OPTIONAL: GROSS (100%)
         // =========================
-        $companyAccount = PaymentAccount::whereNull('terapis_id')->first();
+        $grossIncome = Transaction::where('payment_status', 'verified')
+            ->sum('total_price');
 
-        $balance = $companyAccount->balance ?? 0;
+
+        // =========================
+        // COMPANY BALANCE
+        // =========================
+        // karena profit = company income
+        $balance = $companyIncome;
 
 
         // =========================
@@ -58,7 +67,7 @@ class FinanceController extends Controller
                 CAST(strftime('%m', created_at) AS INTEGER) as month,
                 SUM(company_income) as total
             ")
-            ->where('order_status','completed')
+            ->where('payment_status','verified')
             ->groupBy('month')
             ->pluck('total','month')
             ->toArray();
@@ -76,30 +85,29 @@ class FinanceController extends Controller
         // =========================
         // ORDER STATUS
         // =========================
-
         $completed = Transaction::where('order_status','completed')->count();
         $cancelled = Transaction::where('order_status','cancelled')->count();
 
 
         // =========================
-        // SERVICE POPULAR (SIMPLE)
+        // SERVICE POPULAR (STATIC)
         // =========================
-
         $serviceLabels = ['Full Body','Traditional','Deep Tissue','Thai','Hot Stone','Swedish'];
         $serviceData   = [40,30,20,10,5,2];
 
 
-        return view('pages.finance.dashboard', compact(
-            'totalIncome',
-            'totalExpense',
-            'balance',
-            'ordersChart',
-            'incomeChart',
-            'completed',
-            'cancelled',
-            'serviceLabels',
-            'serviceData'
-        ));
+        return view('pages.finance.dashboard', [
+            'companyIncome' => $companyIncome,
+            'totalExpense'  => $totalExpense,
+            'grossIncome'   => $grossIncome,
+            'balance'       => $balance,
+            'ordersChart'   => $ordersChart,
+            'incomeChart'   => $incomeChart,
+            'completed'     => $completed,
+            'cancelled'     => $cancelled,
+            'serviceLabels' => $serviceLabels,
+            'serviceData'   => $serviceData,
+        ]);
     }
 
 

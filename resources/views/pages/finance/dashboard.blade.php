@@ -30,7 +30,7 @@
             <div>
                 <p class="text-sm text-gray-500">Total Pemasukan</p>
                 <h2 class="text-2xl font-bold text-teal-700">
-                    Rp {{ number_format($totalIncome,0,',','.') }}
+                    Rp {{ number_format($grossIncome) }}
                 </h2>
             </div>
 
@@ -64,7 +64,7 @@
             <div>
                 <p class="text-sm text-gray-500">Keuntungan Perusahaan (30%)</p>
                 <h2 class="text-2xl font-bold text-teal-700">
-                    Rp {{ number_format($totalIncome - $totalExpense,0,',','.') }}
+                    Rp {{ number_format($companyIncome,0,',','.') }}
                 </h2>
             </div>
 
@@ -81,7 +81,7 @@
             <div>
                 <p class="text-sm text-gray-500">Saldo Perusahaan</p>
                 <h2 class="text-2xl font-bold text-gray-800">
-                    Rp {{ number_format($totalIncome - $totalExpense,0,',','.') }}
+                    Rp {{ number_format($balance,0,',','.') }}
                 </h2>
             </div>
 

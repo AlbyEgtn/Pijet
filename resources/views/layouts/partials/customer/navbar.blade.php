@@ -46,7 +46,6 @@
 
         </div>
 
-
         <!-- ================= RIGHT ================= -->
         <div class="flex items-center gap-4">
 
@@ -85,16 +84,17 @@
 
             </a>
 
-
             <!-- USER -->
             <div x-data="{ open: false }" class="relative">
 
                 <button @click="open = !open"
                     class="flex items-center gap-2 hover:opacity-90">
 
-                    <img
-                        src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}"
-                        class="w-8 h-8 rounded-full border border-white">
+                <img
+                    src="{{ $user->foto 
+                        ? asset('storage/'.$user->foto) 
+                        : 'https://ui-avatars.com/api/?name='.urlencode($user->name) }}"
+                    class="w-8 h-8 rounded-full border border-white object-cover">
 
                 </button>
 
@@ -105,7 +105,7 @@
                     x-transition
                     class="absolute right-0 mt-3 w-48 bg-white text-gray-700 rounded-xl shadow-lg py-2 z-50">
 
-                    <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">
+                    <a href="{{ route('customer.profile') }}" class="block px-4 py-2 text-sm hover:bg-gray-100">
                         Profile
                     </a>
 

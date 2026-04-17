@@ -201,6 +201,47 @@
 
         </div>
 
+        {{-- ACTION --}}
+        @if(
+            in_array($order->order_status, ['waiting','ready','assigned']) 
+            && $order->payment_status !== 'verified'
+        )
+
+        <div class="action-card bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 space-y-4">
+
+            {{-- CANCEL --}}
+            <form action="{{ route('customer.orders.cancel', $order->id) }}" method="POST">
+                @csrf
+
+                <textarea name="cancel_reason"
+                    class="w-full border p-2 rounded-xl mb-2"
+                    placeholder="Alasan pembatalan..."
+                    required></textarea>
+
+                <button class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl transition">
+                    Batalkan Pesanan
+                </button>
+            </form>
+
+            {{-- RESCHEDULE --}}
+            <form action="{{ route('customer.orders.reschedule', $order->id) }}" method="POST">
+                @csrf
+
+                <input type="date" name="new_date"
+                    class="w-full border p-2 rounded-xl mb-2" required>
+
+                <input type="time" name="new_time"
+                    class="w-full border p-2 rounded-xl mb-2" required>
+
+                <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-xl transition">
+                    Reschedule
+                </button>
+            </form>
+
+        </div>
+
+        @endif
+
 
         <!-- TOTAL -->
         <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 flex justify-between font-semibold">
@@ -306,5 +347,21 @@ const interval = setInterval(() => {
 
 }, 5000);
 
+function handleActionVisibility(data){
+
+    const actionCard = document.querySelector('.action-card');
+
+    if(!actionCard) return;
+
+    const allowedStatus = ['waiting','ready','assigned'];
+
+    if(
+        !allowedStatus.includes(data.order_status) ||
+        data.payment_status === 'verified'
+    ){
+        actionCard.remove();
+    }
+
+}
 </script>
 @endpush

@@ -9,9 +9,10 @@ use App\Models\Terapis;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Transaction;
 use App\Models\PaymentAccount;
+use App\Models\City;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\FinanceHelper;
-
+use Illuminate\Support\Facades\Storage;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Notification;
@@ -38,23 +39,7 @@ class TerapisController extends Controller
             ]
         );
         
-
-        $transactions = \App\Models\Transaction::with('services')
-            ->where('payment_status', 'verified')
-            ->where('order_status', 'ready')
-            ->whereNull('terapis_id')
-            ->when(
-                $user->city && $terapis->status == 1, // ✅ ONLINE ONLY
-                function ($q) use ($user) {
-                    $q->where('customer_city', $user->city->name);
-                },
-                function ($q) {
-                    $q->whereRaw('1 = 0'); // ❌ OFFLINE / NO CITY → kosong
-                }
-            )
-            ->latest()
-            ->take(5)
-            ->get();
+        $transactions = $this->getAvailableTransactions($user, $terapis, 5);
 
         return view('pages.terapis.dashboard', compact(
             'user',
@@ -72,32 +57,7 @@ class TerapisController extends Controller
             return back()->with('error', 'Data terapis tidak ditemukan');
         }
 
-        // 🔒 STRICT RULE
-        if (!$user->city) {
-            return view('pages.terapis.pesanan', [
-                'user' => $user,
-                'terapis' => $terapis,
-                'transactions' => collect()
-            ])->with('error', 'Kota belum diset');
-        }
-
-        // 🔒 OFFLINE BLOCK
-        if ($terapis->status != 1) {
-            return view('pages.terapis.pesanan', [
-                'user' => $user,
-                'terapis' => $terapis,
-                'transactions' => collect()
-            ])->with('error', 'Status OFFLINE, tidak dapat melihat pesanan');
-        }
-
-        // 🔥 QUERY UTAMA (AVAILABLE ORDERS)
-        $transactions = Transaction::with('services')
-            ->where('payment_status', 'verified')     // hanya yang sudah bayar
-            ->where('order_status', 'ready')          // siap diambil
-            ->whereNull('terapis_id')                 // belum ada terapis
-            ->where('customer_city', $user->city->name) // filter kota
-            ->latest()
-            ->paginate(10); // 🔥 lebih proper dari get()
+        $transactions = $this->getAvailableTransactions($user, $terapis);
 
         return view('pages.terapis.pesanan', compact(
             'user',
@@ -142,7 +102,7 @@ class TerapisController extends Controller
         }
 
         // 🔒 WAJIB ADA KOTA
-        if (!$user->city) {
+        if (!$user->city_id) {
             return back()->with('error', 'Kota belum diset');
         }
 
@@ -150,6 +110,13 @@ class TerapisController extends Controller
             ->where('payment_status', 'verified')
             ->where('order_status', 'ready')
             ->whereNull('terapis_id')
+
+            // 🔥 FILTER GENDER (ANTI CHEAT)
+            ->where(function ($q) use ($user) {
+                $q->whereNull('therapist_gender')
+                ->orWhere('therapist_gender', $user->gender);
+            })
+
             ->update([
                 'order_status' => 'assigned',
                 'terapis_id' => $user->terapis->id
@@ -179,7 +146,7 @@ class TerapisController extends Controller
         }
 
         // 🔒 CITY WAJIB
-        if (!$user->city) {
+        if (!$user->city_id) {
             return view('pages.terapis.pesanan_saya', [
                 'transactions' => collect()
             ])->with('error', 'Kota belum diset');
@@ -205,7 +172,7 @@ class TerapisController extends Controller
         }
 
         // ❗ STRICT MODE
-        if (!$user->city) {
+        if (!$user->city_id) {
             return back()->with('error', 'Kota belum diset');
         }
 
@@ -238,41 +205,100 @@ class TerapisController extends Controller
         return view('pages.terapis.bantuan');
     }
 
-
     public function profile()
     {
         $user = Auth::user();
         $terapis = $user->terapis;
 
-        // ✅ hanya berdasarkan relasi
         $terapisAccounts = PaymentAccount::where('terapis_id', $terapis->id)->get();
+        $companyAccounts = collect();
 
-        // ❌ HAPUS companyAccounts (karena tidak ada field type)
-        $companyAccounts = collect(); // biar blade tidak error
+        // 🔥 TAMBAHAN
+        $cities = City::all();
 
         return view('pages.terapis.profile', compact(
             'user',
             'terapis',
             'terapisAccounts',
-            'companyAccounts'
+            'companyAccounts',
+            'cities' // 🔥 WAJIB
         ));
     }
 
     public function update(Request $request)
     {
+        $user = Auth::user();
+
+        // ================= VALIDATION =================
+        $request->validate([
+            'nik'        => 'nullable|string|max:30',
+            'gender'     => 'nullable|in:L,P',
+            'whatsapp'   => 'nullable|string|max:20',
+            'address'    => 'nullable|string',
+
+            // 🔥 RELASI KOTA
+            'city_id'    => 'nullable|exists:cities,id',
+
+            // 🔥 FILE
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'ktp'  => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+            'skck' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+        ]);
+
+        // ================= UPDATE USER =================
+        $user->update([
+            'gender'  => $request->gender,
+            'address' => $request->address,
+            'city_id' => $request->city_id, // 🔥 PENTING
+        ]);
+
+        // ================= UPDATE TERAPIS =================
         Terapis::updateOrCreate(
-            ['user_id' => Auth::id()],
+            ['user_id' => $user->id],
             [
-                'nik' => $request->nik,
-                'gender' => $request->gender,
-                'whatsapp' => $request->whatsapp,
-                'address' => $request->address,
-                'bank_name' => $request->bank_name,
-                'bank_number' => $request->bank_number
+                'nik'       => $request->nik,
+                'gender'    => $request->gender,
+                'whatsapp'  => $request->whatsapp,
+                'address'   => $request->address,
             ]
         );
 
-        return redirect()->back()->with('success','Data berhasil diupdate');
+        // ================= UPLOAD FOTO =================
+        if ($request->hasFile('foto')) {
+
+            if ($user->foto) {
+                Storage::disk('public')->delete($user->foto);
+            }
+
+            $user->foto = $request->file('foto')
+                ->store('profile', 'public');
+        }
+
+        // ================= UPLOAD KTP =================
+        if ($request->hasFile('ktp')) {
+
+            if ($user->ktp) {
+                Storage::disk('public')->delete($user->ktp);
+            }
+
+            $user->ktp = $request->file('ktp')
+                ->store('ktp', 'public');
+        }
+
+        // ================= UPLOAD SKCK =================
+        if ($request->hasFile('skck')) {
+
+            if ($user->skck) {
+                Storage::disk('public')->delete($user->skck);
+            }
+
+            $user->skck = $request->file('skck')
+                ->store('skck', 'public');
+        }
+
+        $user->save();
+
+        return back()->with('success','Data berhasil diupdate');
     }
 
 
@@ -646,6 +672,38 @@ class TerapisController extends Controller
 
         return redirect()->route('terapis.pesanan.saya')
             ->with('success', 'Pembayaran berhasil');
+    }
+
+    private function getAvailableTransactions($user, $terapis, $limit = null)
+    {
+        // 🔒 VALIDASI DASAR
+        if (!$user->city_id || $terapis->status != 1) {
+            return collect(); // kosong
+        }
+
+        $query = Transaction::with(['services','customer'])
+            ->where('payment_status', 'verified')
+            ->where('order_status', 'ready')
+            ->whereNull('terapis_id')
+
+            // 🔥 FILTER KOTA
+            ->whereHas('customer', function ($q) use ($user) {
+                $q->where('city_id', $user->city_id);
+            })
+
+            // 🔥 FILTER GENDER TERAPIS (INI INTINYA)
+            ->where(function ($q) use ($user) {
+                $q->whereNull('therapist_gender') // kalau user tidak pilih gender
+                ->orWhere('therapist_gender', $user->gender); // cocok gender
+            })
+
+            ->latest();
+
+        if ($limit) {
+            return $query->take($limit)->get();
+        }
+
+        return $query->paginate(10);
     }
 
 }

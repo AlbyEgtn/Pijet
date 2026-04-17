@@ -23,11 +23,13 @@ return new class extends Migration
                 ->constrained('terapis')
                 ->nullOnDelete();
             $table->string('customer_name');
+            $table->enum('therapist_gender', ['L','P'])->nullable();
             $table->string('customer_phone')->nullable();
             $table->text('customer_address')->nullable();
             $table->string('customer_city')->nullable();
 
             $table->string('orderer_name')->nullable();
+            $table->string('snap_token')->nullable();
             $table->date('service_date');
             $table->time('service_time');
             $table->enum('payment_method', [

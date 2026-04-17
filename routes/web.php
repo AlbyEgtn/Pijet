@@ -19,7 +19,7 @@ use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\ServiceCustController;
 use App\Http\Controllers\Customer\OrderController;
-
+use App\Http\Controllers\Customer\ProfileController;
 
 //Superadmin
 use App\Http\Controllers\SuperAdmin\ServiceController as SuperAdminServiceController;
@@ -606,4 +606,8 @@ Route::middleware(['auth','role:customer'])
             ->name('customer.orders.reschedule');
 
         Route::get('/orders/{id}/status', [OrderController::class, 'status']);
+
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('customer.profile');
+        Route::post('/profile', [ProfileController::class, 'update'])->name('customer.profile.update');
+
 });

@@ -50,34 +50,129 @@
     </div>
 
     <!-- ================= DATA TERAPIS ================= -->
-    <form action="{{ route('terapis.profile.update') }}" method="POST"
-          class="bg-white p-5 rounded-2xl shadow space-y-4">
+    <form action="{{ route('terapis.profile.update') }}" 
+        method="POST" 
+        enctype="multipart/form-data"
+        class="bg-white p-5 rounded-2xl shadow space-y-4">
         @csrf
 
         <h2 class="font-semibold text-gray-700">Data Terapis</h2>
 
         <div class="grid grid-cols-2 gap-4">
 
-            <input type="text" name="nik" value="{{ $terapis->nik }}"
-                placeholder="NIK"
-                class="p-2 border rounded-lg">
+            <!-- NIK -->
+            <div>
+                <label class="text-xs text-gray-500">NIK</label>
+                <input type="text" name="nik" value="{{ $terapis->nik }}"
+                    class="w-full p-2 border rounded-lg">
+            </div>
 
-            <select name="gender" class="p-2 border rounded-lg">
-                <option value="">Gender</option>
-                <option value="L" {{ $terapis->gender == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                <option value="P" {{ $terapis->gender == 'P' ? 'selected' : '' }}>Perempuan</option>
-            </select>
+            <!-- GENDER -->
+            <div>
+                <label class="text-xs text-gray-500">Gender</label>
+                <select name="gender" class="w-full p-2 border rounded-lg">
+                    <option value="">Pilih</option>
+                    <option value="L" {{ $terapis->gender == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                    <option value="P" {{ $terapis->gender == 'P' ? 'selected' : '' }}>Perempuan</option>
+                </select>
+            </div>
 
-            <input type="text" name="whatsapp" value="{{ $terapis->whatsapp }}"
-                placeholder="WhatsApp"
-                class="p-2 border rounded-lg">
+            <!-- WHATSAPP -->
+            <div>
+                <label class="text-xs text-gray-500">WhatsApp</label>
+                <input type="text" name="whatsapp" value="{{ $terapis->whatsapp }}"
+                    class="w-full p-2 border rounded-lg">
+            </div>
 
-            <textarea name="address" placeholder="Alamat"
-                class="p-2 border rounded-lg col-span-2">{{ $terapis->address }}</textarea>
+            <!-- TANGGAL LAHIR -->
+            <div>
+                <label class="text-xs text-gray-500">Tanggal Lahir</label>
+                <input type="date" name="birth_date" value="{{ $terapis->birth_date }}"
+                    class="w-full p-2 border rounded-lg">
+            </div>
+
+            <!-- KOTA / AREA KERJA -->
+            <div class="col-span-2">
+                <label class="text-xs text-gray-500">Area Kerja / Kota</label>
+
+                <select name="city_id" 
+                    class="w-full p-2 border rounded-lg">
+
+                    <option value="">Pilih Kota</option>
+
+                    @foreach($cities as $city)
+                        <option value="{{ $city->id }}"
+                            {{ $user->city_id == $city->id ? 'selected' : '' }}>
+                            {{ $city->name }}
+                        </option>
+                    @endforeach
+
+                </select>
+            </div>
+
+            <!-- ALAMAT -->
+            <div class="col-span-2">
+                <label class="text-xs text-gray-500">Alamat</label>
+                <textarea name="address"
+                    class="w-full p-2 border rounded-lg">{{ $terapis->address }}</textarea>
+            </div>
 
         </div>
 
-        <button class="w-full bg-teal-600 text-white py-3 rounded-xl">
+
+        <!-- ================= DOKUMEN ================= -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
+
+            <!-- FOTO -->
+            <div class="text-center">
+                <p class="text-xs text-gray-500 mb-2">Foto Profil</p>
+
+                @if($user->foto)
+                    <img src="{{ asset('storage/'.$user->foto) }}"
+                        class="w-20 h-20 object-cover rounded-full mx-auto mb-2">
+                @else
+                    <div class="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-2"></div>
+                @endif
+
+                <input type="file" name="foto"
+                    class="text-xs w-full">
+            </div>
+
+            <!-- KTP -->
+            <div class="text-center">
+                <p class="text-xs text-gray-500 mb-2">KTP</p>
+
+                @if($user->ktp)
+                    <img src="{{ asset('storage/'.$user->ktp) }}"
+                        class="h-20 object-cover mx-auto mb-2 rounded">
+                @else
+                    <div class="h-20 bg-gray-200 mx-auto mb-2"></div>
+                @endif
+
+                <input type="file" name="ktp"
+                    class="text-xs w-full">
+            </div>
+
+            <!-- SKCK -->
+            <div class="text-center">
+                <p class="text-xs text-gray-500 mb-2">SKCK</p>
+
+                @if($user->skck)
+                    <img src="{{ asset('storage/'.$user->skck) }}"
+                        class="h-20 object-cover mx-auto mb-2 rounded">
+                @else
+                    <div class="h-20 bg-gray-200 mx-auto mb-2"></div>
+                @endif
+
+                <input type="file" name="skck"
+                    class="text-xs w-full">
+            </div>
+
+        </div>
+
+
+        <!-- BUTTON -->
+        <button class="w-full bg-teal-600 text-white py-3 rounded-xl hover:bg-teal-700 transition">
             Simpan Data
         </button>
 

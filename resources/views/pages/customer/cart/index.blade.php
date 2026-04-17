@@ -168,28 +168,6 @@
                     </div>
 
 
-                    <!-- GENDER -->
-                    <div class="mb-5">
-
-                        <label class="text-sm font-semibold">Gender Terapis</label>
-
-                        <div class="flex gap-6 mt-2">
-
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="therapist_gender" value="male">
-                                Laki-laki
-                            </label>
-
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="therapist_gender" value="female">
-                                Perempuan
-                            </label>
-
-                        </div>
-
-                    </div>
-
-
                     <!-- ADDITIONAL -->
                     <div>
 

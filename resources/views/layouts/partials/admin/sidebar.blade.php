@@ -30,36 +30,43 @@
 
 
         <!-- ORDER -->
-        <div x-data="{ open: false  }">
+        @php
+            $orderActive = request()->routeIs('admin.orders.*');
+        @endphp
+
+        <div x-data="{ open: {{ $orderActive ? 'true' : 'false' }} }">
 
             <button @click="open = !open"
-                class="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white/10">
+                class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition
+                {{ $orderActive ? 'bg-white text-[#3E7F73] font-medium shadow-sm' : 'hover:bg-white/10' }}">
 
                 <span>Order</span>
-
                 <span class="text-xs">▾</span>
-
             </button>
 
             <div x-show="open" x-transition class="ml-3 mt-1 space-y-1 text-sm">
 
                 <a href="{{ route('admin.orders.status') }}"
-                   class="block px-3 py-2 rounded hover:bg-white/10">
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('admin.orders.status') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Status Order
                 </a>
 
                 <a href="{{ route('admin.orders.waiting') }}"
-                   class="block px-3 py-2 rounded hover:bg-white/10">
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('admin.orders.waiting') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Menunggu
                 </a>
 
                 <a href="{{ route('admin.orders.finished') }}"
-                   class="block px-3 py-2 rounded hover:bg-white/10">
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('admin.orders.finished') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Selesai
                 </a>
 
                 <a href="{{ route('admin.orders.reschedule') }}"
-                   class="block px-3 py-2 rounded hover:bg-white/10">
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('admin.orders.reschedule') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Reschedule
                 </a>
 
@@ -70,37 +77,46 @@
 
         <!-- PELANGGAN -->
         <a href="{{ route('admin.customer.index') }}"
-           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10">
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+        {{ request()->routeIs('admin.customer.*') 
+        ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
+        : 'hover:bg-white/10' }}">
             Data Pelanggan
         </a>
 
 
         <!-- TERAPIS -->
-        <div x-data="{ open: false  }">
+        @php
+            $terapisActive = request()->routeIs('admin.therapist.*');
+        @endphp
+
+        <div x-data="{ open: {{ $terapisActive ? 'true' : 'false' }} }">
 
             <button @click="open = !open"
-                class="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white/10">
+                class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition
+                {{ $terapisActive ? 'bg-white text-[#3E7F73] font-medium shadow-sm' : 'hover:bg-white/10' }}">
 
                 <span>Data Terapis</span>
-
                 <span class="text-xs">▾</span>
-
             </button>
 
             <div x-show="open" class="ml-3 mt-1 space-y-1 text-sm">
 
                 <a href="{{ route('admin.therapist.index') }}"
-                   class="block px-3 py-2 rounded hover:bg-white/10">
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('admin.therapist.index') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Akun
                 </a>
 
                 <a href="{{ route('admin.therapist.verification') }}"
-                   class="block px-3 py-2 rounded hover:bg-white/10">
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('admin.therapist.verification') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Verifikasi
                 </a>
 
                 <a href="{{ route('admin.therapist.review') }}"
-                   class="block px-3 py-2 rounded hover:bg-white/10">
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('admin.therapist.review') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Rating & Ulasan
                 </a>
 
@@ -111,7 +127,10 @@
 
         <!-- REPORT -->
         <a href="{{ route('admin.report.index') }}"
-           class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10">
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+        {{ request()->routeIs('admin.report.*') 
+        ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
+        : 'hover:bg-white/10' }}">
             Report
         </a>
 

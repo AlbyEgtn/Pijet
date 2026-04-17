@@ -88,7 +88,7 @@ class UserSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'role' => 'customer',
 
-                    'nik' => '3178'.rand(1000000000,9999999999),
+                    'nik' => '3178' . random_int(100000000, 999999999),
                     'gender' => $i % 2 ? 'L' : 'P',
                     'birth_date' => '2000-01-'.rand(10,28),
                     'phone' => '08123'.rand(100000,999999),
@@ -113,7 +113,7 @@ class UserSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'role' => 'terapis',
 
-                    'nik' => '3201'.rand(1000000000,9999999999),
+                    'nik' => '3178' . random_int(100000000, 999999999),
                     'gender' => $i % 2 ? 'L' : 'P',
                     'birth_date' => '1995-02-'.rand(10,28),
                     'phone' => '08213'.rand(100000,999999),

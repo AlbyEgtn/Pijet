@@ -105,31 +105,59 @@
             <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-6 space-y-4">
 
                 <h2 class="font-semibold text-gray-800">
-                    Upload Bukti Pembayaran
+                    Status Pembayaran
                 </h2>
 
-                @if($isUploaded)
-                <div class="text-blue-600 text-sm">
-                    Bukti sudah diupload. Silakan konfirmasi.
-                </div>
+                {{-- ================= PENDING ================= --}}
+                @if($isPending)
+
+                    <p class="text-sm text-gray-500">
+                        Silakan upload bukti pembayaran setelah melakukan transfer.
+                    </p>
+
+                    <form action="{{ route('customer.upload.payment', $order->id) }}"
+                        method="POST" enctype="multipart/form-data">
+                        @csrf
+
+                        <input type="file" name="payment_proof"
+                            class="w-full border p-2 rounded-xl mb-2">
+
+                        <button class="w-full bg-gray-100 border py-2 rounded-xl hover:bg-gray-200 transition">
+                            Upload Bukti
+                        </button>
+                    </form>
+
                 @endif
 
-                <form action="{{ route('customer.upload.payment', $order->id) }}"
-                      method="POST" enctype="multipart/form-data">
-                    @csrf
 
-                    <input type="file" name="payment_proof"
-                        class="w-full border p-2 rounded-xl mb-2">
+                {{-- ================= UPLOADED (TRACKING) ================= --}}
+                @if($isUploaded)
 
-                    <button class="w-full bg-gray-100 border py-2 rounded-xl hover:bg-gray-200 transition">
-                        Upload Bukti
-                    </button>
-                </form>
+                    <div class="flex items-center gap-3">
 
-                <button onclick="confirmPayment({{ $order->id }})"
-                    class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl shadow transition">
-                    Konfirmasi Pembayaran
-                </button>
+                        <!-- STEP ICON -->
+                        <div class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-lg">
+                            ⏳
+                        </div>
+
+                        <!-- TEXT -->
+                        <div>
+                            <p class="font-medium text-gray-800">
+                                Menunggu Verifikasi Admin
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                Bukti pembayaran sudah diterima dan sedang diperiksa.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    {{-- OPTIONAL: progress bar --}}
+                    <div class="w-full bg-gray-100 rounded-full h-2 mt-2">
+                        <div class="bg-blue-500 h-2 rounded-full w-2/3 animate-pulse"></div>
+                    </div>
+
+                @endif
 
                 <p id="confirm-msg" class="text-sm text-center hidden"></p>
 
@@ -142,14 +170,120 @@
             @if($isVerified)
 
             <div class="bg-green-50 border border-green-200 p-4 rounded-2xl text-sm">
-                ✅ Pembayaran telah diverifikasi. Menunggu terapis.
+                Pembayaran telah diverifikasi. Menunggu terapis.
             </div>
 
             @endif
 
+            @php
+                $orderSteps = [
+                    'waiting' => 1,
+                    'ready' => 2,
+                    'assigned' => 3,
+                    'on_the_way' => 4,
+                    'ongoing' => 5,
+                    'completed' => 6,
+                ];
+
+                $currentStep = $orderSteps[$order->order_status] ?? 0;
+            @endphp
+
+            @php
+                if ($order->payment_status !== 'verified') {
+                    $currentStep = 1; // stuck di awal
+                }
+            @endphp
+
+            <!-- ================= ORDER TRACKING ================= -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+
+                <h2 class="font-semibold text-gray-800 mb-4">
+                    Tracking Pesanan
+                </h2>
+
+                <div class="space-y-4">
+
+                    {{-- STEP 1 --}}
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center
+                            {{ $currentStep >= 1 ? 'bg-green-500 text-white' : 'bg-gray-200' }}">
+                            1
+                        </div>
+                        <p class="{{ $currentStep >= 1 ? 'text-gray-800' : 'text-gray-400' }}">
+                            Menunggu Pembayaran
+                        </p>
+                    </div>
+
+                    {{-- STEP 2 --}}
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center
+                            {{ $currentStep >= 2 ? 'bg-green-500 text-white' : 'bg-gray-200' }}">
+                            2
+                        </div>
+                        <p class="{{ $currentStep >= 2 ? 'text-gray-800' : 'text-gray-400' }}">
+                            Terapis Siap
+                        </p>
+                    </div>
+
+                    {{-- STEP 3 --}}
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center
+                            {{ $currentStep >= 3 ? 'bg-green-500 text-white' : 'bg-gray-200' }}">
+                            3
+                        </div>
+                        <p class="{{ $currentStep >= 3 ? 'text-gray-800' : 'text-gray-400' }}">
+                            Terapis Ditugaskan
+                        </p>
+                    </div>
+
+                    {{-- STEP 4 --}}
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center
+                            {{ $currentStep >= 4 ? 'bg-green-500 text-white' : 'bg-gray-200' }}">
+                            4
+                        </div>
+                        <p class="{{ $currentStep >= 4 ? 'text-gray-800' : 'text-gray-400' }}">
+                            Terapis Menuju Lokasi
+                        </p>
+                    </div>
+
+                    {{-- STEP 5 --}}
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center
+                            {{ $currentStep >= 5 ? 'bg-green-500 text-white' : 'bg-gray-200' }}">
+                            5
+                        </div>
+                        <p class="{{ $currentStep >= 5 ? 'text-gray-800' : 'text-gray-400' }}">
+                            Sedang Berlangsung
+                        </p>
+                    </div>
+
+                    {{-- STEP 6 --}}
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center
+                            {{ $currentStep >= 6 ? 'bg-green-500 text-white' : 'bg-gray-200' }}">
+                            6
+                        </div>
+                        <p class="{{ $currentStep >= 6 ? 'text-gray-800' : 'text-gray-400' }}">
+                            Selesai
+                        </p>
+                    </div>
+
+                    {{-- CANCELLED --}}
+                    @if($order->order_status === 'cancelled')
+                    <div class="flex items-center gap-3 text-red-500">
+                        ❌ Pesanan Dibatalkan
+                    </div>
+                    @endif
+
+                </div>
+
+            </div>
+
         @endif
 
     </div>
+
 
 
     <!-- ================= SIDEBAR ================= -->
@@ -159,7 +293,10 @@
         <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 space-y-4">
 
             {{-- CANCEL --}}
-            @if(!in_array($order->order_status, ['completed','cancelled']))
+            @if(
+                !in_array($order->order_status, ['completed','cancelled']) 
+                && $order->payment_status !== 'verified'
+            )
             <form action="{{ route('customer.orders.cancel', $order->id) }}" method="POST">
                 @csrf
 
@@ -195,14 +332,79 @@
         </div>
 
 
-        <!-- DETAIL -->
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5">
+        <!-- ================= DETAIL ORDER (ENHANCED) ================= -->
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 space-y-4">
 
-            <h3 class="font-semibold mb-3 text-gray-800">Detail</h3>
+            <h3 class="font-semibold text-gray-800">Detail Pesanan</h3>
 
-            <p class="text-sm text-gray-500">{{ $order->transaction_code }}</p>
-            <p class="text-sm text-gray-500">{{ $order->customer_address }}</p>
-            <p class="text-sm text-gray-500">{{ $order->customer_city }}</p>
+            <!-- KODE -->
+            <div class="text-sm">
+                <p class="text-gray-400">Kode Transaksi</p>
+                <p class="font-medium text-gray-800">{{ $order->transaction_code }}</p>
+            </div>
+
+            <!-- STATUS -->
+            <div class="text-sm">
+                <p class="text-gray-400">Status Pesanan</p>
+                <p class="font-medium">
+                    {{ strtoupper($order->order_status) }}
+                </p>
+            </div>
+
+            <!-- PAYMENT -->
+            <div class="text-sm">
+                <p class="text-gray-400">Status Pembayaran</p>
+                <p class="font-medium">
+                    {{ strtoupper($order->payment_status) }}
+                </p>
+            </div>
+
+            <!-- METODE -->
+            <div class="text-sm">
+                <p class="text-gray-400">Metode Pembayaran</p>
+                <p class="font-medium">
+                    {{ $order->payment_method ?? '-' }}
+                </p>
+            </div>
+
+            <!-- ALAMAT -->
+            <div class="text-sm">
+                <p class="text-gray-400">Lokasi</p>
+                <p class="text-gray-700">
+                    {{ $order->customer_address }}
+                </p>
+                <p class="text-gray-500 text-xs">
+                    {{ $order->customer_city }}
+                </p>
+            </div>
+
+            <!-- JADWAL -->
+            <div class="text-sm">
+                <p class="text-gray-400">Jadwal Layanan</p>
+                <p class="font-medium text-gray-800">
+                    {{ $order->service_date ?? '-' }} • {{ $order->service_time ?? '-' }}
+                </p>
+            </div>
+
+            <!-- RESCHEDULE -->
+            @if($order->order_status === 'rescheduled')
+            <div class="text-sm bg-blue-50 p-3 rounded-xl border border-blue-200">
+                <p class="text-blue-600 font-medium">🔄 Dijadwalkan Ulang</p>
+                <p class="text-blue-500 text-xs">
+                    {{ $order->reschedule_date }} • {{ $order->reschedule_time }}
+                </p>
+            </div>
+            @endif
+
+            <!-- CANCEL -->
+            @if($order->order_status === 'cancelled')
+            <div class="text-sm bg-red-50 p-3 rounded-xl border border-red-200">
+                <p class="text-red-600 font-medium">❌ Pesanan Dibatalkan</p>
+                <p class="text-red-500 text-xs">
+                    {{ $order->cancel_reason }}
+                </p>
+            </div>
+            @endif
 
         </div>
 
@@ -274,32 +476,70 @@ function payNow(orderId){
 
 
 /* ================= CONFIRM PAYMENT ================= */
+function checkPaymentStatus(orderId){
 
-function confirmPayment(orderId){
-
-    const msg = document.getElementById('confirm-msg');
-
-    msg.innerText = "Mengecek pembayaran...";
-    msg.classList.remove('hidden');
-
-    fetch(`/customer/orders/${orderId}/confirm-payment`, {
-        method: "POST",
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        }
-    })
+    fetch(`/customer/orders/${orderId}/status`)
     .then(res => res.json())
     .then(data => {
 
-        msg.innerText = data.message;
+        console.log("STATUS:", data);
 
-        if(data.success){
-            setTimeout(()=>location.reload(), 1200);
+        if(data.payment_status === 'verified'){
+            location.reload(); // auto update UI
         }
 
-    });
-
+    })
+    .catch(err => console.error(err));
 }
+
+let countdown = 5;
+const el = document.getElementById("confirm-msg");
+
+const timer = setInterval(() => {
+    el.innerText = `Memverifikasi dalam ${countdown} detik...`;
+    countdown--;
+
+    if (countdown < 0) {
+        clearInterval(timer);
+    }
+}, 1000);
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const orderId = {{ $order->id }};
+    let interval;
+
+    // ⏱️ DELAY 5 DETIK
+    setTimeout(() => {
+
+        interval = setInterval(() => {
+
+            fetch(`/customer/orders/${orderId}/status`)
+            .then(res => res.json())
+            .then(data => {
+
+                console.log("CHECK:", data);
+
+                // 🔥 STOP POLLING SAJA
+                if (
+                    data.order_status === 'ready' ||
+                    data.payment_status === 'verified'
+                ) {
+                    clearInterval(interval);
+
+                    // OPTIONAL: ubah text UI
+                    el.innerText = "Pembayaran berhasil diverifikasi ✅";
+
+                }
+
+            })
+            .catch(err => console.error(err));
+
+        }, 3000);
+
+    }, 5000);
+
+});
 
 </script>
 

@@ -15,6 +15,9 @@
 
     </div>
 
+    @php
+        $transaksiActive = request()->routeIs('finance.transaction.*');
+    @endphp
 
     <!-- MENU -->
     <nav class="flex-1 px-3 py-4 space-y-1 text-[15px]">
@@ -23,28 +26,23 @@
         <!-- Dashboard -->
         <a
             href="{{ route('finance.dashboard') }}"
-            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition"
-        >
-
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+        {{ request()->routeIs('finance.dashboard') 
+        ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
+        : 'hover:bg-white/10' }}">
             Dashboard
-
         </a>
 
 
         <!-- TRANSAKSI CUSTOMER -->
-        <div
-            x-data="{ open: false  }"
-            class="space-y-1"
-        >
+        <div x-data="{ open: {{ $transaksiActive ? 'true' : 'false' }} }" class="space-y-1">
 
             <button
                 @click="open = !open"
-                class="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white/10"
+                class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition
+                {{ $transaksiActive ? 'bg-white text-[#3E7F73] font-medium shadow-sm' : 'hover:bg-white/10' }}"
             >
-
-                <span>
-                    Transaksi customer
-                </span>
+                <span>Transaksi customer</span>
 
                 <svg
                     :class="open ? 'rotate-180' : ''"
@@ -53,46 +51,38 @@
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                 >
-
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 9l-7 7-7-7"
-                    />
-
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 9l-7 7-7-7"/>
                 </svg>
-
             </button>
 
-
-            <!-- DROPDOWN -->
             <div
                 x-show="open"
                 x-transition
-                class="bg-white text-[#3E7F73] rounded-xl p-3 space-y-2 ml-2"
+                class="ml-3 mt-1 space-y-1 text-sm"
             >
 
-                <a
-                    href="{{ route('finance.transaction.transfer') }}"
-                    class="block text-sm hover:underline"
-                >
+                <a href="{{ route('finance.transaction.transfer') }}"
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('finance.transaction.transfer') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Daftar pembayaran transfer
                 </a>
 
+                <a href="{{ route('finance.transaction.cash') }}"
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('finance.transaction.cash') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
+                    Daftar pembayaran cash
+                </a>
 
-                <a
-                    href="{{ route('finance.transaction.cancelled') }}"
-                    class="block text-sm hover:underline"
-                >
+                <a href="{{ route('finance.transaction.cancelled') }}"
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('finance.transaction.cancelled') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Daftar transaksi dibatalkan
                 </a>
 
-
-                <a
-                    href="{{ route('finance.transaction.reschedule') }}"
-                    class="block text-sm hover:underline"
-                >
+                <a href="{{ route('finance.transaction.reschedule') }}"
+                class="block px-3 py-2 rounded transition
+                {{ request()->routeIs('finance.transaction.reschedule') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
                     Daftar transaksi reschedule
                 </a>
 
@@ -102,24 +92,22 @@
 
 
         <!-- RECAP -->
-        <a
-            href="{{ route('finance.recap') }}"
-            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition"
-        >
-
+        <a href="{{ route('finance.recap') }}"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+        {{ request()->routeIs('finance.recap') 
+        ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
+        : 'hover:bg-white/10' }}">
             Recap transaksi
-
         </a>
 
 
         <!-- PENGATURAN -->
-        <a
-            href="{{ route('finance.setting') }}"
-            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition"
-        >
-
+        <a href="{{ route('finance.setting') }}"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
+        {{ request()->routeIs('finance.setting') 
+        ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
+        : 'hover:bg-white/10' }}">
             Pengaturan
-
         </a>
 
     </nav>
