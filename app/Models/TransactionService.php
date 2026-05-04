@@ -10,51 +10,25 @@ class TransactionService extends Model
     use HasFactory;
 
     protected $fillable = [
-
         'transaction_id',
-
         'service_name',
-
         'therapist_name',
-
         'duration',
-
         'service_price',
-
         'additional_service',
-
         'additional_price',
-
         'total_duration'
-
     ];
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RELATIONSHIPS
-    |--------------------------------------------------------------------------
-    */
 
     public function transaction()
     {
         return $this->belongsTo(Transaction::class);
     }
 
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ACCESSOR
-    |--------------------------------------------------------------------------
-    */
-
     public function getFormattedServicePriceAttribute()
     {
         return 'Rp' . number_format($this->service_price,0,',','.');
     }
-
 
     public function getFormattedAdditionalPriceAttribute()
     {

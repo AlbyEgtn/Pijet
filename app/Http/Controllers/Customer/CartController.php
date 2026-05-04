@@ -35,7 +35,6 @@ class CartController extends Controller
             ->where('is_active', 1)
             ->get();
 
-        // 🔥 TAMBAHAN: ambil data rekening (tanpa transaction_id)
         $payments = PaymentAccount::where('is_active', 1)
             ->where('type', 'company')
             ->get();   
@@ -44,7 +43,7 @@ class CartController extends Controller
             'carts' => $carts,
             'total' => $total,
             'additionalServices' => $additionalServices,
-            'payments' => $payments // 🔥 kirim ke view
+            'payments' => $payments 
         ]);
     }
 
@@ -156,13 +155,22 @@ class CartController extends Controller
             ], 422);
         }
 
-        $total = $carts->sum(fn($cart) => $cart->service->price * $cart->qty);
+        $total = $carts->sum(fn($cart) =>
+            $cart->service->price * $cart->qty
+        );
+
+        if ($total <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Total tidak valid'
+            ], 422);
+        }
 
         $code = 'TRX-' . strtoupper(Str::random(10));
 
         $gender = $user->gender;
 
-        if(!in_array($gender, ['L','P'])){
+        if (!in_array($gender, ['L','P'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Gender user tidak valid'
@@ -198,7 +206,7 @@ class CartController extends Controller
                 'payment_expired_at' => now()->addHours(24),
             ]);
 
-            /* ================= GENERATE MIDTRANS ID ================= */
+            /* ================= GENERATE MIDTRANS ORDER ID ================= */
             $midtransOrderId = 'ORDER-' . $transaction->id . '-' . time();
 
             $transaction->update([
@@ -221,12 +229,35 @@ class CartController extends Controller
                 ]);
             }
 
+            /* ================= MIDTRANS (FIX UTAMA) ================= */
+            if ($request->payment_method === 'transfer') {
+
+                Config::$serverKey = config('midtrans.server_key');
+                Config::$isProduction = false;
+                Config::$isSanitized = true;
+                Config::$is3ds = true;
+
+                $params = [
+                    'transaction_details' => [
+                        'order_id' => $midtransOrderId,
+                        'gross_amount' => $total,
+                    ],
+                    'customer_details' => [
+                        'first_name' => $user->name,
+                        'email' => $user->email,
+                        'phone' => $user->phone,
+                    ],
+                ];
+
+                // 🔥 INI YANG MEMBUAT ORDER MASUK KE MIDTRANS
+                Snap::createTransaction($params);
+            }
+
             /* ================= CLEAR CART ================= */
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
 
-            /* ================= RESPONSE ================= */
             return response()->json([
                 'success' => true,
                 'redirect' => route('customer.orders.show', $transaction->id)
@@ -276,4 +307,45 @@ class CartController extends Controller
         return back()->with('success','Bukti berhasil diupload');
     }
 
+    public function updateQty(Request $request, $id)
+    {
+        $cart = Cart::findOrFail($id);
+
+        if ($request->action === 'increase') {
+            $cart->qty += 1;
+        } else {
+            $cart->qty = max(1, $cart->qty - 1);
+        }
+
+        $cart->save();
+
+        $total = Cart::where('user_id', auth()->id())
+            ->with('service')
+            ->get()
+            ->sum(fn($c) => $c->qty * $c->service->price);
+
+        return response()->json([
+            'success' => true,
+            'qty' => $cart->qty,
+            'total' => $total
+        ]);
+    }
+
+    public function delete($id)
+    {
+        Cart::where('id', $id)->delete();
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    public function count()
+    {
+        $count = Cart::where('user_id', auth()->id())->sum('qty');
+
+        return response()->json([
+            'count' => $count
+        ]);
+    }
 }

@@ -14,12 +14,10 @@ class ServiceController extends Controller
 
     public function index()
     {
-        // layanan utama (paginate 9)
         $services = Service::where('is_additional', 0)
             ->latest()
             ->paginate(9);
 
-        // layanan tambahan (tetap biasa)
         $additionalServices = Service::where('is_additional', 1)
             ->latest()
             ->get();
@@ -64,7 +62,6 @@ class ServiceController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // hapus gambar lama
             if ($service->image && Storage::disk('public')->exists($service->image)) {
                 Storage::disk('public')->delete($service->image);
             }
@@ -77,12 +74,10 @@ class ServiceController extends Controller
         return back()->with('success', 'Layanan berhasil diperbarui');
     }
 
-    // ===== PRIVATE HELPER =====
     private function storeImage($file): string
     {
         $directory = storage_path('app/public/services');
 
-        // buat folder jika belum ada
         if (!file_exists($directory)) {
             mkdir($directory, 0755, true);
         }
@@ -104,7 +99,6 @@ class ServiceController extends Controller
     {
         $service = Service::findOrFail($id);
 
-        // hapus gambar dari storage
         if ($service->image && Storage::disk('public')->exists($service->image)) {
             Storage::disk('public')->delete($service->image);
         }

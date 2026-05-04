@@ -2,8 +2,7 @@
     $user = auth()->user();
 @endphp
 
-<header class="bg-white border-b px-8 py-4 flex justify-between items-center">
-
+<header class="bg-white border-b px-4 md:px-8 py-4 flex justify-between items-center">
     <!-- TITLE -->
     <h1 class="text-lg font-semibold">
         @yield('title')

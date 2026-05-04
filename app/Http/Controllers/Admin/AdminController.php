@@ -12,13 +12,6 @@ class AdminController extends Controller
 {
     public function index()
     {
-
-        /*
-        |--------------------------------------------------------------------------
-        | STATISTIK DASHBOARD
-        |--------------------------------------------------------------------------
-        */
-
         $totalCustomers = User::where('role', 'customer')->count();
 
         $totalTherapists = User::where('role', 'terapis')->count();
@@ -26,14 +19,6 @@ class AdminController extends Controller
         $totalCompletedOrders = Transaction::where('order_status', 'completed')->count();
 
         $totalCancelledOrders = Transaction::where('order_status', 'cancelled')->count();
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | CHART PEMESANAN PER BULAN (SQLITE)
-        |--------------------------------------------------------------------------
-        */
 
         $ordersPerMonth = Transaction::selectRaw("
                 CAST(strftime('%m', created_at) AS INTEGER) as month,
@@ -51,51 +36,19 @@ class AdminController extends Controller
             $chartData[] = $ordersPerMonth[$i] ?? 0;
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | PESANAN TERBARU
-        |--------------------------------------------------------------------------
-        */
-
         $latestOrders = Transaction::latest()
             ->limit(5)
             ->get();
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | TERAPIS TERBARU
-        |--------------------------------------------------------------------------
-        */
 
         $latestTherapists = User::where('role', 'terapis')
             ->latest()
             ->limit(5)
             ->get();
 
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LAYANAN TERPOPULER
-        |--------------------------------------------------------------------------
-        | (menggunakan transaksi jika tidak ada tabel transaction_details)
-        |--------------------------------------------------------------------------
-        */
-
         $popularServices = DB::table('services')
             ->select('name')
             ->limit(3)
             ->get();
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | RETURN VIEW
-        |--------------------------------------------------------------------------
-        */
 
         return view('pages.admin.dashboard', [
 

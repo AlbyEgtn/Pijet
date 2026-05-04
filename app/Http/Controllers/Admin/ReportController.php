@@ -15,7 +15,6 @@ class ReportController extends Controller
     {
         $query = Transaction::query();
 
-        // OPTIONAL: hanya ambil yang ada masalah / laporan
         $query->whereNotNull('cancel_reason');
 
         if ($request->search) {

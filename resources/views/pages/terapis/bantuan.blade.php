@@ -7,7 +7,6 @@
 
 <div class="max-w-4xl mx-auto mt-10 bg-white shadow rounded-xl p-8">
 
-    <!-- HEADER -->
     <h2 class="text-2xl font-bold text-gray-700 mb-6 flex items-center gap-2">
 
         <a 
@@ -26,11 +25,8 @@
         Jika mengalami kendala saat menggunakan sistem, silakan hubungi kami melalui kontak berikut.
     </p>
 
-
-    <!-- CONTACT LIST -->
     <div class="grid grid-cols-3 gap-6">
 
-        <!-- WHATSAPP -->
         <a 
             href="https://wa.me/6281234567890"
             target="_blank"
@@ -52,8 +48,6 @@
 
         </a>
 
-
-        <!-- INSTAGRAM -->
         <a 
             href="https://instagram.com/"
             target="_blank"
@@ -75,8 +69,6 @@
 
         </a>
 
-
-        <!-- EMAIL -->
         <a 
             href="mailto:support@pijetin.com"
             class="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 rounded-xl p-6 transition"

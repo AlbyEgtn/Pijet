@@ -40,7 +40,6 @@ return new class extends Migration
 
             $table->string('work_area')->nullable();
 
-            // 🔥 RELASI KE CITIES (CABANG)
             $table->string('city')->nullable();
             $table->foreignId('city_id')
                   ->nullable()

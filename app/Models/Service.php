@@ -28,12 +28,17 @@ class Service extends Model
             return 'https://via.placeholder.com/400x200';
         }
 
-        // jika image adalah URL
+        // full URL
         if (str_starts_with($this->image, 'http')) {
             return $this->image;
         }
 
-        // jika image adalah file storage
+        // 🔥 UNSPLASH DETECTION (LEBIH AKURAT)
+        if (!str_contains($this->image, '/') && !str_contains($this->image, '.')) {
+            return "https://images.unsplash.com/photo-{$this->image}?auto=format&fit=crop&w=400&q=70";
+        }
+
+        // local storage
         return asset('storage/' . $this->image);
     }
 }

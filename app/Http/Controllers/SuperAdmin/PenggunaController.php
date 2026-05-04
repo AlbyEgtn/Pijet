@@ -26,13 +26,11 @@ class PenggunaController extends Controller
     {
         $user = User::with(['terapis'])->findOrFail($id);
 
-        // 🔥 ambil transaksi berdasarkan customer_id
         $transactions = \App\Models\Transaction::with('services')
             ->where('customer_id', $user->id)
             ->latest()
             ->get();
 
-        // statistik real
         $totalLayanan = $transactions->count();
         $totalBatal = $transactions->where('status', 'dibatalkan')->count();
         $totalWarning = $user->warning_count ?? 0;
@@ -54,7 +52,7 @@ class PenggunaController extends Controller
         $user->is_suspended = true;
         $user->save();
 
-        // optional simpan log (kalau mau nanti)
+        // optional simpan log
         // $request->reason
         // $request->note
         // $request->duration
@@ -66,7 +64,6 @@ class PenggunaController extends Controller
     {
         if ($type == 'aduan') {
 
-            // ambil data laporan (contoh pakai model Report)
             $reports = \App\Models\Report::with(['user', 'reportedUser'])
                         ->latest()
                         ->paginate(10);

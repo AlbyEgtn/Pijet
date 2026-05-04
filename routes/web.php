@@ -549,17 +549,15 @@ Route::middleware(['auth','role:customer'])
         Route::get('/cart/add/{id}', [CartController::class,'add'])
             ->name('customer.cart.add');
 
-        Route::get('/cart/increase/{id}', [CartController::class,'increase'])
-            ->name('customer.cart.increase');
-
-        Route::get('/cart/decrease/{id}', [CartController::class,'decrease'])
-            ->name('customer.cart.decrease');
-
-        Route::get('/cart/remove/{id}', [CartController::class,'remove'])
-            ->name('customer.cart.remove');
+        Route::get('/cart/count', [CartController::class, 'count']);
 
         Route::post('/cart/checkout', [CartController::class,'checkout'])
             ->name('customer.cart.checkout');
+
+        Route::post('/cart/update/{id}', [CartController::class, 'updateQty']);
+
+        Route::delete('/cart/delete/{id}', [CartController::class, 'delete']);
+
 
 
         /* ORDERS */

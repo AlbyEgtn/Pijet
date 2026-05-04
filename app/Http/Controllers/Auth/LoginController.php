@@ -23,9 +23,6 @@ class LoginController extends Controller
 
             $user = Auth::user();
 
-            // =========================
-            // 🔥 CONSTRAINT TERAPIS
-            // =========================
             if ($user->role === 'terapis' && $user->verification_status !== 'approved') {
 
                 Auth::logout(); // paksa logout
@@ -34,9 +31,6 @@ class LoginController extends Controller
                     ->with('error','Akun terapis belum disetujui admin');
             }
 
-            // =========================
-            // REDIRECT BERDASARKAN ROLE
-            // =========================
             switch ($user->role) {
 
                 case 'super_admin':

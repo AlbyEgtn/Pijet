@@ -11,79 +11,52 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-
         'transaction_code',
-
         'customer_id',
         'terapis_id',
-
         'customer_name',
         'customer_phone',
         'customer_address',
         'customer_city',
-
         'therapist_gender',
-
         'orderer_name',
-
         'company_account_id',
-
         'company_income',
         'therapist_income',
-
-        'is_balance_recorded',   // ✅ tambahan
-        'is_profit_shared',      // ✅ tambahan
-
+        'is_balance_recorded',   
+        'is_profit_shared', 
         'service_date',
         'service_time',
-
         'payment_method',
-
         'payment_status',
         'payment_uploaded_at',
         'payment_verified_at',
         'payment_expired_at',
         'payment_proof',
-
         'order_status',
-
         'total_price',
-
         'reschedule_date',
         'reschedule_time',
-
         'cancel_reason',
-
         'midtrans_order_id',
-
         'expired_at',
-
-        'started_at',   // ✅ tambahan
-        'completed_at', // ✅ tambahan
+        'started_at', 
+        'completed_at', 
         
     ];
 
     protected $casts = [
         'service_date' => 'date',
         'service_time' => 'datetime:H:i',
-
         'payment_uploaded_at' => 'datetime',
         'payment_verified_at' => 'datetime',
         'payment_expired_at' => 'datetime',
         'expired_at' => 'datetime',
-
-        'started_at' => 'datetime',     // ✅ tambahan
-        'completed_at' => 'datetime',   // ✅ tambahan
-
-        'is_balance_recorded' => 'boolean', // ✅ tambahan
-        'is_profit_shared' => 'boolean',    // ✅ tambahan
+        'started_at' => 'datetime',     
+        'completed_at' => 'datetime',   
+        'is_balance_recorded' => 'boolean', 
+        'is_profit_shared' => 'boolean', 
     ];
-
-    /*
-    |--------------------------------------------------------------------------
-    | RELATIONSHIPS
-    |--------------------------------------------------------------------------
-    */
 
     public function services()
     {
@@ -105,12 +78,6 @@ class Transaction extends Model
         return $this->belongsTo(PaymentAccount::class, 'company_account_id');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ACCESSOR
-    |--------------------------------------------------------------------------
-    */
-
     public function getFormattedTotalPriceAttribute()
     {
         return 'Rp' . number_format($this->total_price,0,',','.');
@@ -128,12 +95,6 @@ class Transaction extends Model
             default => 'bg-gray-200'
         };
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | HELPER
-    |--------------------------------------------------------------------------
-    */
 
     public function serviceCount()
     {
@@ -166,7 +127,6 @@ class Transaction extends Model
     {
         static::creating(function ($transaction) {
 
-            // kalau belum ada company_account_id
             if (!$transaction->company_account_id) {
 
                 $wallet = \App\Models\PaymentAccount::where('bank_name', 'SYSTEM')->first();

@@ -1,6 +1,5 @@
-<aside class="w-64 bg-gradient-to-b from-teal-700 to-teal-900 text-white flex flex-col min-h-screen shadow-lg">
-    
-    <!-- LOGO -->
+<aside class="hidden md:flex md:w-64 flex-col bg-gradient-to-b from-teal-700 to-teal-900 text-white shadow-lg min-h-screen">
+        <!-- LOGO -->
     <div class="px-6 py-7 flex items-center gap-3 border-b border-white/10">
         
         <img

@@ -27,9 +27,6 @@ class MidtransController extends Controller
 
         DB::transaction(function () use ($orderId, $status) {
 
-            // ===============================
-            // 🔥 HANDLE HUTANG (IMPORTANT)
-            // ===============================
             if (str_starts_with($orderId, 'HUTANG-')) {
 
                 if (!preg_match('/HUTANG-(\d+)-/', $orderId, $match)) {
@@ -58,9 +55,6 @@ class MidtransController extends Controller
                 return;
             }
 
-            // ===============================
-            // 🔥 HANDLE ORDER NORMAL
-            // ===============================
             $order = Transaction::lockForUpdate()
                 ->where('midtrans_order_id', $orderId)
                 ->first();

@@ -13,12 +13,6 @@ class Cart extends Model
         'qty'
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELATION
-    |--------------------------------------------------------------------------
-    */
-
     public function service()
     {
         return $this->belongsTo(Service::class);

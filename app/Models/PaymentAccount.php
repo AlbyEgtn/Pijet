@@ -11,19 +11,13 @@ class PaymentAccount extends Model
 
     protected $fillable = [
         'type',
-        'terapis_id',       // ← tambahkan kolom ini via migration (lihat catatan)
+        'terapis_id',     
         'bank_name',
         'account_number',
         'account_holder',
         'balance',
         'is_active'
     ];
-
-    /*
-    |----------------------------------------------------------------------
-    | SCOPES
-    |----------------------------------------------------------------------
-    */
 
     public function scopeActive($query)
     {

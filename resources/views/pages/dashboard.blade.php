@@ -11,8 +11,6 @@
     $role = $user->role;
 @endphp
 
-
-{{-- SUPER ADMIN --}}
 @if ($role === 'super_admin')
 
 <div class="p-6 bg-white rounded shadow">
@@ -28,8 +26,6 @@
 
 </div>
 
-
-{{-- ADMIN --}}
 @elseif ($role === 'admin')
 
 <div class="p-6 bg-white rounded shadow">
@@ -45,8 +41,6 @@
 
 </div>
 
-
-{{-- FINANCE --}}
 @elseif ($role === 'finance')
 
 <div class="p-6 bg-white rounded shadow">
@@ -62,8 +56,6 @@
 
 </div>
 
-
-{{-- TERAPIS --}}
 @elseif ($role === 'terapis')
 
 <div class="p-6 bg-white rounded shadow">
@@ -79,8 +71,6 @@
 
 </div>
 
-
-{{-- CUSTOMER --}}
 @elseif ($role === 'customer')
 
 <div class="p-6 bg-white rounded shadow">

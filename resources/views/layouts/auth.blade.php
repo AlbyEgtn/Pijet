@@ -3,12 +3,14 @@
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>@yield('title')</title>
+    <title>@yield('title')</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+        {{-- APP CSS (WAJIB untuk scrollbar) --}}
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
 </head>
 

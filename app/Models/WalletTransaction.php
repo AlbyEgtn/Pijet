@@ -20,35 +20,18 @@ class WalletTransaction extends Model
         'description',
     ];
 
-    // =========================
-    // CONSTANTS (Best Practice)
-    // =========================
     const TYPE_INCOME  = 'income';
     const TYPE_EXPENSE = 'expense';
 
-    // =========================
-    // RELATIONS
-    // =========================
-
-    /**
-     * Relasi ke PaymentAccount
-     */
     public function paymentAccount()
     {
         return $this->belongsTo(PaymentAccount::class);
     }
 
-    /**
-     * Polymorphic reference (transaction / withdraw / dll)
-     */
     public function reference()
     {
         return $this->morphTo(__FUNCTION__, 'reference_type', 'reference_id');
     }
-
-    // =========================
-    // SCOPES (Optional tapi bagus)
-    // =========================
 
     public function scopeIncome($query)
     {
@@ -59,10 +42,6 @@ class WalletTransaction extends Model
     {
         return $query->where('type', self::TYPE_EXPENSE);
     }
-
-    // =========================
-    // HELPER METHODS
-    // =========================
 
     public function isIncome()
     {

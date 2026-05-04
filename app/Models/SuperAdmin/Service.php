@@ -31,12 +31,10 @@ class Service extends Model
             return 'https://via.placeholder.com/400x200';
         }
 
-        // jika image adalah URL
         if (str_starts_with($this->image, 'http')) {
             return $this->image;
         }
 
-        // jika image adalah file storage
         return asset('storage/' . $this->image);
     }
 }

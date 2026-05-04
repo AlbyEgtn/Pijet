@@ -66,8 +66,12 @@
 
             <!-- IMAGE -->
             <div class="relative aspect-[4/3] overflow-hidden">
-                <img src="{{ $service->image_url }}"
-                     class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                <img 
+                    src="{{ $service->image_url }}"
+                    loading="lazy"
+                    decoding="async"
+                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                />
 
                 <!-- overlay -->
                 <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>

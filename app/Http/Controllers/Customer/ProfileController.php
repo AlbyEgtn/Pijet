@@ -31,7 +31,6 @@ class ProfileController extends Controller
             'ktp'  => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
         ]);
 
-        // UPDATE DATA
         $user->update([
             'name'       => $request->name,
             'phone'      => $request->phone,
@@ -40,7 +39,6 @@ class ProfileController extends Controller
             'gender'     => $request->gender,
         ]);
 
-        // UPLOAD FOTO
         if ($request->hasFile('foto')) {
 
             if ($user->foto) {
@@ -51,7 +49,6 @@ class ProfileController extends Controller
                 ->store('profile', 'public');
         }
 
-        // UPLOAD KTP
         if ($request->hasFile('ktp')) {
 
             if ($user->ktp) {

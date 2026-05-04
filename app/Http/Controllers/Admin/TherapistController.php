@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\Hash;
 
 class TherapistController extends Controller
 {
-    /**
-     * ===============================
-     * LIST DATA TERAPIS
-     * ===============================
-     */
     public function index(Request $request)
     {
         $query = User::where('role', 'terapis')
@@ -34,22 +29,11 @@ class TherapistController extends Controller
         return view('pages.admin.therapist.index', compact('therapists'));
     }
 
-    /**
-     * ===============================
-     * FORM CREATE
-     * ===============================
-     */
     public function create()
     {
         return view('pages.admin.therapist.create');
     }
 
-
-    /**
-     * ===============================
-     * STORE DATA
-     * ===============================
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -73,12 +57,6 @@ class TherapistController extends Controller
                          ->with('success', 'Terapis berhasil ditambahkan');
     }
 
-
-    /**
-     * ===============================
-     * EDIT
-     * ===============================
-     */
     public function edit($id)
     {
         $therapist = User::where('role', 'terapis')->findOrFail($id);
@@ -86,12 +64,6 @@ class TherapistController extends Controller
         return view('pages.admin.therapist.edit', compact('therapist'));
     }
 
-
-    /**
-     * ===============================
-     * UPDATE
-     * ===============================
-     */
     public function update(Request $request, $id)
     {
         $therapist = User::where('role', 'terapis')->findOrFail($id);
@@ -114,12 +86,6 @@ class TherapistController extends Controller
                          ->with('success', 'Data berhasil diperbarui');
     }
 
-
-    /**
-     * ===============================
-     * DELETE
-     * ===============================
-     */
     public function destroy($id)
     {
         $therapist = User::where('role', 'terapis')->findOrFail($id);
@@ -129,12 +95,6 @@ class TherapistController extends Controller
         return back()->with('success', 'Data berhasil dihapus');
     }
 
-
-    /**
-     * ===============================
-     * HALAMAN VERIFIKASI
-     * ===============================
-     */
     public function verification(Request $request)
     {
         $query = User::where('role', 'terapis')
@@ -153,17 +113,10 @@ class TherapistController extends Controller
         return view('pages.admin.therapist.verification', compact('therapists'));
     }
 
-
-    /**
-     * ===============================
-     * APPROVE TERAPIS
-     * ===============================
-     */
     public function verify($id)
     {
         $user = User::with('terapis')->where('role', 'terapis')->findOrFail($id);
 
-        // 1. Update status
         $user->update([
             'verification_status' => 'approved',
             'verified_at' => now(),
@@ -171,7 +124,6 @@ class TherapistController extends Controller
             'reject_reason' => null
         ]);
 
-        // 2. Cegah duplicate (IMPORTANT 🔥)
         $exists = Terapis::where('user_id', $user->id)->exists();
 
         if (!$exists) {
@@ -183,7 +135,6 @@ class TherapistController extends Controller
                 'whatsapp' => $user->phone,
                 'address' => $user->address,
 
-                // payout (kosong dulu)
                 'bank_name' => null,
                 'bank_number' => null,
                 'account_holder' => null,
@@ -197,12 +148,6 @@ class TherapistController extends Controller
         return back()->with('success', 'Terapis berhasil diverifikasi & dimasukkan ke sistem');
     }
 
-
-    /**
-     * ===============================
-     * REJECT TERAPIS
-     * ===============================
-     */
     public function reject(Request $request, $id)
     {
         $request->validate([
@@ -219,15 +164,9 @@ class TherapistController extends Controller
         return back()->with('success', 'Terapis ditolak');
     }
 
-
-    /**
-     * ===============================
-     * REVIEW TERAPIS
-     * ===============================
-     */
     public function review()
     {
-        $reviews = Review::with(['user']) // user = pemberi review
+        $reviews = Review::with(['user'])
                          ->latest()
                          ->paginate(10);
 

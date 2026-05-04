@@ -43,7 +43,6 @@ class CabangController extends Controller
         ]);
 
 
-        // ambil kode cabang terakhir
         $lastCabang = Cabang::orderBy('id','desc')->first();
 
         if ($lastCabang) {

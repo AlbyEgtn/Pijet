@@ -26,73 +26,93 @@
 </section>
 
 
-<!-- ================= CART LIST ================= -->
-<div class="max-w-4xl mx-auto px-6 py-10 space-y-5">
+<div class="max-w-4xl mx-auto px-4 md:px-6 py-6 space-y-4">
 
-    @forelse($carts as $cart)
+@forelse($carts as $cart)
 
-    <div class="flex items-center bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-4">
+    <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition p-4 flex items-center gap-4">
 
+        <!-- CHECKBOX -->
+        <input type="checkbox"
+               class="cart-check accent-teal-600 flex-shrink-0"
+               data-id="{{ $cart->id }}"
+               data-price="{{ $cart->service->price }}"
+               onchange="updateSelectedTotal()">
+
+        <!-- IMAGE -->
         <img src="{{ $cart->service->image_url }}"
-             class="w-20 h-20 rounded-xl object-cover">
+             class="w-20 h-20 rounded-xl object-cover flex-shrink-0">
 
-        <div class="flex-1 ml-4 space-y-1">
+        <!-- CONTENT -->
+        <div class="flex-1 min-w-0">
 
-            <h3 class="font-semibold text-sm text-gray-800">
+            <h3 class="font-semibold text-gray-800 text-sm truncate">
                 {{ $cart->service->name }}
             </h3>
 
-            <p class="text-xs text-gray-400">
+            <p class="text-xs text-gray-400 mt-1">
                 ⏱ {{ $cart->service->duration }} menit
             </p>
 
-            <p class="text-teal-600 font-semibold text-sm">
+            <p class="text-teal-600 font-semibold text-sm mt-2">
                 Rp {{ number_format($cart->service->price) }}
             </p>
 
         </div>
 
-        <!-- QTY CONTROL (TIDAK DIUBAH) -->
-        <div class="flex items-center gap-2">
+        <!-- ACTION -->
+        <div class="flex flex-col items-end gap-2 flex-shrink-0">
 
-            <button onclick="updateQty({{ $cart->id }},'decrease')"
-                class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg hover:bg-gray-300">
-                -
-            </button>
+            <!-- QTY -->
+            <div class="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
 
-            <span id="qty-{{ $cart->id }}" class="text-sm font-medium w-6 text-center">
-                {{ $cart->qty }}
-            </span>
+                <button onclick="updateQty({{ $cart->id }},'decrease')"
+                    class="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded">
+                    -
+                </button>
 
-            <button onclick="updateQty({{ $cart->id }},'increase')"
-                class="w-8 h-8 flex items-center justify-center bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                +
+                <span id="qty-{{ $cart->id }}"
+                      class="text-sm font-medium w-5 text-center">
+                    {{ $cart->qty }}
+                </span>
+
+                <button onclick="updateQty({{ $cart->id }},'increase')"
+                    class="w-6 h-6 flex items-center justify-center text-white bg-teal-600 rounded">
+                    +
+                </button>
+
+            </div>
+
+            <!-- DELETE -->
+            <button onclick="deleteCart({{ $cart->id }})"
+                class="text-xs text-red-500 hover:underline">
+                Hapus
             </button>
 
         </div>
 
     </div>
 
-    @empty
+@empty
 
     <div class="bg-white rounded-xl shadow p-10 text-center text-gray-500">
         Keranjang kosong
     </div>
 
-    @endforelse
+@endforelse
 
 </div>
 
 
 <!-- ================= CHECKOUT BAR ================= -->
-<div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t shadow-lg">
+<div class="fixed bottom-16 md:bottom-0 left-0 right-0 bg-white border-t shadow-lg">
 
     <div class="max-w-4xl mx-auto flex justify-between items-center px-6 py-4">
 
         <div>
             <p class="text-xs text-gray-400">Total</p>
             <p id="cart-total" class="font-semibold text-teal-700 text-lg">
-                Rp {{ number_format($total) }}
+                Rp 0
             </p>
         </div>
 
@@ -107,166 +127,70 @@
 
 
 <!-- ================= CHECKOUT MODAL ================= -->
-<div id="checkoutSheet" class="fixed inset-0 bg-black/50 hidden z-50 backdrop-blur-sm">
+<div id="checkoutSheet" class="fixed inset-0 bg-black/40 hidden z-50 backdrop-blur-sm">
 
-    <div class="flex items-center justify-center min-h-screen p-6">
+    <div class="flex items-end md:items-center justify-center min-h-screen p-4">
 
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-5xl p-8">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden animate-fadeIn">
 
             <!-- HEADER -->
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex justify-between items-center px-5 py-4 border-b">
 
-                <h2 class="text-xl font-semibold">
-                    Detail Pesanan
+                <h2 class="font-semibold text-lg text-gray-800">
+                    Checkout
                 </h2>
 
-                <button onclick="closeCheckout()"
-                    class="text-gray-500 text-xl hover:text-gray-700">
+                <button onclick="closeCheckout()" class="text-gray-400 hover:text-gray-600 text-xl">
                     ✕
                 </button>
 
             </div>
 
 
-            <div class="grid md:grid-cols-2 gap-8">
-
-                <!-- ================= LEFT ================= -->
-                <div>
-
-                    <!-- SERVICE -->
-                    <div class="flex items-center gap-4 mb-6">
-
-                        <img src="{{ $carts->first()?->service->image_url ?? '' }}"
-                             class="w-24 h-24 rounded-xl object-cover">
-
-                        <div>
-                            <p class="font-semibold text-lg">
-                                {{ $carts->first()?->service->name ?? '' }}
-                            </p>
-                            <p class="text-sm text-gray-400">
-                                {{ $carts->first()?->service->duration ?? '' }} menit
-                            </p>
-                        </div>
-
-                    </div>
+            <!-- LIST LAYANAN -->
+            <div class="px-5 py-4 space-y-3 max-h-60 overflow-y-auto" id="checkoutItems">
+                <!-- 🔥 akan diisi via JS -->
+            </div>
 
 
-                    <!-- DURASI -->
-                    <div class="mb-5">
+            <!-- FORM -->
+            <div class="px-5 pb-5 space-y-4">
 
-                        <label class="text-sm font-semibold">Durasi</label>
-
-                        <select id="duration"
-                            class="w-full border rounded-xl px-3 py-2 mt-2 focus:ring-2 focus:ring-teal-500">
-
-                            <option value="60">60 menit</option>
-                            <option value="90">90 menit</option>
-                            <option value="120">120 menit</option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- ADDITIONAL -->
-                    <div>
-
-                        <label class="text-sm font-semibold">Layanan Tambahan</label>
-
-                        <div class="space-y-2 mt-2 max-h-40 overflow-y-auto">
-
-                            @foreach($additionalServices as $add)
-
-                            <label class="flex justify-between border rounded-xl p-3 cursor-pointer hover:bg-gray-50">
-
-                                <div>
-                                    <input type="checkbox"
-                                           class="additional"
-                                           value="{{ $add->price }}">
-
-                                    <span class="ml-2 text-sm font-medium">
-                                        {{ $add->name }}
-                                    </span>
-                                </div>
-
-                                <span class="text-sm text-gray-500">
-                                    Rp {{ number_format($add->price) }}
-                                </span>
-
-                            </label>
-
-                            @endforeach
-
-                        </div>
-
-                    </div>
-
+                <!-- JADWAL -->
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="date" id="service_date"
+                        class="border rounded-xl px-3 py-2 text-sm">
+                    <input type="time" id="service_time"
+                        class="border rounded-xl px-3 py-2 text-sm">
                 </div>
 
+                <!-- PAYMENT -->
+                <div class="space-y-2">
+                    <label class="flex justify-between border rounded-xl p-3 text-sm cursor-pointer">
+                        Cash
+                        <input type="radio" name="payment_method" value="cash">
+                    </label>
 
-                <!-- ================= RIGHT ================= -->
-                <div>
+                    <label class="flex justify-between border rounded-xl p-3 text-sm cursor-pointer">
+                        Transfer
+                        <input type="radio" name="payment_method" value="transfer">
+                    </label>
+                </div>
 
-                    <!-- JADWAL -->
-                    <div class="mb-6">
+                <!-- TOTAL -->
+                <div class="bg-gray-100 rounded-xl p-4 flex justify-between items-center">
 
-                        <label class="text-sm font-semibold">Jadwal</label>
-
-                        <div class="grid grid-cols-2 gap-3 mt-2">
-
-                            <input type="date" id="service_date"
-                                class="border rounded-xl px-3 py-2">
-
-                            <input type="time" id="service_time"
-                                class="border rounded-xl px-3 py-2">
-
-                        </div>
-
+                    <div>
+                        <p class="text-xs text-gray-500">Total Bayar</p>
+                        <p id="checkoutTotal" class="text-lg font-semibold text-teal-700">
+                            Rp 0
+                        </p>
                     </div>
 
-
-                    <!-- PAYMENT -->
-                    <div class="mb-6">
-
-                        <label class="text-sm font-semibold">Metode Pembayaran</label>
-
-                        <div class="space-y-3 mt-3">
-
-                            <label class="flex justify-between items-center border rounded-xl p-3 cursor-pointer hover:bg-gray-50">
-                                <span>Cash (Bayar di tempat)</span>
-                                <input type="radio" name="payment_method" value="cash">
-                            </label>
-
-                            <label class="flex justify-between items-center border rounded-xl p-3 cursor-pointer hover:bg-gray-50">
-                                <span>Transfer</span>
-                                <input type="radio" name="payment_method" value="transfer">
-                            </label>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- TOTAL -->
-                    <div class="bg-gray-100 rounded-xl p-5">
-
-                        <div class="flex justify-between mb-4">
-
-                            <span class="text-gray-500">Total</span>
-
-                            <span id="checkoutTotal"
-                                  class="font-semibold text-lg text-teal-700">
-                                Rp {{ number_format($total) }}
-                            </span>
-
-                        </div>
-
-                        <button onclick="confirmCheckout()"
-                            class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl font-semibold transition">
-                            Buat Pesanan
-                        </button>
-
-                    </div>
+                    <button onclick="confirmCheckout()"
+                        class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-xl text-sm">
+                        Checkout
+                    </button>
 
                 </div>
 
@@ -286,11 +210,58 @@
 /* ================= MODAL CONTROL ================= */
 
 function openCheckout(){
+
+    const checked = document.querySelectorAll(".cart-check:checked");
+
+    if(checked.length === 0){
+        showToast("Pilih layanan terlebih dahulu", "error");
+        return;
+    }
+
     document.getElementById('checkoutSheet').classList.remove('hidden');
+
+    renderCheckoutItems(); // 🔥 tampilkan list
+    updateTotal();         // 🔥 hitung total
 }
 
 function closeCheckout(){
     document.getElementById('checkoutSheet').classList.add('hidden');
+}
+
+function renderCheckoutItems(){
+
+    const container = document.getElementById("checkoutItems");
+    container.innerHTML = "";
+
+    document.querySelectorAll(".cart-check:checked").forEach(el => {
+
+        const id    = el.dataset.id;
+        const price = parseInt(el.dataset.price);
+        const qty   = parseInt(document.getElementById("qty-" + id).innerText);
+
+        const name  = el.closest('.bg-white')
+                        .querySelector('h3')
+                        .innerText;
+
+        const item = `
+            <div class="flex justify-between items-center border rounded-xl p-3">
+
+                <div>
+                    <p class="text-sm font-medium text-gray-800">${name}</p>
+                    <p class="text-xs text-gray-400">${qty}x</p>
+                </div>
+
+                <p class="text-sm font-semibold text-teal-600">
+                    Rp ${(price * qty).toLocaleString()}
+                </p>
+
+            </div>
+        `;
+
+        container.innerHTML += item;
+
+    });
+
 }
 
 
@@ -324,7 +295,22 @@ function showToast(message, type = 'success'){
 
 /* ================= TOTAL CALCULATION ================= */
 
-const baseTotal = {{ $total }};
+function getSelectedTotal(){
+
+    let total = 0;
+
+    document.querySelectorAll(".cart-check:checked").forEach(el => {
+
+        const id    = el.dataset.id;
+        const price = parseInt(el.dataset.price);
+        const qty   = parseInt(document.getElementById("qty-" + id).innerText);
+
+        total += price * qty;
+
+    });
+
+    return total;
+}
 
 document.querySelectorAll(".additional").forEach(el => {
     el.addEventListener("change", updateTotal);
@@ -332,7 +318,17 @@ document.querySelectorAll(".additional").forEach(el => {
 
 function updateTotal(){
 
-    let total = baseTotal;
+    let total = 0;
+
+    document.querySelectorAll(".cart-check:checked").forEach(el => {
+
+        const id    = el.dataset.id;
+        const price = parseInt(el.dataset.price);
+        const qty   = parseInt(document.getElementById("qty-" + id).innerText);
+
+        total += price * qty;
+
+    });
 
     document.querySelectorAll(".additional:checked").forEach(el => {
         total += parseInt(el.value);
@@ -347,9 +343,15 @@ function updateTotal(){
 
 function confirmCheckout(){
 
+    const checked = document.querySelectorAll(".cart-check:checked");
+
+    if(checked.length === 0){
+        showToast("Tidak ada layanan yang dipilih", "error");
+        return;
+    }
+
     const btn = event.target;
 
-    // 🔒 prevent double click
     btn.disabled = true;
     btn.innerText = "Memproses...";
 
@@ -370,6 +372,12 @@ function confirmCheckout(){
     }
 
     const formData = new FormData();
+
+    // 🔥 kirim ID yang dicentang
+    checked.forEach(el => {
+        formData.append("cart_ids[]", el.dataset.id);
+    });
+
     formData.append("payment_method", payment);
     formData.append("service_date", date);
     formData.append("service_time", time);
@@ -387,11 +395,36 @@ function confirmCheckout(){
 
         if(data.success){
 
-            showToast("Pesanan dibuat");
+            // 🔥 JIKA ADA MIDTRANS
+            if(data.snap_token){
 
-            setTimeout(() => {
-                window.location.href = data.redirect;
-            }, 800);
+                window.snap.pay(data.snap_token, {
+
+                    onSuccess: function(){
+                        showToast("Pembayaran berhasil");
+                        window.location.href = data.redirect;
+                    },
+
+                    onPending: function(){
+                        showToast("Menunggu pembayaran");
+                        window.location.href = data.redirect;
+                    },
+
+                    onError: function(){
+                        showToast("Pembayaran gagal", "error");
+                        resetButton(btn);
+                    }
+
+                });
+
+            }else{
+                // 🔥 CASH FLOW
+                showToast("Pesanan dibuat");
+
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 800);
+            }
 
         }else{
             showToast(data.message || "Checkout gagal", "error");
@@ -405,6 +438,93 @@ function confirmCheckout(){
         resetButton(btn);
     });
 
+}
+
+/* ================= SCROLL FIX ================= */
+document.body.style.overflow = "auto";
+
+
+/* ================= TOTAL BERDASARKAN CHECKBOX ================= */
+function updateSelectedTotal(){
+
+    let total = 0;
+
+    document.querySelectorAll(".cart-check:checked").forEach(el => {
+
+        const price = parseInt(el.dataset.price);
+        const qty   = parseInt(document.getElementById("qty-" + el.dataset.id).innerText);
+
+        total += price * qty;
+
+    });
+
+    document.getElementById("cart-total").innerText =
+        "Rp " + total.toLocaleString();
+}
+
+
+/* ================= UPDATE QTY ================= */
+function updateQty(cartId, action){
+
+    fetch(`/customer/cart/update/${cartId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify({ action })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.success){
+
+            document.getElementById(`qty-${cartId}`).innerText = data.qty;
+
+            updateSelectedTotal();
+
+            // ✅ TAMBAH INI
+            loadCartCount();
+            renderCheckoutItems();
+            updateTotal();
+
+        }
+
+    });
+}
+
+
+/* ================= DELETE CART ================= */
+function deleteCart(cartId){
+
+    if(!confirm("Hapus layanan ini?")) return;
+
+    fetch(`/customer/cart/delete/${cartId}`, {
+        method: "DELETE",
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.success){
+
+            // hapus element dari DOM
+            const el = document.querySelector(`[data-id="${cartId}"]`)?.closest('.bg-white');
+            if(el) el.remove();
+
+            updateSelectedTotal();
+
+            // ✅ UPDATE BADGE
+            loadCartCount();
+            renderCheckoutItems();
+            updateTotal();
+        }
+
+    });
 }
 
 

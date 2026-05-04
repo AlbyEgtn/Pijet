@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Log;
 
 class FinanceHelper
 {
-    // ===============================
-    // 🔥 GET COMPANY WALLET
-    // ===============================
     public static function getCompanyWallet()
     {
         $wallet = PaymentAccount::where('bank_name', 'SYSTEM')->first();
@@ -23,15 +20,10 @@ class FinanceHelper
         return $wallet;
     }
 
-    // ===============================
-    // 🔥 SAFE ADD BALANCE + LEDGER
-    // ===============================
     public static function addBalance($wallet, $amount, $order, $description)
     {
-        // 💰 UPDATE BALANCE
         $wallet->increment('balance', $amount);
 
-        // 🧾 INSERT LEDGER
         DB::table('wallet_transactions')->insert([
             'payment_account_id' => $wallet->id,
             'type'               => 'income',
@@ -44,21 +36,16 @@ class FinanceHelper
         ]);
     }
 
-    // ===============================
-    // 🔥 PAYMENT VERIFIED (TRANSFER ONLY)
-    // ===============================
     public static function handlePaymentVerified(Transaction $order)
     {
         Log::info('PAYMENT VERIFIED START', [
             'order_id' => $order->id
         ]);
 
-        // ❌ SKIP CASH
         if ($order->payment_method === 'cash') {
             return;
         }
 
-        // ❌ ANTI DOUBLE PAYMENT
         $existing = DB::table('wallet_transactions')
             ->where('reference_id', $order->id)
             ->where('reference_type', 'transaction')
@@ -74,7 +61,6 @@ class FinanceHelper
 
         DB::transaction(function () use ($wallet, $order) {
 
-            // 💰 MASUKKAN UANG CUSTOMER
             self::addBalance(
                 $wallet,
                 $order->total_price,
@@ -82,23 +68,18 @@ class FinanceHelper
                 'Pembayaran Midtrans'
             );
 
-            // 🔥 UPDATE ORDER
             $order->updateQuietly([
                 'payment_verified_at' => now()
             ]);
         });
     }
 
-    // ===============================
-    // 🔥 ORDER COMPLETED (PROFIT SHARING)
-    // ===============================
     public static function handleOrderCompleted(Transaction $order)
     {
         Log::info('ORDER COMPLETED START', [
             'order_id' => $order->id
         ]);
 
-        // ❌ ANTI DOUBLE SPLIT
         if ($order->company_income !== null && $order->therapist_income !== null) {
             Log::warning('ALREADY SPLIT', ['order_id' => $order->id]);
             return;
@@ -106,7 +87,6 @@ class FinanceHelper
 
         DB::transaction(function () use ($order) {
 
-            // 🔥 WALLET TERAPIS
             $terapisWallet = PaymentAccount::where('terapis_id', $order->terapis_id)
                 ->where('is_active', 1)
                 ->first();
@@ -115,20 +95,13 @@ class FinanceHelper
                 throw new \Exception('Wallet terapis tidak ditemukan');
             }
 
-            // 🔥 WALLET COMPANY
             $companyWallet = self::getCompanyWallet();
 
-            // ===============================
-            // 💰 HITUNG BAGI HASIL
-            // ===============================
             $total = $order->total_price;
 
             $companyFee     = $order->company_income ?? ($total * 0.2);
             $terapisIncome  = $total - $companyFee;
 
-            // ===============================
-            // 💰 TERAPIS SELALU DAPAT
-            // ===============================
             self::addBalance(
                 $terapisWallet,
                 $terapisIncome,
@@ -136,12 +109,8 @@ class FinanceHelper
                 'Pendapatan Terapis'
             );
 
-            // ===============================
-            // 💰 COMPANY LOGIC
-            // ===============================
             if ($order->payment_method === 'cash') {
 
-                // CASH → belum masuk → hanya catat hutang
                 DB::table('wallet_transactions')->insert([
                     'payment_account_id' => $companyWallet->id,
                     'type'               => 'income',
@@ -155,7 +124,6 @@ class FinanceHelper
 
             } else {
 
-                // TRANSFER → uang sudah ada → tambah balance
                 self::addBalance(
                     $companyWallet,
                     $companyFee,
@@ -164,9 +132,6 @@ class FinanceHelper
                 );
             }
 
-            // ===============================
-            // 🔥 UPDATE ORDER
-            // ===============================
             $order->updateQuietly([
                 'company_income'    => $companyFee,
                 'therapist_income' => $terapisIncome
@@ -174,16 +139,12 @@ class FinanceHelper
         });
     }
 
-    // ===============================
-    // 🔥 BAYAR HUTANG COMPANY (CASH)
-    // ===============================
     public static function payCompanyFee(Transaction $order)
     {
         Log::info('PAY COMPANY FEE', [
             'order_id' => $order->id
         ]);
 
-        // ❌ ANTI DOUBLE
         if ($order->is_company_paid) {
             return;
         }
@@ -198,7 +159,6 @@ class FinanceHelper
                 throw new \Exception('Invalid company income');
             }
 
-            // 💰 TAMBAH SALDO
             self::addBalance(
                 $companyWallet,
                 $amount,
@@ -206,7 +166,6 @@ class FinanceHelper
                 'Pembayaran Hutang Terapis'
             );
 
-            // 🔥 UPDATE FLAG
             $order->updateQuietly([
                 'is_company_paid' => true,
                 'company_paid_at' => now()
@@ -214,9 +173,6 @@ class FinanceHelper
         });
     }
 
-    // ===============================
-    // 🔥 RECONCILIATION (FIX DATA)
-    // ===============================
     public static function syncBalance($walletId)
     {
         $total = DB::table('wallet_transactions')

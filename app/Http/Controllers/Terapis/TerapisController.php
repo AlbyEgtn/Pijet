@@ -96,12 +96,10 @@ class TerapisController extends Controller
             return back()->with('error', 'Data terapis belum tersedia');
         }
 
-        // 🔒 WAJIB ONLINE
         if ($user->terapis->status != 1) {
             return back()->with('error', 'Status OFFLINE, tidak bisa mengambil pesanan');
         }
 
-        // 🔒 WAJIB ADA KOTA
         if (!$user->city_id) {
             return back()->with('error', 'Kota belum diset');
         }
@@ -111,7 +109,6 @@ class TerapisController extends Controller
             ->where('order_status', 'ready')
             ->whereNull('terapis_id')
 
-            // 🔥 FILTER GENDER (ANTI CHEAT)
             ->where(function ($q) use ($user) {
                 $q->whereNull('therapist_gender')
                 ->orWhere('therapist_gender', $user->gender);
@@ -138,14 +135,12 @@ class TerapisController extends Controller
             return back()->with('error', 'Data terapis tidak ditemukan');
         }
 
-        // 🔒 OFFLINE → tidak boleh akses
         if ($user->terapis->status != 1) {
             return view('pages.terapis.pesanan_saya', [
                 'transactions' => collect()
             ])->with('error', 'Status OFFLINE, tidak dapat mengakses pesanan');
         }
 
-        // 🔒 CITY WAJIB
         if (!$user->city_id) {
             return view('pages.terapis.pesanan_saya', [
                 'transactions' => collect()
@@ -171,7 +166,6 @@ class TerapisController extends Controller
             return back()->with('error', 'Data terapis tidak ditemukan');
         }
 
-        // ❗ STRICT MODE
         if (!$user->city_id) {
             return back()->with('error', 'Kota belum diset');
         }
@@ -213,7 +207,6 @@ class TerapisController extends Controller
         $terapisAccounts = PaymentAccount::where('terapis_id', $terapis->id)->get();
         $companyAccounts = collect();
 
-        // 🔥 TAMBAHAN
         $cities = City::all();
 
         return view('pages.terapis.profile', compact(
@@ -221,7 +214,7 @@ class TerapisController extends Controller
             'terapis',
             'terapisAccounts',
             'companyAccounts',
-            'cities' // 🔥 WAJIB
+            'cities'
         ));
     }
 
@@ -236,10 +229,8 @@ class TerapisController extends Controller
             'whatsapp'   => 'nullable|string|max:20',
             'address'    => 'nullable|string',
 
-            // 🔥 RELASI KOTA
             'city_id'    => 'nullable|exists:cities,id',
 
-            // 🔥 FILE
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'ktp'  => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
             'skck' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
@@ -249,7 +240,7 @@ class TerapisController extends Controller
         $user->update([
             'gender'  => $request->gender,
             'address' => $request->address,
-            'city_id' => $request->city_id, // 🔥 PENTING
+            'city_id' => $request->city_id,
         ]);
 
         // ================= UPDATE TERAPIS =================
@@ -403,7 +394,7 @@ class TerapisController extends Controller
 
         $transaction->update([
             'order_status' => 'ongoing',
-            'started_at' => now() // 🔥 TAMBAH INI
+            'started_at' => now() 
         ]);
 
         return back()->with('success', 'Layanan dimulai');
@@ -425,12 +416,8 @@ class TerapisController extends Controller
 
         \App\Helpers\FinanceHelper::handleOrderCompleted($transaction);
 
-        // 🔥 REFRESH DATA (PENTING!)
         $transaction->refresh();
 
-        // ===============================
-        // 🔥 REDIRECT KE BAYAR HUTANG (CASH)
-        // ===============================
         if (
             $transaction->payment_method === 'cash' &&
             !$transaction->is_company_paid
@@ -482,7 +469,6 @@ class TerapisController extends Controller
 
         $transaction->update([
             'order_status' => 'cancelled'
-            // ❌ JANGAN HAPUS TERAPIS
         ]);
 
         return back()->with('success', 'Pesanan dibatalkan');
@@ -517,8 +503,8 @@ class TerapisController extends Controller
             $isFirst = $terapis->paymentAccounts()->count() == 0;
 
             $terapis->paymentAccounts()->create([
-                'type' => 'terapis', // 🔥 WAJIB
-                'terapis_id' => $terapis->id, // 🔥 WAJIB
+                'type' => 'terapis', 
+                'terapis_id' => $terapis->id, 
                 'bank_name' => $request->bank_name,
                 'account_number' => $request->account_number,
                 'account_holder' => $request->account_holder,
@@ -537,9 +523,7 @@ class TerapisController extends Controller
         $account = $terapis->paymentAccounts()->where('id', $id)->firstOrFail();
 
         DB::transaction(function () use ($terapis, $account) {
-            // non-aktifkan semua
             $terapis->paymentAccounts()->update(['is_active' => false]);
-            // aktifkan yang dipilih
             $account->update(['is_active' => true]);
         });
 
@@ -553,7 +537,6 @@ class TerapisController extends Controller
 
         $account = $terapis->paymentAccounts()->where('id', $id)->firstOrFail();
 
-        // jika yang dihapus aktif → pilih salah satu lain jadi aktif (jika ada)
         DB::transaction(function () use ($terapis, $account) {
             $wasActive = $account->is_active;
             $account->delete();
@@ -597,13 +580,11 @@ class TerapisController extends Controller
             ->where('terapis_id', auth()->user()->terapis->id)
             ->firstOrFail();
 
-        // 🔐 config
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = true;
         Config::$is3ds = true;
 
-        // 🔑 order_id unik + bisa diparse
         $midtransOrderId = 'HUTANG-' . $order->id . '-' . time();
 
         DB::table('transactions')
@@ -617,13 +598,9 @@ class TerapisController extends Controller
                 'order_id' => $midtransOrderId,
                 'gross_amount' => (int) $order->company_income,
             ],
-            // Snap akan menampilkan pilihan QRIS
-            // (tidak perlu set payment_type di Snap)
         ];
 
         $snapToken = Snap::getSnapToken($params);
-
-        // (opsional) simpan ke DB kalau kamu punya kolomnya
 
         return view('pages.terapis.hutang_midtrans', compact('order','snapToken'));
     }
@@ -635,10 +612,9 @@ class TerapisController extends Controller
 
         $notif = new Notification();
 
-        $orderId = $notif->order_id;               // HUTANG-{id}-{ts}
-        $status  = $notif->transaction_status;     // settlement, capture, pending, dll
+        $orderId = $notif->order_id;         
+        $status  = $notif->transaction_status;     
 
-        // ekstrak ID transaksi kamu
         if (!preg_match('/HUTANG-(\d+)-/', $orderId, $m)) {
             return response()->json(['ok' => true]);
         }
@@ -647,12 +623,10 @@ class TerapisController extends Controller
         $order = \App\Models\Transaction::find($transactionId);
         if (!$order) return response()->json(['ok' => true]);
 
-        // hanya proses jika belum dibayar
         if ($order->is_company_paid) {
             return response()->json(['ok' => true]);
         }
 
-        // QRIS sukses biasanya 'settlement'
         if (in_array($status, ['settlement','capture'])) {
             \App\Helpers\FinanceHelper::payCompanyFee($order);
         }
@@ -676,7 +650,6 @@ class TerapisController extends Controller
 
     private function getAvailableTransactions($user, $terapis, $limit = null)
     {
-        // 🔒 VALIDASI DASAR
         if (!$user->city_id || $terapis->status != 1) {
             return collect(); // kosong
         }
@@ -686,15 +659,13 @@ class TerapisController extends Controller
             ->where('order_status', 'ready')
             ->whereNull('terapis_id')
 
-            // 🔥 FILTER KOTA
             ->whereHas('customer', function ($q) use ($user) {
                 $q->where('city_id', $user->city_id);
             })
 
-            // 🔥 FILTER GENDER TERAPIS (INI INTINYA)
             ->where(function ($q) use ($user) {
-                $q->whereNull('therapist_gender') // kalau user tidak pilih gender
-                ->orWhere('therapist_gender', $user->gender); // cocok gender
+                $q->whereNull('therapist_gender')
+                ->orWhere('therapist_gender', $user->gender);
             })
 
             ->latest();

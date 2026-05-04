@@ -31,9 +31,6 @@ class RegisterController extends Controller
 
         try {
 
-            // =========================
-            // VALIDATION (DYNAMIC ROLE)
-            // =========================
             $rules = [
 
                 'nik'        => ['required','digits_between:10,20'],
@@ -50,9 +47,6 @@ class RegisterController extends Controller
                 'role'       => ['required','in:terapis,customer'],
             ];
 
-            // =========================
-            // CONDITIONAL RULES
-            // =========================
             if ($request->role === 'customer') {
 
                 $rules['address'] = ['required','string'];
@@ -62,15 +56,11 @@ class RegisterController extends Controller
                 $rules['ktp']  = ['required','file','mimes:jpg,png,pdf','max:2048'];
                 $rules['skck'] = ['required','file','mimes:jpg,png,pdf','max:2048'];
 
-                // address optional biar ga error
                 $rules['address'] = ['nullable','string'];
             }
 
             $validated = $request->validate($rules);
 
-            // =====================
-            // HANDLE FILE UPLOAD
-            // =====================
             $ktpPath = $request->hasFile('ktp')
                 ? $request->file('ktp')->store('ktp','public')
                 : null;
@@ -79,14 +69,8 @@ class RegisterController extends Controller
                 ? $request->file('skck')->store('skck','public')
                 : null;
 
-            // =====================
-            // GENERATE OTP
-            // =====================
             $otp = rand(100000, 999999);
 
-            // =====================
-            // CREATE USER
-            // =====================
             $user = User::create([
 
                 'nik'        => $validated['nik'],
@@ -114,14 +98,10 @@ class RegisterController extends Controller
                 'otp_expired_at' => now()->addMinutes(10),
             ]);
 
-            // =====================
-            // SEND EMAIL (SAFE MODE)
-            // =====================
             try {
                 Mail::to($user->email)->send(new SendOtpMail($otp));
             } catch (\Exception $mailError) {
 
-                // log error email tapi user tetap dibuat
                 \Log::error('Mail error: '.$mailError->getMessage());
             }
 

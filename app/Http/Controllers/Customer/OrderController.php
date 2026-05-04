@@ -164,14 +164,12 @@ class OrderController extends Controller
             ->where('customer_id', Auth::id())
             ->findOrFail($id);
 
-        // 🔥 CEK STATUS PEMBAYARAN
         $isPending = in_array($order->payment_status, ['pending','uploaded']);
 
         if ($isPending) {
             return redirect()->route('customer.orders.show', $order->id);
         }
 
-        // 🔥 HALAMAN TRACKING
         return view('pages.customer.orders.detail', [
             'order' => $order
         ]);
@@ -187,7 +185,7 @@ class OrderController extends Controller
     public function uploadPaymentProof(Request $request, $id)
     {
         $request->validate([
-            'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+            'payment_proof' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048'
         ]);
 
         $order = Transaction::where('customer_id', auth()->id())
@@ -197,17 +195,14 @@ class OrderController extends Controller
             return back()->with('error', 'Metode pembayaran tidak valid');
         }
 
-        // 🔥 HAPUS FILE LAMA (JIKA ADA)
         if ($order->payment_proof) {
             \Storage::disk('public')->delete($order->payment_proof);
         }
 
-        // 🔥 UPLOAD FILE BARU
         $file     = $request->file('payment_proof');
         $filename = 'payment_' . $order->transaction_code . '_' . time() . '.' . $file->getClientOriginalExtension();
         $path     = $file->storeAs('payment_proofs', $filename, 'public');
 
-        // 🔥 UPDATE ORDER → UPLOADED
         $order->update([
             'payment_proof'       => $path,
             'payment_uploaded_at' => now(),
@@ -220,7 +215,6 @@ class OrderController extends Controller
         |--------------------------------------------------
         */
 
-        // ❗ CEGah DUPLIKAT
         $existing = WalletTransaction::where('reference_id', $order->id)
             ->where('reference_type', 'transaction')
             ->where('type', 'income')
@@ -295,7 +289,6 @@ class OrderController extends Controller
 
         $snapToken = Snap::getSnapToken($params);
 
-        // 🔥 simpan
         $order->update([
             'snap_token' => $snapToken
         ]);
@@ -324,7 +317,6 @@ class OrderController extends Controller
         $order = Transaction::where('customer_id', auth()->id())
             ->findOrFail($id);
 
-        // ❗ HARD RULE
         if (!in_array($order->order_status, ['waiting','ready','assigned'])) {
             return back()->with('error', 'Pesanan tidak bisa dibatalkan');
         }
@@ -380,7 +372,6 @@ class OrderController extends Controller
         $order = Transaction::where('customer_id', auth()->id())
             ->findOrFail($id);
 
-        // ❗ HARD RULE
         if (!in_array($order->order_status, ['waiting','ready','assigned'])) {
             return back()->with('error', 'Pesanan tidak bisa dijadwalkan ulang');
         }
@@ -388,11 +379,9 @@ class OrderController extends Controller
         DB::transaction(function () use ($order, $request) {
 
             $order->update([
-                // 🔥 pindahkan ke field reschedule
                 'reschedule_date' => $request->new_date,
                 'reschedule_time' => $request->new_time,
 
-                // 🔥 update jadwal utama juga
                 'service_date' => $request->new_date,
                 'service_time' => $request->new_time,
 

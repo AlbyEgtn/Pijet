@@ -116,10 +116,14 @@
                     </p>
 
                     <form action="{{ route('customer.upload.payment', $order->id) }}"
-                        method="POST" enctype="multipart/form-data">
+                        method="POST"
+                        enctype="multipart/form-data"
+                        onsubmit="return validateUploadForm(this)">
                         @csrf
 
                         <input type="file" name="payment_proof"
+                            accept="image/*"
+                            onchange="validateImage(this)"
                             class="w-full border p-2 rounded-xl mb-2">
 
                         <button class="w-full bg-gray-100 border py-2 rounded-xl hover:bg-gray-200 transition">
@@ -540,6 +544,40 @@ document.addEventListener("DOMContentLoaded", function(){
     }, 5000);
 
 });
+
+function validateImage(input){
+
+    const file = input.files[0];
+
+    if(!file) return;
+
+    const allowedTypes = ["image/jpeg","image/png","image/jpg","image/webp"];
+
+    if(!allowedTypes.includes(file.type)){
+        showToast("File harus berupa gambar", "error");
+        input.value = "";
+        return;
+    }
+
+    // preview (optional)
+    const reader = new FileReader();
+    reader.onload = e => {
+        console.log("Preview ready"); // bisa ditampilkan kalau mau
+    };
+    reader.readAsDataURL(file);
+}
+
+function validateUploadForm(form){
+
+    const fileInput = form.querySelector('input[name="payment_proof"]');
+
+    if(!fileInput.files.length){
+        showToast("Silakan pilih file terlebih dahulu", "error");
+        return false;
+    }
+
+    return true;
+}
 
 </script>
 

@@ -19,12 +19,10 @@ class KaryawanController extends Controller
         $query = User::query()
             ->whereIn('role', ['admin', 'finance']);
 
-        // filter role tab
         if ($role) {
             $query->where('role', $role);
         }
 
-        // search
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")

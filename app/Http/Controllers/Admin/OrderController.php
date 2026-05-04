@@ -44,9 +44,6 @@ class OrderController extends Controller
         return view('pages.admin.orders.reschedule', compact('transactions'));
     }
 
-    /**
-     * Detail transaksi
-     */
     public function detail($id)
     {
         $transaction = Transaction::findOrFail($id);
@@ -56,10 +53,6 @@ class OrderController extends Controller
         ]);
     }
 
-
-    /**
-     * Form edit transaksi
-     */
     public function edit($id)
     {
         $transaction = Transaction::findOrFail($id);
@@ -69,10 +62,6 @@ class OrderController extends Controller
         ]);
     }
 
-
-    /**
-     * Update transaksi
-     */
     public function update(Request $request, $id)
     {
         $transaction = Transaction::findOrFail($id);
@@ -92,9 +81,6 @@ class OrderController extends Controller
             ->with('success','Order berhasil diperbarui');
     }
 
-    /**
-     * Hapus transaksi
-     */
     public function delete($id)
     {
         $transaction = Transaction::findOrFail($id);
@@ -106,9 +92,6 @@ class OrderController extends Controller
             ->with('success','Order berhasil dihapus');
     }
 
-    /**
-     * Konfirmasi pesanan
-     */
     public function approve($id)
     {
         $transaction = Transaction::findOrFail($id);
@@ -121,10 +104,6 @@ class OrderController extends Controller
         return back()->with('success','Pesanan dikonfirmasi');
     }
 
-
-    /**
-     * Tolak pesanan
-     */
     public function reject(Request $request, $id)
     {
         $request->validate([
