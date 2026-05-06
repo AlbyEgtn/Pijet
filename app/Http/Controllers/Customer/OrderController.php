@@ -14,6 +14,7 @@ use Midtrans\Config;
 use Midtrans\Snap;
 use App\Models\WalletTransaction;
 use App\Observers\WalletTransactionObserver;
+use App\Models\Report;
 
 class OrderController extends Controller
 {
@@ -392,5 +393,32 @@ class OrderController extends Controller
 
         return redirect()->back()
             ->with('success', 'Jadwal berhasil diubah');
+    }
+
+    public function storeReport(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'required',
+            'description' => 'required'
+        ]);
+
+        $transaction = Transaction::with('terapis.user')
+            ->findOrFail($id);
+
+        Report::create([
+            'user_id' => auth()->id(),
+
+            'reported_user_id' =>
+                $transaction->terapis->user->id,
+
+            'reason' => $request->reason,
+
+            'description' => $request->description
+        ]);
+
+        return back()->with(
+            'success',
+            'Report berhasil dikirim'
+        );
     }
 }

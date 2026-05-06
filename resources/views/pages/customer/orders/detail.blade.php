@@ -254,6 +254,126 @@
 
         </div>
 
+        {{-- REPORT BUTTON --}}
+        @if($order->order_status === 'completed')
+
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5">
+
+            <button
+                onclick="openReportModal()"
+                class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition font-medium"
+            >
+                Laporkan Masalah
+            </button>
+
+        </div>
+
+        @endif
+
+
+        {{-- REPORT MODAL --}}
+        <div
+            id="reportModal"
+            class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4"
+        >
+
+            <div
+                class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-fadeIn"
+            >
+
+                <!-- HEADER -->
+                <div class="flex items-center justify-between px-6 py-4 border-b">
+
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800">
+                            Laporkan Terapis
+                        </h2>
+
+                        <p class="text-sm text-gray-400">
+                            Jelaskan masalah yang terjadi
+                        </p>
+                    </div>
+
+                    <button
+                        onclick="closeReportModal()"
+                        class="text-gray-400 hover:text-gray-600 text-xl"
+                    >
+                        ✕
+                    </button>
+
+                </div>
+
+                <!-- FORM -->
+                <form
+                    action="{{ route('customer.report.store', $order->id) }}"
+                    method="POST"
+                    class="p-6 space-y-4"
+                >
+
+                    @csrf
+
+                    <div class="space-y-3">
+
+                    <select
+                        name="reason"
+                        required
+                        class="w-full border rounded-2xl p-3 text-sm"
+                    >
+                        <option value="">Pilih alasan laporan</option>
+
+                        <option value="Terapis terlambat">
+                            Terapis terlambat
+                        </option>
+
+                        <option value="Pelayanan buruk">
+                            Pelayanan buruk
+                        </option>
+
+                        <option value="Perilaku tidak sopan">
+                            Perilaku tidak sopan
+                        </option>
+
+                        <option value="Tindakan mencurigakan">
+                            Tindakan mencurigakan
+                        </option>
+
+                    </select>
+
+                    <textarea
+                        name="description"
+                        rows="5"
+                        required
+                        placeholder="Jelaskan detail laporan..."
+                        class="w-full border rounded-2xl p-4 text-sm"
+                    ></textarea>
+
+                </div>
+
+                    <div class="flex justify-end gap-3">
+
+                        <button
+                            type="button"
+                            onclick="closeReportModal()"
+                            class="px-4 py-2 rounded-xl border text-gray-600 hover:bg-gray-100"
+                        >
+                            Batal
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="px-5 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white"
+                        >
+                            Kirim Report
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>
@@ -363,5 +483,20 @@ function handleActionVisibility(data){
     }
 
 }
+function openReportModal(){
+    const modal = document.getElementById('reportModal');
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeReportModal(){
+    const modal = document.getElementById('reportModal');
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
 </script>
+{{-- REPORT --}}
+
 @endpush

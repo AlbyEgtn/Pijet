@@ -49,16 +49,18 @@ class PenggunaController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $user->is_suspended = true;
+        // toggle suspend
+        $user->is_suspended = !$user->is_suspended;
+
         $user->save();
 
-        // optional simpan log
-        // $request->reason
-        // $request->note
-        // $request->duration
-
-        return back()->with('success', 'Akun berhasil ditangguhkan');
-    }
+        return back()->with(
+            'success',
+            $user->is_suspended
+                ? 'Akun berhasil ditangguhkan'
+                : 'Akun berhasil diaktifkan kembali'
+        );
+}
 
     public function penangguhan($type)
     {
