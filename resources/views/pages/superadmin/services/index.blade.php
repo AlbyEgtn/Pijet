@@ -25,8 +25,13 @@
         <div class="bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden group">
 
             <div class="h-40 overflow-hidden">
-                <img src="{{ $service->image ? asset('storage/'.$service->image) : 'https://via.placeholder.com/400x300' }}"
-                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                <img 
+                    src="{{ $service->image }}?w=600&q=70&auto=format"
+                    loading="lazy"
+                     {{'https://via.placeholder.com/400x300?text=No+Image' }}"
+                    onerror="this.src='https://via.placeholder.com/400x300?text=Error'"
+                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                />
             </div>
 
             <div class="p-4">

@@ -89,7 +89,7 @@ class ServiceSeeder extends Seeder
             'description' => 'Teknik pijat khas Bali dengan tekanan lembut dan aromaterapi.',
             'price' => 160000,
             'duration' => 90,
-            'image' => 'https://images.unsplash.com/photo-1556228724-4d3c6b66e3c7',
+            'image' => 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=600&q=70&auto=format',
             'is_additional' => 0,
             'is_active' => 1
         ]);
