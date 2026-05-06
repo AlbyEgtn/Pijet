@@ -101,6 +101,11 @@ class Transaction extends Model
         return $this->services()->count();
     }
 
+    public function terapis()
+    {
+        return $this->belongsTo(Terapis::class);
+    }
+
     public function getServiceCountAttribute()
     {
         return $this->services->count();

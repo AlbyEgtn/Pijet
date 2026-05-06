@@ -651,7 +651,7 @@ class TerapisController extends Controller
     private function getAvailableTransactions($user, $terapis, $limit = null)
     {
         if (!$user->city_id || $terapis->status != 1) {
-            return collect(); // kosong
+            return Transaction::whereRaw('1 = 0')->paginate(10); // kosong
         }
 
         $query = Transaction::with(['services','customer'])

@@ -608,4 +608,6 @@ Route::middleware(['auth','role:customer'])
         Route::get('/profile', [ProfileController::class, 'edit'])->name('customer.profile');
         Route::post('/profile', [ProfileController::class, 'update'])->name('customer.profile.update');
 
+        Route::post('/customer/report/{id}', [OrderController::class, 'storeReport'])
+            ->name('customer.report.store');
 });
