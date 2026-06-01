@@ -5,136 +5,506 @@
 
 @section('content')
 
-<div x-data="{ openSuspend: false }" class="space-y-6">
+<div
+    x-data="{ openSuspend: false }"
+    class="space-y-6"
+>
 
-    <!-- BREADCRUMB -->
-    <div class="text-sm text-gray-400">
-        Pengguna > {{ ucfirst($type) }} > 
-        <span class="text-green-600">Detail Akun</span>
+    <!-- ================= BREADCRUMB ================= -->
+    <div class="
+        flex items-center
+        gap-2
+        text-sm
+        text-gray-400
+    ">
+
+        <span>Pengguna</span>
+
+        <span>/</span>
+
+        <span>{{ ucfirst($type) }}</span>
+
+        <span>/</span>
+
+        <span class="
+            text-teal-600
+            font-medium
+        ">
+            Detail Akun
+        </span>
+
     </div>
 
-    <!-- TOP -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <!-- LEFT CARD -->
-        <div class="bg-white rounded-2xl shadow-sm p-6">
+    <!-- ================= HERO ================= -->
+    <div class="
+        relative overflow-hidden
+        bg-gradient-to-r from-teal-600 via-teal-700 to-teal-800
+        rounded-3xl
+        p-6 md:p-8
+        text-white
+        shadow-xl
+    ">
 
-            <div class="flex items-center gap-4">
+        <!-- BG -->
+        <div class="
+            absolute -top-10 -right-10
+            w-56 h-56
+            bg-white/10
+            rounded-full
+            blur-3xl
+        "></div>
 
-                <div class="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
+
+        <div class="
+            relative z-10
+            flex flex-col lg:flex-row
+            lg:items-center
+            lg:justify-between
+            gap-6
+        ">
+
+            <!-- LEFT -->
+            <div class="
+                flex items-center
+                gap-5
+            ">
+
+                <!-- AVATAR -->
+                <div class="
+                    w-24 h-24 md:w-28 md:h-28
+                    rounded-3xl
+                    overflow-hidden
+                    bg-white/10
+                    border border-white/20
+                    backdrop-blur
+                    flex items-center justify-center
+                    text-3xl font-bold
+                ">
+
                     @if($user->foto)
-                        <img src="{{ asset('storage/'.$user->foto) }}" class="w-full h-full object-cover">
+
+                        <img
+                            src="{{ asset('storage/'.$user->foto) }}"
+                            class="w-full h-full object-cover"
+                        >
+
                     @else
-                        <div class="w-full h-full flex items-center justify-center text-xl font-bold">
-                            {{ strtoupper(substr($user->name,0,1)) }}
-                        </div>
+
+                        {{ strtoupper(substr($user->name,0,1)) }}
+
                     @endif
+
                 </div>
 
+
+                <!-- INFO -->
                 <div>
-                    <h3 class="font-semibold text-lg">{{ $user->name }}</h3>
 
-                    <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-600">
-                        {{ ucfirst($user->role) }}
-                    </span>
-                </div>
+                    <p class="
+                        text-sm
+                        text-teal-100
+                        mb-2
+                    ">
+                        Detail Pengguna
+                    </p>
 
-                <div class="ml-auto text-sm text-gray-400">
-                    #{{ $user->kode }}
+                    <h2 class="
+                        text-2xl md:text-4xl
+                        font-bold
+                    ">
+                        {{ $user->name }}
+                    </h2>
+
+
+                    <div class="
+                        flex flex-wrap items-center
+                        gap-3
+                        mt-4
+                    ">
+
+                        <!-- ROLE -->
+                        <span class="
+                            px-4 py-2
+                            rounded-2xl
+                            bg-blue-100
+                            text-blue-700
+                            text-sm font-semibold
+                        ">
+
+                            {{ ucfirst($user->role) }}
+
+                        </span>
+
+
+                        <!-- STATUS -->
+                        @if($user->is_suspended ?? false)
+
+                            <span class="
+                                px-4 py-2
+                                rounded-2xl
+                                bg-red-100
+                                text-red-700
+                                text-sm font-semibold
+                            ">
+
+                                Ditangguhkan
+
+                            </span>
+
+                        @else
+
+                            <span class="
+                                px-4 py-2
+                                rounded-2xl
+                                bg-green-100
+                                text-green-700
+                                text-sm font-semibold
+                            ">
+
+                                Aktif
+
+                            </span>
+
+                        @endif
+
+
+                        <!-- ID -->
+                        <span class="
+                            px-4 py-2
+                            rounded-2xl
+                            bg-white/10
+                            text-sm
+                        ">
+
+                            #{{ $user->kode }}
+
+                        </span>
+
+                    </div>
+
                 </div>
 
             </div>
 
-            <!-- INFO -->
-            <div class="mt-6 space-y-3 text-sm">
-
-                <h4 class="font-semibold text-gray-700">Informasi Akun</h4>
-
-                <div class="flex justify-between">
-                    <span>Status Akun</span>
-
-                    @if($user->is_suspended ?? false)
-                        <span class="bg-red-100 text-red-600 px-2 py-1 text-xs rounded">
-                            Ditangguhkan
-                        </span>
-                    @else
-                        <span class="bg-green-100 text-green-600 px-2 py-1 text-xs rounded">
-                            Aktif
-                        </span>
-                    @endif
-                </div>
-
-                <div class="flex justify-between">
-                    <span>Email</span>
-                    <span>{{ $user->email }}</span>
-                </div>
-
-                <div class="flex justify-between">
-                    <span>Telepon</span>
-                    <span>{{ $user->phone ?? '-' }}</span>
-                </div>
-
-                <div class="flex justify-between">
-                    <span>Alamat</span>
-                    <span class="text-right max-w-xs">
-                        {{ $user->address ?? '-' }}
-                    </span>
-                </div>
-
-            </div>
 
             <!-- ACTION -->
-            <div class="flex gap-2 mt-6">
+            <div>
 
-                <button 
+                <button
                     @click="openSuspend = true"
-                    class="border border-red-400 text-red-500 px-4 py-2 rounded-lg text-sm hover:bg-red-50">
+                    class="
+                        bg-red-500
+                        hover:bg-red-600
+                        text-white
+                        px-6 py-4
+                        rounded-2xl
+                        text-sm font-semibold
+                        transition
+                        shadow-sm
+                    "
+                >
+
                     Tangguhkan Akun
+
                 </button>
-
-
 
             </div>
 
         </div>
 
-        <!-- RIGHT -->
-        <div class="bg-white rounded-2xl shadow-sm p-6 space-y-6">
+    </div>
 
-            <div>
 
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="font-semibold text-gray-700">Identitas Diri</h4>
+    <!-- ================= CONTENT ================= -->
+    <div class="
+        grid grid-cols-1
+        xl:grid-cols-2
+        gap-6
+    ">
 
-                    @if($user->ktp)
-                        <a href="{{ asset('storage/'.$user->ktp) }}" target="_blank"
-                           class="text-xs border px-3 py-1 rounded-lg text-blue-600 hover:bg-blue-50">
-                            Lihat Bukti KTP
-                        </a>
-                    @endif
+        <!-- ================= LEFT ================= -->
+        <div class="
+            bg-white
+            rounded-3xl
+            border border-gray-100
+            shadow-sm
+            p-6
+        ">
+
+            <!-- HEADER -->
+            <div class="mb-6">
+
+                <h3 class="
+                    text-lg
+                    font-semibold
+                    text-gray-800
+                ">
+                    Informasi Akun
+                </h3>
+
+                <p class="
+                    text-sm
+                    text-gray-400
+                    mt-1
+                ">
+                    Informasi login dan kontak pengguna.
+                </p>
+
+            </div>
+
+
+            <!-- CONTENT -->
+            <div class="space-y-4">
+
+                <!-- EMAIL -->
+                <div class="
+                    bg-gray-50
+                    rounded-2xl
+                    p-4
+                ">
+
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mb-1
+                    ">
+                        Email
+                    </p>
+
+                    <p class="
+                        font-semibold
+                        text-gray-800
+                        break-all
+                    ">
+                        {{ $user->email }}
+                    </p>
+
                 </div>
 
-                <div class="text-sm space-y-2">
 
-                    <div class="flex justify-between">
-                        <span>NIK</span>
-                        <span>{{ $user->nik ?? '-' }}</span>
-                    </div>
+                <!-- PHONE -->
+                <div class="
+                    bg-gray-50
+                    rounded-2xl
+                    p-4
+                ">
 
-                    <div class="flex justify-between">
-                        <span>Nama</span>
-                        <span>{{ $user->name }}</span>
-                    </div>
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mb-1
+                    ">
+                        Telepon
+                    </p>
 
-                    <div class="flex justify-between">
-                        <span>Jenis Kelamin</span>
-                        <span>{{ $user->gender == 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
-                    </div>
+                    <p class="
+                        font-semibold
+                        text-gray-800
+                    ">
+                        {{ $user->phone ?? '-' }}
+                    </p>
 
-                    <div class="flex justify-between">
-                        <span>Tanggal Lahir</span>
-                        <span>{{ $user->birth_date ?? '-' }}</span>
-                    </div>
+                </div>
+
+
+                <!-- ADDRESS -->
+                <div class="
+                    bg-gray-50
+                    rounded-2xl
+                    p-4
+                ">
+
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mb-1
+                    ">
+                        Alamat
+                    </p>
+
+                    <p class="
+                        font-semibold
+                        text-gray-800
+                        leading-relaxed
+                    ">
+                        {{ $user->address ?? '-' }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= RIGHT ================= -->
+        <div class="
+            bg-white
+            rounded-3xl
+            border border-gray-100
+            shadow-sm
+            p-6
+        ">
+
+            <!-- HEADER -->
+            <div class="
+                flex flex-col sm:flex-row
+                sm:items-center
+                sm:justify-between
+                gap-4
+                mb-6
+            ">
+
+                <div>
+
+                    <h3 class="
+                        text-lg
+                        font-semibold
+                        text-gray-800
+                    ">
+                        Identitas Diri
+                    </h3>
+
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mt-1
+                    ">
+                        Informasi pribadi pengguna.
+                    </p>
+
+                </div>
+
+
+                <!-- KTP -->
+                @if($user->ktp)
+
+                    <a href="{{ asset('storage/'.$user->ktp) }}"
+                       target="_blank"
+                       class="
+                            inline-flex items-center justify-center
+                            border border-blue-200
+                            hover:bg-blue-50
+                            text-blue-600
+                            px-4 py-2
+                            rounded-2xl
+                            text-sm font-medium
+                            transition
+                       ">
+
+                        Lihat Bukti KTP
+
+                    </a>
+
+                @endif
+
+            </div>
+
+
+            <!-- CONTENT -->
+            <div class="space-y-4">
+
+                <!-- NIK -->
+                <div class="
+                    bg-gray-50
+                    rounded-2xl
+                    p-4
+                ">
+
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mb-1
+                    ">
+                        NIK
+                    </p>
+
+                    <p class="
+                        font-semibold
+                        text-gray-800
+                    ">
+                        {{ $user->nik ?? '-' }}
+                    </p>
+
+                </div>
+
+
+                <!-- NAME -->
+                <div class="
+                    bg-gray-50
+                    rounded-2xl
+                    p-4
+                ">
+
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mb-1
+                    ">
+                        Nama Lengkap
+                    </p>
+
+                    <p class="
+                        font-semibold
+                        text-gray-800
+                    ">
+                        {{ $user->name }}
+                    </p>
+
+                </div>
+
+
+                <!-- GENDER -->
+                <div class="
+                    bg-gray-50
+                    rounded-2xl
+                    p-4
+                ">
+
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mb-1
+                    ">
+                        Jenis Kelamin
+                    </p>
+
+                    <p class="
+                        font-semibold
+                        text-gray-800
+                    ">
+
+                        {{ $user->gender == 'L' ? 'Laki-laki' : 'Perempuan' }}
+
+                    </p>
+
+                </div>
+
+
+                <!-- BIRTH -->
+                <div class="
+                    bg-gray-50
+                    rounded-2xl
+                    p-4
+                ">
+
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mb-1
+                    ">
+                        Tanggal Lahir
+                    </p>
+
+                    <p class="
+                        font-semibold
+                        text-gray-800
+                    ">
+
+                        {{ $user->birth_date ?? '-' }}
+
+                    </p>
 
                 </div>
 
@@ -144,156 +514,328 @@
 
     </div>
 
-    <div 
-        x-show="openSuspend"
-        x-transition:enter="transition ease-out duration-200"
-        x-transition:enter-start="opacity-0 scale-90"
-        x-transition:enter-end="opacity-100 scale-100"
-        x-cloak
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
-        <div @click.away="openSuspend = false"
-            class="bg-white w-full max-w-xl rounded-2xl shadow-xl p-6">
+    <!-- ================= MODAL SUSPEND ================= -->
+    <div
+        x-show="openSuspend"
+        x-transition
+        x-cloak
+        class="
+            fixed inset-0
+            z-50
+            bg-black/50
+            backdrop-blur-sm
+            flex items-center justify-center
+            p-4
+        "
+    >
+
+        <div
+            @click.away="openSuspend = false"
+            class="
+                bg-white
+                w-full
+                max-w-2xl
+                rounded-3xl
+                shadow-2xl
+                overflow-hidden
+            "
+        >
 
             <!-- HEADER -->
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 bg-red-100 text-red-600 flex items-center justify-center rounded-full">
-                    ⚠️
-                </div>
-                <div>
-                    <h2 class="font-semibold text-lg">Penangguhan Akun</h2>
-                    <p class="text-xs text-gray-400">Tindakan ini akan membatasi akses pengguna</p>
-                </div>
-            </div>
+            <div class="
+                bg-gradient-to-r from-red-500 to-red-600
+                p-6
+                text-white
+            ">
 
-            <!-- WARNING -->
-            <div class="bg-yellow-100 text-yellow-700 text-sm p-3 rounded-lg mb-4">
-                Pastikan keputusan ini sudah dipertimbangkan dengan baik sebelum melanjutkan.
-            </div>
+                <div class="
+                    flex items-center
+                    gap-4
+                ">
 
-            <form method="POST" action="{{ route('superadmin.pengguna.suspend', $user->id) }}">
-                @csrf
+                    <div class="
+                        w-14 h-14
+                        rounded-2xl
+                        bg-white/20
+                        flex items-center justify-center
+                        text-2xl
+                    ">
+                        ⚠️
+                    </div>
 
-                <!-- ALASAN -->
-                <div class="mb-4">
-                    <p class="text-sm font-medium mb-2">Alasan Penangguhan</p>
+                    <div>
 
-                    <div class="grid grid-cols-1 gap-2 text-sm">
+                        <h2 class="
+                            text-xl
+                            font-bold
+                        ">
+                            Penangguhan Akun
+                        </h2>
 
-                        <label class="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="reason" value="pelecehan">
-                            Pelecehan Seksual
-                        </label>
-
-                        <label class="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="reason" value="penghinaan">
-                            Penghinaan
-                        </label>
-
-                        <label class="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="reason" value="tidak_sopan">
-                            Perilaku Tidak Sopan
-                        </label>
-
-                        <label class="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="reason" value="kekerasan">
-                            Tindak Kekerasan
-                        </label>
-
-                        <label class="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="reason" value="mengabaikan">
-                            Mengabaikan Peringatan
-                        </label>
+                        <p class="
+                            text-sm
+                            text-red-100
+                            mt-1
+                        ">
+                            Akses pengguna akan dibatasi sementara.
+                        </p>
 
                     </div>
+
                 </div>
 
-                <!-- CATATAN -->
-                <div class="mb-4">
-                    <p class="text-sm font-medium mb-2">Catatan Tambahan</p>
+            </div>
 
-                    <textarea 
+
+            <!-- BODY -->
+            <form method="POST"
+                  action="{{ route('superadmin.pengguna.suspend', $user->id) }}"
+                  class="p-6 space-y-6">
+
+                @csrf
+
+                <!-- WARNING -->
+                <div class="
+                    bg-yellow-50
+                    border border-yellow-200
+                    rounded-2xl
+                    p-4
+                    text-sm
+                    text-yellow-700
+                ">
+
+                    Pastikan keputusan ini sudah dipertimbangkan sebelum melanjutkan proses penangguhan akun.
+
+                </div>
+
+
+                <!-- REASON -->
+                <div>
+
+                    <h3 class="
+                        font-semibold
+                        text-gray-800
+                        mb-4
+                    ">
+                        Alasan Penangguhan
+                    </h3>
+
+
+                    <div class="
+                        grid grid-cols-1
+                        md:grid-cols-2
+                        gap-3
+                    ">
+
+                        @foreach([
+                            'pelecehan' => 'Pelecehan Seksual',
+                            'penghinaan' => 'Penghinaan',
+                            'tidak_sopan' => 'Perilaku Tidak Sopan',
+                            'kekerasan' => 'Tindak Kekerasan',
+                            'mengabaikan' => 'Mengabaikan Peringatan'
+                        ] as $value => $label)
+
+                        <label class="cursor-pointer">
+
+                            <input
+                                type="radio"
+                                name="reason"
+                                value="{{ $value }}"
+                                class="hidden peer"
+                            >
+
+                            <div class="
+                                border border-gray-200
+                                rounded-2xl
+                                p-4
+                                text-sm
+                                font-medium
+                                text-gray-600
+                                transition
+                                hover:border-red-300
+                                peer-checked:bg-red-500
+                                peer-checked:border-red-500
+                                peer-checked:text-white
+                            ">
+
+                                {{ $label }}
+
+                            </div>
+
+                        </label>
+
+                        @endforeach
+
+                    </div>
+
+                </div>
+
+
+                <!-- NOTE -->
+                <div>
+
+                    <div class="
+                        flex items-center justify-between
+                        mb-2
+                    ">
+
+                        <h3 class="
+                            font-semibold
+                            text-gray-800
+                        ">
+                            Catatan Tambahan
+                        </h3>
+
+                        <span class="
+                            text-xs
+                            text-gray-400
+                        "
+                              x-data="{ count: 0 }">
+
+                        </span>
+
+                    </div>
+
+
+                    <textarea
                         name="note"
                         maxlength="500"
                         x-data="{ count: 0 }"
                         @input="count = $event.target.value.length"
-                        placeholder="Tuliskan detail alasan..."
-                        class="w-full border rounded-lg p-3 text-sm"></textarea>
+                        placeholder="Tuliskan detail alasan penangguhan..."
+                        class="
+                            w-full
+                            border border-gray-200
+                            rounded-2xl
+                            p-4
+                            text-sm
+                            focus:ring-2 focus:ring-red-400
+                            outline-none
+                            min-h-[120px]
+                        "
+                    ></textarea>
 
-                    <div class="text-right text-xs text-gray-400 mt-1">
+
+                    <div class="
+                        text-right
+                        text-xs
+                        text-gray-400
+                        mt-2
+                    ">
+
                         <span x-text="count"></span>/500
-                    </div>
-                </div>
-
-                <!-- DURASI -->
-                <div class="mb-6">
-                    <p class="text-sm font-medium mb-2">Durasi Penangguhan</p>
-
-                    <div class="grid grid-cols-4 gap-2 text-sm">
-
-                        <!-- 7 Hari -->
-                        <label class="cursor-pointer">
-                            <input type="radio" name="duration" value="7" class="hidden peer">
-                            <div class="text-center border rounded-lg p-2 
-                                peer-checked:bg-red-500 
-                                peer-checked:text-white 
-                                peer-checked:border-red-500 
-                                hover:bg-gray-50">
-                                7 Hari
-                            </div>
-                        </label>
-
-                        <!-- 14 Hari -->
-                        <label class="cursor-pointer">
-                            <input type="radio" name="duration" value="14" class="hidden peer">
-                            <div class="text-center border rounded-lg p-2 
-                                peer-checked:bg-red-500 
-                                peer-checked:text-white 
-                                peer-checked:border-red-500 
-                                hover:bg-gray-50">
-                                14 Hari
-                            </div>
-                        </label>
-
-                        <!-- 30 Hari -->
-                        <label class="cursor-pointer">
-                            <input type="radio" name="duration" value="30" class="hidden peer">
-                            <div class="text-center border rounded-lg p-2 
-                                peer-checked:bg-red-500 
-                                peer-checked:text-white 
-                                peer-checked:border-red-500 
-                                hover:bg-gray-50">
-                                30 Hari
-                            </div>
-                        </label>
-
-                        <!-- Permanen -->
-                        <label class="cursor-pointer">
-                            <input type="radio" name="duration" value="permanent" class="hidden peer">
-                            <div class="text-center border rounded-lg p-2 
-                                peer-checked:bg-red-500 
-                                peer-checked:text-white 
-                                peer-checked:border-red-500 
-                                hover:bg-gray-50">
-                                Permanen
-                            </div>
-                        </label>
 
                     </div>
+
                 </div>
+
+
+                <!-- DURATION -->
+                <div>
+
+                    <h3 class="
+                        font-semibold
+                        text-gray-800
+                        mb-4
+                    ">
+                        Durasi Penangguhan
+                    </h3>
+
+
+                    <div class="
+                        grid grid-cols-2
+                        md:grid-cols-4
+                        gap-3
+                    ">
+
+                        @foreach([
+                            '7' => '7 Hari',
+                            '14' => '14 Hari',
+                            '30' => '30 Hari',
+                            'permanent' => 'Permanen'
+                        ] as $value => $label)
+
+                        <label class="cursor-pointer">
+
+                            <input
+                                type="radio"
+                                name="duration"
+                                value="{{ $value }}"
+                                class="hidden peer"
+                            >
+
+                            <div class="
+                                border border-gray-200
+                                rounded-2xl
+                                p-4
+                                text-center
+                                text-sm
+                                font-medium
+                                text-gray-600
+                                transition
+                                hover:border-red-300
+                                peer-checked:bg-red-500
+                                peer-checked:border-red-500
+                                peer-checked:text-white
+                            ">
+
+                                {{ $label }}
+
+                            </div>
+
+                        </label>
+
+                        @endforeach
+
+                    </div>
+
+                </div>
+
 
                 <!-- ACTION -->
-                <div class="flex justify-end gap-2">
+                <div class="
+                    flex flex-col-reverse sm:flex-row
+                    justify-end
+                    gap-3
+                    pt-2
+                ">
 
-                    <button type="button"
+                    <button
+                        type="button"
                         @click="openSuspend = false"
-                        class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50">
+                        class="
+                            border border-gray-200
+                            hover:bg-gray-50
+                            text-gray-600
+                            px-6 py-3
+                            rounded-2xl
+                            text-sm font-medium
+                            transition
+                        "
+                    >
+
                         Batal
+
                     </button>
 
-                    <button type="submit"
-                        class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600">
+
+                    <button
+                        type="submit"
+                        class="
+                            bg-red-500
+                            hover:bg-red-600
+                            text-white
+                            px-6 py-3
+                            rounded-2xl
+                            text-sm font-semibold
+                            transition
+                            shadow-sm
+                        "
+                    >
+
                         Tangguhkan Akun
+
                     </button>
 
                 </div>
@@ -304,74 +846,355 @@
 
     </div>
 
-    <!-- RIWAYAT PESANAN -->
-    <div class="bg-white rounded-2xl shadow-sm p-6">
 
-        <h4 class="font-semibold mb-4">Riwayat Pesanan</h4>
+    <!-- ================= RIWAYAT PESANAN ================= -->
+    <div class="
+        bg-white
+        rounded-3xl
+        border border-gray-100
+        shadow-sm
+        overflow-hidden
+    ">
 
-        <table class="w-full text-sm">
+        <!-- HEADER -->
+        <div class="
+            px-6 py-5
+            border-b border-gray-100
+        ">
 
-            <thead class="text-gray-400 border-b">
-                <tr>
-                    <th class="text-left py-2">Kode</th>
-                    <th class="text-left py-2">Layanan</th>
-                    <th class="text-left py-2">Tanggal</th>
-                    <th class="text-left py-2">Waktu</th>
-                    <th class="text-left py-2">Total</th>
-                    <th class="text-left py-2">Status</th>
-                </tr>
-            </thead>
+            <h3 class="
+                text-lg
+                font-semibold
+                text-gray-800
+            ">
+                Riwayat Pesanan
+            </h3>
 
-            <tbody>
+            <p class="
+                text-sm
+                text-gray-400
+                mt-1
+            ">
+                Riwayat transaksi pengguna dalam sistem.
+            </p>
+
+        </div>
+
+
+        <!-- MOBILE -->
+        <div class="block md:hidden">
 
             @forelse($transactions as $trx)
-            <tr class="border-b hover:bg-gray-50">
 
-                <!-- KODE -->
-                <td>{{ $trx->transaction_code }}</td>
+            <div class="
+                p-5
+                border-b border-gray-100
+                space-y-4
+            ">
 
-                <!-- LAYANAN -->
-                <td>
-                    @if($trx->services->count())
-                        {{ $trx->services->first()->service_name ?? 'Layanan' }}
-                        @if($trx->services->count() > 1)
-                            +{{ $trx->services->count()-1 }} lainnya
-                        @endif
-                    @else
-                        -
-                    @endif
-                </td>
+                <!-- TOP -->
+                <div class="
+                    flex items-start justify-between
+                    gap-4
+                ">
 
-                <!-- TANGGAL -->
-                <td>
-                    {{ \Carbon\Carbon::parse($trx->service_date)->format('d M Y') }}
-                </td>
+                    <div>
 
-                <!-- WAKTU -->
-                <td>{{ $trx->service_time }}</td>
+                        <h4 class="
+                            font-semibold
+                            text-gray-800
+                        ">
+                            {{ $trx->transaction_code }}
+                        </h4>
 
-                <!-- TOTAL -->
-                <td>{{ $trx->formatted_total_price }}</td>
+                        <p class="
+                            text-sm
+                            text-gray-400
+                            mt-1
+                        ">
+                            {{ \Carbon\Carbon::parse($trx->service_date)->format('d M Y') }}
+                        </p>
 
-                <!-- STATUS -->
-                <td>
-                    <span class="px-2 py-1 text-xs rounded {{ $trx->status_badge }}">
+                    </div>
+
+
+                    <span class="
+                        px-3 py-1.5
+                        rounded-full
+                        text-xs font-semibold
+                        {{ $trx->status_badge }}
+                    ">
+
                         {{ ucfirst(str_replace('_',' ',$trx->status)) }}
-                    </span>
-                </td>
 
-            </tr>
+                    </span>
+
+                </div>
+
+
+                <!-- DETAIL -->
+                <div class="
+                    grid grid-cols-1
+                    gap-3
+                    text-sm
+                ">
+
+                    <div>
+
+                        <p class="text-gray-400">
+                            Layanan
+                        </p>
+
+                        <p class="
+                            text-gray-700
+                            font-medium
+                        ">
+
+                            @if($trx->services->count())
+
+                                {{ $trx->services->first()->service_name ?? 'Layanan' }}
+
+                                @if($trx->services->count() > 1)
+
+                                    +{{ $trx->services->count()-1 }} lainnya
+
+                                @endif
+
+                            @else
+
+                                -
+
+                            @endif
+
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <p class="text-gray-400">
+                            Waktu
+                        </p>
+
+                        <p class="
+                            text-gray-700
+                            font-medium
+                        ">
+                            {{ $trx->service_time }}
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <p class="text-gray-400">
+                            Total
+                        </p>
+
+                        <p class="
+                            text-gray-700
+                            font-semibold
+                        ">
+                            {{ $trx->formatted_total_price }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
             @empty
-            <tr>
-                <td colspan="6" class="text-center py-4 text-gray-400">
+
+            <div class="
+                p-10
+                text-center
+            ">
+
+                <p class="
+                    text-gray-400
+                ">
                     Belum ada riwayat pesanan
-                </td>
-            </tr>
+                </p>
+
+            </div>
+
             @endforelse
 
-            </tbody>
+        </div>
 
-        </table>
+
+        <!-- DESKTOP -->
+        <div class="
+            hidden md:block
+            overflow-x-auto
+        ">
+
+            <table class="min-w-full text-sm">
+
+                <!-- HEADER -->
+                <thead class="
+                    bg-gray-50
+                    text-xs uppercase
+                    text-gray-500
+                ">
+
+                    <tr>
+
+                        <th class="px-6 py-4 text-left">
+                            Kode
+                        </th>
+
+                        <th class="px-6 py-4 text-left">
+                            Layanan
+                        </th>
+
+                        <th class="px-6 py-4 text-left">
+                            Tanggal
+                        </th>
+
+                        <th class="px-6 py-4 text-left">
+                            Waktu
+                        </th>
+
+                        <th class="px-6 py-4 text-left">
+                            Total
+                        </th>
+
+                        <th class="px-6 py-4 text-left">
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <!-- BODY -->
+                <tbody class="divide-y divide-gray-100">
+
+                    @forelse($transactions as $trx)
+
+                    <tr class="
+                        hover:bg-gray-50
+                        transition
+                    ">
+
+                        <!-- KODE -->
+                        <td class="
+                            px-6 py-5
+                            font-semibold
+                            text-gray-700
+                        ">
+
+                            {{ $trx->transaction_code }}
+
+                        </td>
+
+
+                        <!-- SERVICE -->
+                        <td class="
+                            px-6 py-5
+                            text-gray-600
+                        ">
+
+                            @if($trx->services->count())
+
+                                {{ $trx->services->first()->service_name ?? 'Layanan' }}
+
+                                @if($trx->services->count() > 1)
+
+                                    +{{ $trx->services->count()-1 }} lainnya
+
+                                @endif
+
+                            @else
+
+                                -
+
+                            @endif
+
+                        </td>
+
+
+                        <!-- DATE -->
+                        <td class="
+                            px-6 py-5
+                            text-gray-600
+                        ">
+
+                            {{ \Carbon\Carbon::parse($trx->service_date)->format('d M Y') }}
+
+                        </td>
+
+
+                        <!-- TIME -->
+                        <td class="
+                            px-6 py-5
+                            text-gray-600
+                        ">
+
+                            {{ $trx->service_time }}
+
+                        </td>
+
+
+                        <!-- TOTAL -->
+                        <td class="
+                            px-6 py-5
+                            font-semibold
+                            text-gray-800
+                        ">
+
+                            {{ $trx->formatted_total_price }}
+
+                        </td>
+
+
+                        <!-- STATUS -->
+                        <td class="px-6 py-5">
+
+                            <span class="
+                                px-3 py-1.5
+                                rounded-full
+                                text-xs font-semibold
+                                {{ $trx->status_badge }}
+                            ">
+
+                                {{ ucfirst(str_replace('_',' ',$trx->status)) }}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    @empty
+
+                    <tr>
+
+                        <td colspan="6"
+                            class="
+                                text-center
+                                py-12
+                                text-gray-400
+                            ">
+
+                            Belum ada riwayat pesanan
+
+                        </td>
+
+                    </tr>
+
+                    @endforelse
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 

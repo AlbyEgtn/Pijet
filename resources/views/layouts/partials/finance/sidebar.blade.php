@@ -1,129 +1,121 @@
-<aside class="hidden md:flex md:w-64 flex-col bg-gradient-to-b from-teal-700 to-teal-900 text-white shadow-lg min-h-screen">
+<aside class="
+    hidden md:flex
+    md:w-64
+    flex-col
+    bg-gradient-to-b from-teal-700 to-teal-900
+    text-white
+    shadow-xl
+    min-h-screen
+">
+
+    <!-- ================= LOGO ================= -->
+    <div class="
+        px-6 py-7
+        flex items-center
+        gap-3
+        border-b border-white/10
+    ">
+
         <!-- LOGO -->
-    <div class="px-6 py-7 flex items-center gap-3 border-b border-white/10">
-        
         <img
             src="{{ asset('images/logo-pth.png') }}"
             alt="Logo Pijat.in"
             class="w-10 h-10 object-contain"
         >
 
-        <span class="text-xl font-semibold tracking-wide">
-            Pijat.in
-        </span>
+        <!-- NAME -->
+        <div>
+
+            <h2 class="
+                text-xl
+                font-semibold
+                tracking-wide
+            ">
+                Pijat.in
+            </h2>
+
+            <p class="
+                text-xs
+                text-teal-100
+                mt-0.5
+            ">
+                Finance Panel
+            </p>
+
+        </div>
 
     </div>
+
 
     @php
         $transaksiActive = request()->routeIs('finance.transaction.*');
     @endphp
 
-    <!-- MENU -->
-    <nav class="flex-1 px-3 py-4 space-y-1 text-[15px]">
 
+    <!-- ================= MENU ================= -->
+    <nav class="
+        flex-1
+        px-4 py-5
+        space-y-2
+        text-sm
+    ">
 
-        <!-- Dashboard -->
+        <!-- DASHBOARD -->
         <a
             href="{{ route('finance.dashboard') }}"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
-        {{ request()->routeIs('finance.dashboard') 
-        ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
-        : 'hover:bg-white/10' }}">
+            class="
+                block
+                px-4 py-3
+                rounded-2xl
+                transition-all duration-200
+                {{
+                    request()->routeIs('finance.dashboard')
+                    ? 'bg-white text-teal-700 font-semibold shadow-sm'
+                    : 'text-white/90 hover:bg-white/10'
+                }}
+            "
+        >
+
             Dashboard
+
         </a>
 
 
-        <!-- TRANSAKSI CUSTOMER -->
-        <div x-data="{ open: {{ $transaksiActive ? 'true' : 'false' }} }" class="space-y-1">
+        <!-- ================= TRANSAKSI ================= -->
+        <div
+            x-data="{ open: {{ $transaksiActive ? 'true' : 'false' }} }"
+            class="space-y-2"
+        >
 
+            <!-- BUTTON -->
             <button
                 @click="open = !open"
-                class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition
-                {{ $transaksiActive ? 'bg-white text-[#3E7F73] font-medium shadow-sm' : 'hover:bg-white/10' }}"
+                class="
+                    w-full
+                    flex items-center justify-between
+                    px-4 py-3
+                    rounded-2xl
+                    transition-all duration-200
+                    {{
+                        $transaksiActive
+                        ? 'bg-white text-teal-700 font-semibold shadow-sm'
+                        : 'text-white/90 hover:bg-white/10'
+                    }}
+                "
             >
-                <span>Transaksi customer</span>
 
+                <span>
+                    Transaksi Customer
+                </span>
+
+
+                <!-- ARROW -->
                 <svg
                     :class="open ? 'rotate-180' : ''"
-                    class="w-4 h-4 transition"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 9l-7 7-7-7"/>
-                </svg>
-            </button>
-
-            <div
-                x-show="open"
-                x-transition
-                class="ml-3 mt-1 space-y-1 text-sm"
-            >
-
-                <a href="{{ route('finance.transaction.transfer') }}"
-                class="block px-3 py-2 rounded transition
-                {{ request()->routeIs('finance.transaction.transfer') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
-                    Daftar pembayaran transfer
-                </a>
-
-                <a href="{{ route('finance.transaction.cash') }}"
-                class="block px-3 py-2 rounded transition
-                {{ request()->routeIs('finance.transaction.cash') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
-                    Daftar pembayaran cash
-                </a>
-
-                <a href="{{ route('finance.transaction.cancelled') }}"
-                class="block px-3 py-2 rounded transition
-                {{ request()->routeIs('finance.transaction.cancelled') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
-                    Daftar transaksi dibatalkan
-                </a>
-
-                <a href="{{ route('finance.transaction.reschedule') }}"
-                class="block px-3 py-2 rounded transition
-                {{ request()->routeIs('finance.transaction.reschedule') ? 'bg-white text-[#3E7F73] font-medium' : 'hover:bg-white/10' }}">
-                    Daftar transaksi reschedule
-                </a>
-
-            </div>
-
-        </div>
-
-
-        <!-- RECAP -->
-        <a href="{{ route('finance.recap') }}"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
-        {{ request()->routeIs('finance.recap') 
-        ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
-        : 'hover:bg-white/10' }}">
-            Recap transaksi
-        </a>
-
-
-        <!-- PENGATURAN -->
-        <a href="{{ route('finance.setting') }}"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition
-        {{ request()->routeIs('finance.setting') 
-        ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
-        : 'hover:bg-white/10' }}">
-            Pengaturan
-        </a>
-
-    </nav>
-
-        <!-- LOGOUT -->
-    <div class="px-4 pb-6">
-
-        <form method="POST" action="{{ route('logout') }}">
-
-            @csrf
-
-            <button
-                class="flex items-center gap-3 px-4 py-3 rounded-lg w-full hover:bg-white/10"
-            >
-
-                <svg
-                    class="w-5 h-5"
+                    class="
+                        w-4 h-4
+                        transition-transform duration-200
+                    "
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -133,10 +125,183 @@
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         stroke-width="2"
-                        d="M17 16l4-4m0 0l-4-4m4 4H7"
+                        d="M19 9l-7 7-7-7"
                     />
 
                 </svg>
+
+            </button>
+
+
+            <!-- DROPDOWN -->
+            <div
+                x-show="open"
+                x-transition
+                class="
+                    ml-2
+                    pl-4
+                    border-l border-white/10
+                    space-y-1
+                "
+            >
+
+                <!-- TRANSFER -->
+                <a
+                    href="{{ route('finance.transaction.transfer') }}"
+                    class="
+                        block
+                        px-4 py-2.5
+                        rounded-xl
+                        text-sm
+                        transition
+                        {{
+                            request()->routeIs('finance.transaction.transfer')
+                            ? 'bg-white text-teal-700 font-medium'
+                            : 'text-white/80 hover:bg-white/10'
+                        }}
+                    "
+                >
+
+                    Pembayaran Transfer
+
+                </a>
+
+
+                <!-- CASH -->
+                <a
+                    href="{{ route('finance.transaction.cash') }}"
+                    class="
+                        block
+                        px-4 py-2.5
+                        rounded-xl
+                        text-sm
+                        transition
+                        {{
+                            request()->routeIs('finance.transaction.cash')
+                            ? 'bg-white text-teal-700 font-medium'
+                            : 'text-white/80 hover:bg-white/10'
+                        }}
+                    "
+                >
+
+                    Pembayaran Cash
+
+                </a>
+
+
+                <!-- CANCELLED -->
+                <a
+                    href="{{ route('finance.transaction.cancelled') }}"
+                    class="
+                        block
+                        px-4 py-2.5
+                        rounded-xl
+                        text-sm
+                        transition
+                        {{
+                            request()->routeIs('finance.transaction.cancelled')
+                            ? 'bg-white text-teal-700 font-medium'
+                            : 'text-white/80 hover:bg-white/10'
+                        }}
+                    "
+                >
+
+                    Transaksi Dibatalkan
+
+                </a>
+
+
+                <!-- RESCHEDULE -->
+                <a
+                    href="{{ route('finance.transaction.reschedule') }}"
+                    class="
+                        block
+                        px-4 py-2.5
+                        rounded-xl
+                        text-sm
+                        transition
+                        {{
+                            request()->routeIs('finance.transaction.reschedule')
+                            ? 'bg-white text-teal-700 font-medium'
+                            : 'text-white/80 hover:bg-white/10'
+                        }}
+                    "
+                >
+
+                    Transaksi Reschedule
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECAP -->
+        <a
+            href="{{ route('finance.recap') }}"
+            class="
+                block
+                px-4 py-3
+                rounded-2xl
+                transition-all duration-200
+                {{
+                    request()->routeIs('finance.recap')
+                    ? 'bg-white text-teal-700 font-semibold shadow-sm'
+                    : 'text-white/90 hover:bg-white/10'
+                }}
+            "
+        >
+
+            Recap Transaksi
+
+        </a>
+
+
+        <!-- PENGATURAN -->
+        <a
+            href="{{ route('finance.setting') }}"
+            class="
+                block
+                px-4 py-3
+                rounded-2xl
+                transition-all duration-200
+                {{
+                    request()->routeIs('finance.setting')
+                    ? 'bg-white text-teal-700 font-semibold shadow-sm'
+                    : 'text-white/90 hover:bg-white/10'
+                }}
+            "
+        >
+
+            Pengaturan
+
+        </a>
+
+    </nav>
+
+
+    <!-- ================= LOGOUT ================= -->
+    <div class="
+        px-4 pb-6 pt-2
+        border-t border-white/10
+    ">
+
+        <form method="POST" action="{{ route('logout') }}">
+
+            @csrf
+
+            <button
+                class="
+                    w-full
+                    px-4 py-3
+                    rounded-2xl
+                    text-left
+                    text-white/90
+                    hover:bg-white/10
+                    transition-all duration-200
+                "
+            >
 
                 Keluar Akun
 

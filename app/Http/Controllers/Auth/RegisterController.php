@@ -59,7 +59,39 @@ class RegisterController extends Controller
                 $rules['address'] = ['nullable','string'];
             }
 
-            $validated = $request->validate($rules);
+            $messages = [
+
+                'nik.required' => 'NIK wajib diisi',
+                'nik.digits_between' => 'NIK harus 16 digit',
+
+                'name.required' => 'Nama wajib diisi',
+
+                'email.required' => 'Email wajib diisi',
+                'email.email' => 'Format email tidak valid',
+                'email.unique' => 'Email sudah digunakan',
+
+                'phone.required' => 'Nomor telepon wajib diisi',
+
+                'gender.required' => 'Jenis kelamin wajib dipilih',
+
+                'birth_date.required' => 'Tanggal lahir wajib diisi',
+
+                'city_id.required' => 'Area kerja wajib dipilih',
+
+                'password.required' => 'Password wajib diisi',
+                'password.confirmed' => 'Konfirmasi password tidak cocok',
+                'password.min' => 'Password minimal 6 karakter',
+
+                'ktp.required' => 'File KTP wajib diupload',
+                'ktp.mimes' => 'KTP harus JPG, PNG, atau PDF',
+                'ktp.max' => 'Ukuran KTP maksimal 2MB',
+
+                'skck.required' => 'File SKCK wajib diupload',
+                'skck.mimes' => 'SKCK harus JPG, PNG, atau PDF',
+                'skck.max' => 'Ukuran SKCK maksimal 2MB',
+            ];
+
+            $validated = $request->validate($rules, $messages);
 
             $ktpPath = $request->hasFile('ktp')
                 ? $request->file('ktp')->store('ktp','public')
@@ -113,16 +145,22 @@ class RegisterController extends Controller
 
             return redirect()->route('verify.notice');
 
-        } catch (\Exception $e) {
+            } catch (\Illuminate\Validation\ValidationException $e) {
 
-            DB::rollBack();
+                DB::rollBack();
 
-            \Log::error('Register error: '.$e->getMessage());
+                throw $e;
 
-            return back()
-                ->withInput()
-                ->with('error', 'Registrasi gagal. Silakan cek input atau hubungi admin.');
-        }
+            } catch (\Exception $e) {
+
+                DB::rollBack();
+
+                \Log::error('Register error: '.$e->getMessage());
+
+                return back()
+                    ->withInput()
+                    ->with('error', 'Terjadi kesalahan sistem, silakan coba lagi.');
+            }
     }
 
     public function verifyOtp(Request $request)

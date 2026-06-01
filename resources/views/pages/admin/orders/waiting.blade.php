@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title','Order Menunggu')
-@section('header','Order Menunggu')
+@section('title','Pesanan Menunggu')
+@section('header','Pesanan Menunggu')
 
 @section('content')
 

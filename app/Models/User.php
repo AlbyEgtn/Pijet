@@ -78,4 +78,20 @@ class User extends Authenticatable
         return $this->belongsTo(\App\Models\SuperAdmin\Cabang::class, 'cabang_id');
     }
 
+    public function reviewsReceived()
+    {
+        return $this->hasMany(
+            TherapistReview::class,
+            'therapist_id'
+        );
+    }
+
+    public function reviewsGiven()
+    {
+        return $this->hasMany(
+            TherapistReview::class,
+            'customer_id'
+        );
+    }
+    
 }

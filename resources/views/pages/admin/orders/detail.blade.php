@@ -1,256 +1,829 @@
 @extends('layouts.admin')
 
-@section('title','Detail Status Order')
-@section('header','Detail Status Order')
+@section('title','Detail Status Pesanan')
+@section('header','Detail Status Pesanan')
 
 @section('content')
 
-<div 
+<div
     x-data="{
         showPayment:false,
         showReject:false
     }"
-    class="bg-[#E7F1EE] p-6 rounded-xl"
+    class="space-y-6"
 >
 
-    <!-- BACK -->
-    <a href="{{ route('admin.orders.status') }}" 
-       class="flex items-center gap-2 text-sm text-gray-600 mb-4 hover:text-teal-600">
+    <!-- ================= BACK ================= -->
+    <a href="{{ route('admin.orders.status') }}"
+       class="
+            inline-flex items-center gap-2
+            text-sm
+            text-gray-500
+            hover:text-teal-600
+            transition
+       ">
 
         ← Kembali ke Status Order
 
     </a>
 
 
-    <!-- HEADER -->
-    <div class="bg-white rounded-xl shadow p-5 mb-5">
+    <!-- ================= HEADER ================= -->
+    <div class="
+        bg-gradient-to-r from-teal-600 via-teal-700 to-teal-800
+        rounded-3xl
+        p-5 md:p-7
+        text-white
+        shadow-lg
+        relative overflow-hidden
+    ">
 
-        <div class="flex justify-between items-center">
+        <!-- BG -->
+        <div class="
+            absolute -top-10 -right-10
+            w-40 h-40
+            bg-white/10
+            rounded-full
+            blur-3xl
+        "></div>
 
+        <div class="
+            relative z-10
+            flex flex-col lg:flex-row
+            lg:items-center
+            lg:justify-between
+            gap-5
+        ">
+
+            <!-- LEFT -->
             <div>
 
-                <p class="text-teal-600 font-semibold">
-                    ID Pesanan : {{ $transaction->transaction_code }}
+                <p class="text-sm text-teal-100 mb-1">
+                    Detail Pesanan
                 </p>
 
-                <p class="text-sm mt-1">
-                    Status :
-                    <span class="px-2 py-1 text-xs rounded {{ $transaction->status_badge }}">
-                        {{ ucfirst($transaction->payment_status) }} / {{ ucfirst($transaction->order_status) }}
+                <h2 class="
+                    text-2xl md:text-3xl
+                    font-bold
+                ">
+                    {{ $transaction->transaction_code }}
+                </h2>
+
+                <div class="
+                    flex flex-wrap items-center
+                    gap-2
+                    mt-3
+                ">
+
+                    <span class="
+                        px-3 py-1.5
+                        rounded-full
+                        text-xs font-semibold
+                        bg-white/20
+                        backdrop-blur
+                    ">
+
+                        {{ ucfirst($transaction->payment_status) }}
+
+                    </span>
+
+
+                    <span class="
+                        px-3 py-1.5
+                        rounded-full
+                        text-xs font-semibold
+                        bg-white/20
+                        backdrop-blur
+                    ">
+
+                        {{ ucfirst($transaction->order_status) }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT -->
+            <div class="
+                text-left lg:text-right
+                text-sm text-teal-100
+            ">
+
+                <p>
+                    Tanggal :
+                    <span class="font-semibold text-white">
+                        {{ $transaction->created_at->format('d M Y') }}
+                    </span>
+                </p>
+
+                <p class="mt-1">
+                    Jam :
+                    <span class="font-semibold text-white">
+                        {{ $transaction->created_at->format('H:i') }} WIB
                     </span>
                 </p>
 
             </div>
 
-            <div class="text-right text-sm text-gray-500">
-
-                <p>
-                    Tanggal :
-                    <b>{{ $transaction->created_at->format('d M Y') }}</b>
-                </p>
-
-                <p>
-                    Jam :
-                    <b>{{ $transaction->created_at->format('H:i') }} WIB</b>
-                </p>
-
-            </div>
-
         </div>
 
 
-        <!-- ACTION -->
+        <!-- ================= ACTION ================= -->
         @if($transaction->payment_status === 'uploaded')
-        <div class="flex gap-3 mt-4">
 
-            <form method="POST" action="{{ route('admin.orders.approve',$transaction->id) }}">
+        <div class="
+            flex flex-col sm:flex-row
+            gap-3
+            mt-6
+            relative z-10
+        ">
+
+            <!-- APPROVE -->
+            <form method="POST"
+                action="{{ route('admin.orders.approve',$transaction->id) }}">
+
                 @csrf
-                <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm">
-                    Konfirmasi
+
+                <button class="
+                    w-full sm:w-auto
+                    bg-white
+                    text-teal-700
+                    hover:bg-gray-100
+                    transition
+                    px-5 py-3
+                    rounded-2xl
+                    text-sm font-semibold
+                    shadow-sm
+                ">
+
+                    Konfirmasi Pembayaran
+
                 </button>
+
             </form>
 
-            <button 
+
+            <!-- REJECT -->
+            <button
                 @click="showReject = true"
-                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
+                class="
+                    w-full sm:w-auto
+                    bg-red-500
+                    hover:bg-red-600
+                    transition
+                    text-white
+                    px-5 py-3
+                    rounded-2xl
+                    text-sm font-semibold
+                "
             >
-                Tolak
+
+                Tolak Pembayaran
+
             </button>
 
         </div>
+
         @endif
 
     </div>
 
 
+    <!-- ================= CONTENT ================= -->
+    <div class="
+        grid grid-cols-1 xl:grid-cols-3
+        gap-6
+    ">
 
-    <div class="grid grid-cols-3 gap-5">
+        <!-- ================= LEFT ================= -->
+        <div class="
+            xl:col-span-2
+            space-y-6
+        ">
 
-        <!-- LEFT -->
-        <div class="col-span-2 space-y-5">
+            <!-- ================= CUSTOMER INFO ================= -->
+            <div class="
+                bg-white
+                rounded-3xl
+                border border-gray-100
+                shadow-sm
+                p-5 md:p-6
+            ">
 
-            <!-- PEMESAN -->
-            <div class="bg-white rounded-xl shadow p-5">
+                <div class="mb-5">
 
-                <h3 class="font-semibold mb-4">Informasi Pemesanan</h3>
+                    <h3 class="
+                        text-lg
+                        font-semibold
+                        text-gray-800
+                    ">
+                        Informasi Pemesanan
+                    </h3>
 
-                <div class="grid grid-cols-2 gap-4 text-sm">
-
-                    <div>
-                        <p class="text-gray-400">Pemesan</p>
-                        <p>{{ $transaction->orderer_name ?? '-' }}</p>
-                    </div>
-
-                    <div>
-                        <p class="text-gray-400">Customer</p>
-                        <p>{{ $transaction->customer_name }}</p>
-                    </div>
-
-                    <div>
-                        <p class="text-gray-400">No HP</p>
-                        <p>{{ $transaction->customer_phone ?? '-' }}</p>
-                    </div>
-
-                    <div>
-                        <p class="text-gray-400">Tanggal Layanan</p>
-                        <p>{{ $transaction->service_date }}</p>
-                    </div>
-
-                    <div>
-                        <p class="text-gray-400">Jam</p>
-                        <p>{{ $transaction->service_time }}</p>
-                    </div>
-
-                    <div>
-                        <p class="text-gray-400">Kota</p>
-                        <p>{{ $transaction->customer_city ?? '-' }}</p>
-                    </div>
-
-                    <div class="col-span-2">
-                        <p class="text-gray-400">Alamat</p>
-                        <p>{{ $transaction->customer_address ?? '-' }}</p>
-                    </div>
-
-                    @if($transaction->status == 'dibatalkan' && $transaction->cancel_reason)
-                    <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mt-4">
-                        <p class="font-semibold text-sm">Alasan Penolakan:</p>
-                        <p class="text-sm">{{ $transaction->cancel_reason }}</p>
-                    </div>
-                    @endif
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mt-1
+                    ">
+                        Informasi lengkap customer dan lokasi
+                    </p>
 
                 </div>
 
-            </div>
 
+                <div class="
+                    grid grid-cols-1 md:grid-cols-2
+                    gap-5 text-sm
+                ">
 
+                    <!-- PEMESAN -->
+                    <div>
 
-            <!-- SERVICES -->
-            <div class="bg-white rounded-xl shadow p-5">
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            Pemesan
+                        </p>
 
-                <h3 class="font-semibold mb-4">Detail Layanan</h3>
+                        <p class="
+                            font-medium
+                            text-gray-700
+                        ">
+                            {{ $transaction->orderer_name ?? '-' }}
+                        </p>
 
-                @forelse($transaction->services as $service)
-
-                <div class="border rounded-lg mb-4 overflow-hidden">
-
-                    <div class="bg-teal-600 text-white px-4 py-2 text-sm font-semibold">
-                        {{ $service->service_name }}
                     </div>
 
-                    <div class="p-4 grid grid-cols-4 gap-3 text-sm">
 
-                        <div>
-                            <p class="text-gray-400">Terapis</p>
-                            <p>{{ $service->therapist_name }}</p>
-                        </div>
+                    <!-- CUSTOMER -->
+                    <div>
 
-                        <div>
-                            <p class="text-gray-400">Durasi</p>
-                            <p>{{ $service->duration }} menit</p>
-                        </div>
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            Customer
+                        </p>
 
-                        <div>
-                            <p class="text-gray-400">Tambahan</p>
-                            <p>{{ $service->additional_service ?? '-' }}</p>
-                        </div>
+                        <p class="
+                            font-medium
+                            text-gray-700
+                        ">
+                            {{ $transaction->customer_name }}
+                        </p>
 
-                        <div>
-                            <p class="text-gray-400">Total Durasi</p>
-                            <p>{{ $service->total_duration }} menit</p>
+                    </div>
+
+
+                    <!-- PHONE -->
+                    <div>
+
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            No HP
+                        </p>
+
+                        <p class="
+                            font-medium
+                            text-gray-700
+                        ">
+                            {{ $transaction->customer_phone ?? '-' }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- DATE -->
+                    <div>
+
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            Tanggal Layanan
+                        </p>
+
+                        <p class="
+                            font-medium
+                            text-gray-700
+                        ">
+                            {{ $transaction->service_date }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- TIME -->
+                    <div>
+
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            Jam
+                        </p>
+
+                        <p class="
+                            font-medium
+                            text-gray-700
+                        ">
+                            {{ $transaction->service_time }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- CITY -->
+                    <div>
+
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            Kota
+                        </p>
+
+                        <p class="
+                            font-medium
+                            text-gray-700
+                        ">
+                            {{ $transaction->customer_city ?? '-' }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- ADDRESS -->
+                    <div class="md:col-span-2">
+
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            Alamat
+                        </p>
+
+                        <div class="
+                            bg-gray-50
+                            rounded-2xl
+                            p-4
+                            text-gray-700
+                            leading-relaxed
+                        ">
+
+                            {{ $transaction->customer_address ?? '-' }}
+
                         </div>
 
                     </div>
 
                 </div>
 
-                @empty
-                <p class="text-gray-400 text-sm">Tidak ada layanan</p>
-                @endforelse
 
-            </div>
+                <!-- REJECT INFO -->
+                @if($transaction->status == 'dibatalkan' && $transaction->cancel_reason)
 
-        </div>
+                <div class="
+                    mt-5
+                    bg-red-50
+                    border border-red-200
+                    rounded-2xl
+                    p-5
+                ">
 
+                    <p class="
+                        text-sm
+                        font-semibold
+                        text-red-700
+                        mb-2
+                    ">
+                        Alasan Penolakan
+                    </p>
 
+                    <p class="
+                        text-sm
+                        text-red-600
+                        leading-relaxed
+                    ">
+                        {{ $transaction->cancel_reason }}
+                    </p>
 
-        <!-- RIGHT -->
-        <div class="space-y-5">
-
-            <!-- PAYMENT -->
-            <div class="bg-white rounded-xl shadow p-5">
-
-                <h3 class="font-semibold mb-3">Pembayaran</h3>
-
-                <p class="text-sm text-gray-400">Metode</p>
-                <p>{{ ucfirst($transaction->payment_method) }}</p>
-
-                @if($transaction->payment)
-
-                    <p class="text-sm text-gray-400 mt-2">Bank</p>
-                    <p>{{ $transaction->payment->bank_name ?? '-' }}</p>
-
-                    <p class="text-sm text-gray-400">No Rekening</p>
-                    <p>{{ $transaction->payment->account_number ?? '-' }}</p>
-
-                    <button 
-                        @click="showPayment = true"
-                        class="w-full mt-3 bg-blue-500 text-white py-2 rounded text-sm"
-                    >
-                        Lihat Bukti
-                    </button>
+                </div>
 
                 @endif
 
             </div>
 
 
+            <!-- ================= SERVICES ================= -->
+            <div class="
+                bg-white
+                rounded-3xl
+                border border-gray-100
+                shadow-sm
+                p-5 md:p-6
+            ">
 
-            <!-- TOTAL -->
-            <div class="bg-white rounded-xl shadow p-5">
+                <div class="mb-5">
 
-                <h3 class="font-semibold mb-3">Rincian Harga</h3>
+                    <h3 class="
+                        text-lg
+                        font-semibold
+                        text-gray-800
+                    ">
+                        Detail Layanan
+                    </h3>
 
-                @foreach($transaction->services as $service)
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mt-1
+                    ">
+                        Daftar layanan yang dipilih customer
+                    </p>
 
-                    <div class="flex justify-between text-sm">
-                        <span>{{ $service->service_name }}</span>
-                        <span>{{ $service->formatted_service_price }}</span>
+                </div>
+
+
+                <div class="space-y-5">
+
+                    @forelse($transaction->services as $service)
+
+                    <div class="
+                        border border-gray-100
+                        rounded-3xl
+                        overflow-hidden
+                    ">
+
+                        <!-- HEADER -->
+                        <div class="
+                            bg-teal-600
+                            text-white
+                            px-5 py-4
+                        ">
+
+                            <p class="
+                                font-semibold
+                            ">
+                                {{ $service->service_name }}
+                            </p>
+
+                        </div>
+
+
+                        <!-- CONTENT -->
+                        <div class="
+                            p-5
+                            grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4
+                            gap-5
+                            text-sm
+                        ">
+
+                            <!-- THERAPIST -->
+                            <div>
+
+                                <p class="
+                                    text-gray-400
+                                    text-xs mb-1
+                                ">
+                                    Terapis
+                                </p>
+
+                                <p class="
+                                    font-medium
+                                    text-gray-700
+                                ">
+                                    {{ $service->therapist_name }}
+                                </p>
+
+                            </div>
+
+
+                            <!-- DURATION -->
+                            <div>
+
+                                <p class="
+                                    text-gray-400
+                                    text-xs mb-1
+                                ">
+                                    Durasi
+                                </p>
+
+                                <p class="
+                                    font-medium
+                                    text-gray-700
+                                ">
+                                    {{ $service->duration }} menit
+                                </p>
+
+                            </div>
+
+
+                            <!-- ADDITIONAL -->
+                            <div>
+
+                                <p class="
+                                    text-gray-400
+                                    text-xs mb-1
+                                ">
+                                    Tambahan
+                                </p>
+
+                                <p class="
+                                    font-medium
+                                    text-gray-700
+                                ">
+                                    {{ $service->additional_service ?? '-' }}
+                                </p>
+
+                            </div>
+
+
+                            <!-- TOTAL -->
+                            <div>
+
+                                <p class="
+                                    text-gray-400
+                                    text-xs mb-1
+                                ">
+                                    Total Durasi
+                                </p>
+
+                                <p class="
+                                    font-medium
+                                    text-gray-700
+                                ">
+                                    {{ $service->total_duration }} menit
+                                </p>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    @if($service->additional_price)
-                    <div class="flex justify-between text-sm">
-                        <span>+ {{ $service->additional_service }}</span>
-                        <span>{{ $service->formatted_additional_price }}</span>
+                    @empty
+
+                    <div class="
+                        text-center
+                        py-10
+                        text-gray-400
+                    ">
+
+                        Tidak ada layanan
+
                     </div>
+
+                    @endforelse
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= RIGHT ================= -->
+        <div class="space-y-6">
+
+            <!-- ================= PAYMENT ================= -->
+            <div class="
+                bg-white
+                rounded-3xl
+                border border-gray-100
+                shadow-sm
+                p-5 md:p-6
+            ">
+
+                <div class="mb-5">
+
+                    <h3 class="
+                        text-lg
+                        font-semibold
+                        text-gray-800
+                    ">
+                        Pembayaran
+                    </h3>
+
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mt-1
+                    ">
+                        Informasi pembayaran customer
+                    </p>
+
+                </div>
+
+
+                <div class="space-y-4 text-sm">
+
+                    <!-- METHOD -->
+                    <div>
+
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            Metode Pembayaran
+                        </p>
+
+                        <p class="
+                            font-medium
+                            text-gray-700
+                        ">
+                            {{ ucfirst($transaction->payment_method) }}
+                        </p>
+
+                    </div>
+
+
+                    @if($transaction->payment)
+
+                    <!-- BANK -->
+                    <div>
+
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            Nama Bank
+                        </p>
+
+                        <p class="
+                            font-medium
+                            text-gray-700
+                        ">
+                            {{ $transaction->payment->bank_name ?? '-' }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- ACCOUNT -->
+                    <div>
+
+                        <p class="
+                            text-gray-400
+                            text-xs mb-1
+                        ">
+                            Nomor Rekening
+                        </p>
+
+                        <p class="
+                            font-medium
+                            text-gray-700
+                        ">
+                            {{ $transaction->payment->account_number ?? '-' }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- BUTTON -->
+                    <button
+                        @click="showPayment = true"
+                        class="
+                            w-full
+                            mt-3
+                            bg-blue-50
+                            hover:bg-blue-100
+                            transition
+                            text-blue-600
+                            py-3
+                            rounded-2xl
+                            text-sm font-medium
+                        "
+                    >
+
+                        Lihat Bukti Pembayaran
+
+                    </button>
+
                     @endif
 
-                @endforeach
+                </div>
 
-                <hr class="my-2">
+            </div>
 
-                <div class="flex justify-between font-semibold text-teal-600">
-                    <span>Total</span>
-                    <span>{{ $transaction->formatted_total_price }}</span>
+
+            <!-- ================= PRICE ================= -->
+            <div class="
+                bg-white
+                rounded-3xl
+                border border-gray-100
+                shadow-sm
+                p-5 md:p-6
+            ">
+
+                <div class="mb-5">
+
+                    <h3 class="
+                        text-lg
+                        font-semibold
+                        text-gray-800
+                    ">
+                        Rincian Harga
+                    </h3>
+
+                    <p class="
+                        text-sm
+                        text-gray-400
+                        mt-1
+                    ">
+                        Detail pembayaran layanan
+                    </p>
+
+                </div>
+
+
+                <div class="space-y-4">
+
+                    @foreach($transaction->services as $service)
+
+                    <div class="space-y-2">
+
+                        <div class="
+                            flex justify-between
+                            gap-4
+                            text-sm
+                        ">
+
+                            <span class="text-gray-600">
+                                {{ $service->service_name }}
+                            </span>
+
+                            <span class="
+                                font-medium
+                                text-gray-700
+                            ">
+                                {{ $service->formatted_service_price }}
+                            </span>
+
+                        </div>
+
+
+                        @if($service->additional_price)
+
+                        <div class="
+                            flex justify-between
+                            gap-4
+                            text-sm
+                        ">
+
+                            <span class="text-gray-500">
+                                + {{ $service->additional_service }}
+                            </span>
+
+                            <span class="
+                                font-medium
+                                text-gray-700
+                            ">
+                                {{ $service->formatted_additional_price }}
+                            </span>
+
+                        </div>
+
+                        @endif
+
+                    </div>
+
+                    @endforeach
+
+
+                    <hr class="border-gray-100">
+
+
+                    <!-- TOTAL -->
+                    <div class="
+                        flex justify-between
+                        items-center
+                    ">
+
+                        <span class="
+                            font-semibold
+                            text-gray-800
+                        ">
+                            Total
+                        </span>
+
+                        <span class="
+                            text-xl
+                            font-bold
+                            text-teal-600
+                        ">
+
+                            {{ $transaction->formatted_total_price }}
+
+                        </span>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -260,71 +833,182 @@
     </div>
 
 
-
-    <!-- MODAL PAYMENT -->
-    <div 
+    <!-- ================= PAYMENT MODAL ================= -->
+    <div
         x-show="showPayment"
         x-cloak
         x-transition
         @click.self="showPayment = false"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        class="
+            fixed inset-0
+            bg-black/60
+            backdrop-blur-sm
+            flex items-center justify-center
+            z-50
+            p-4
+        "
     >
 
-        <div class="bg-white p-5 rounded-xl w-[400px]">
+        <div class="
+            bg-white
+            rounded-3xl
+            w-full max-w-lg
+            p-5
+            shadow-2xl
+        ">
 
-            <h3 class="font-semibold mb-3">Bukti Pembayaran</h3>
+            <div class="
+                flex items-center justify-between
+                mb-5
+            ">
 
-            <img 
-                src="{{ asset('storage/'.$transaction->payment_proof ?? '') }}" 
-                class="w-full rounded"
+                <h3 class="
+                    text-lg
+                    font-semibold
+                    text-gray-800
+                ">
+                    Bukti Pembayaran
+                </h3>
+
+                <button
+                    @click="showPayment = false"
+                    class="
+                        w-10 h-10
+                        rounded-xl
+                        hover:bg-gray-100
+                        transition
+                    "
+                >
+
+                    ✕
+
+                </button>
+
+            </div>
+
+
+            <img
+                src="{{ asset('storage/'.$transaction->payment_proof ?? '') }}"
+                class="
+                    w-full
+                    rounded-2xl
+                    max-h-[70vh]
+                    object-contain
+                    bg-gray-50
+                "
             >
-
-            <button 
-                @click="showPayment=false"
-                class="mt-4 w-full bg-gray-200 py-2 rounded">
-                Tutup
-            </button>
 
         </div>
 
     </div>
 
 
-
-    <!-- MODAL REJECT -->
-    <div 
+    <!-- ================= REJECT MODAL ================= -->
+    <div
         x-show="showReject"
         x-cloak
         x-transition
         @click.self="showReject = false"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        class="
+            fixed inset-0
+            bg-black/60
+            backdrop-blur-sm
+            flex items-center justify-center
+            z-50
+            p-4
+        "
     >
 
-        <div class="bg-white p-5 rounded-xl w-[400px]">
+        <div class="
+            bg-white
+            rounded-3xl
+            w-full max-w-md
+            p-6
+            shadow-2xl
+        ">
 
-            <h3 class="font-semibold mb-3">Alasan Penolakan</h3>
+            <h3 class="
+                text-lg
+                font-semibold
+                text-gray-800
+                mb-2
+            ">
+                Tolak Pembayaran
+            </h3>
 
-            <form method="POST" action="{{ route('admin.orders.reject',$transaction->id) }}">
+            <p class="
+                text-sm
+                text-gray-400
+                mb-5
+            ">
+                Masukkan alasan penolakan pembayaran customer
+            </p>
+
+
+            <form method="POST"
+                action="{{ route('admin.orders.reject',$transaction->id) }}">
+
                 @csrf
 
                 <textarea
                     name="cancel_reason"
-                    class="w-full border rounded p-2 text-sm"
-                    placeholder="Masukkan alasan penolakan..."
+                    rows="5"
                     required
+                    placeholder="Masukkan alasan penolakan..."
+                    class="
+                        w-full
+                        border border-gray-200
+                        rounded-2xl
+                        p-4
+                        text-sm
+                        focus:ring-2 focus:ring-red-500
+                        focus:border-transparent
+                        outline-none
+                    "
                 ></textarea>
 
-                <div class="flex gap-2 mt-4">
 
-                    <button class="bg-red-500 text-white w-full py-2 rounded">
+                <div class="
+                    flex flex-col sm:flex-row
+                    gap-3
+                    mt-5
+                ">
+
+                    <!-- REJECT -->
+                    <button class="
+                        flex-1
+                        bg-red-500
+                        hover:bg-red-600
+                        transition
+                        text-white
+                        py-3
+                        rounded-2xl
+                        text-sm font-semibold
+                    ">
+
                         Tolak
+
                     </button>
 
-                    <button 
+
+                    <!-- CANCEL -->
+                    <button
                         type="button"
-                        @click="showReject=false"
-                        class="bg-gray-200 w-full py-2 rounded">
+                        @click="showReject = false"
+                        class="
+                            flex-1
+                            bg-gray-100
+                            hover:bg-gray-200
+                            transition
+                            text-gray-700
+                            py-3
+                            rounded-2xl
+                            text-sm font-semibold
+                        "
+                    >
+
                         Batal
+
                     </button>
 
                 </div>

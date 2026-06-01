@@ -333,10 +333,11 @@ Route::middleware(['auth','role:admin'])
             Route::get('/admin/therapist/{id}', [TherapistController::class, 'show'])
                 ->name('admin.therapist.show'); 
 
-
             // 🔹 RATING & ULASAN
-            Route::get('/review', [TherapistController::class, 'review'])
+            Route::get('/therapist/review', [TherapistController::class,'review'])
                 ->name('admin.therapist.review');
+
+
         });
 
         /*
@@ -520,6 +521,8 @@ Route::middleware(['auth','role:terapis'])
         Route::post('/hutang/{id}', [TerapisController::class, 'prosesBayarHutang'])
             ->name('bayar.hutang.proses');
 
+        Route::get('/review', [TerapisController::class,'review'])
+            ->name('review');
 });
 
 
@@ -607,5 +610,7 @@ Route::middleware(['auth','role:customer'])
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('customer.profile');
         Route::post('/profile', [ProfileController::class, 'update'])->name('customer.profile.update');
+
+        Route::post('/customer/review/{order}', [OrderController::class,'storeReview'])->name('customer.review.store');
 
 });

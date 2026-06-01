@@ -1,126 +1,319 @@
 @extends('layouts.superadmin')
 
-@section('title','Dashboard  ')
-@section('header','Dashboard ')
+@section('title','Dashboard')
+@section('header','Dashboard')
 
 @section('content')
 
 <div class="space-y-6">
 
-    <!-- HEADER -->
-    <div class="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-6 rounded-2xl shadow">
+    <!-- ================= HERO ================= -->
+    <div class="
+        relative overflow-hidden
+        bg-gradient-to-r from-teal-600 via-teal-700 to-teal-800
+        rounded-3xl
+        p-6 md:p-8
+        shadow-xl
+        text-white
+    ">
 
-        <h2 class="text-xl font-semibold">
-            Super Admin Panel
-        </h2>
+        <!-- BG EFFECT -->
+        <div class="
+            absolute -top-16 -right-16
+            w-52 h-52
+            bg-white/10
+            rounded-full
+            blur-3xl
+        "></div>
 
-        <p class="text-sm text-teal-100 mt-1">
-            Kontrol penuh terhadap sistem & manajemen aplikasi
-        </p>
+        <div class="
+            absolute -bottom-16 -left-16
+            w-52 h-52
+            bg-black/10
+            rounded-full
+            blur-3xl
+        "></div>
+
+
+        <div class="relative z-10">
+
+            <p class="
+                text-sm
+                text-teal-100
+                mb-2
+            ">
+                Super Admin Panel
+            </p>
+
+            <h2 class="
+                text-2xl md:text-4xl
+                font-bold
+                leading-tight
+            ">
+                Kontrol Sistem Pijat.in
+            </h2>
+
+            <p class="
+                text-sm md:text-base
+                text-teal-100
+                mt-3
+                max-w-2xl
+                leading-relaxed
+            ">
+                Monitoring pengguna, transaksi, layanan,
+                dan keseluruhan aktivitas sistem dalam satu dashboard.
+            </p>
+
+        </div>
 
     </div>
 
 
-    <!-- SUMMARY -->
-    <div class="grid grid-cols-3 gap-6">
+    <!-- ================= SUMMARY ================= -->
+    <div class="
+        grid grid-cols-1
+        sm:grid-cols-2
+        xl:grid-cols-3
+        gap-5
+    ">
 
         <!-- USER -->
-        <div class="bg-white rounded-2xl p-5 shadow hover:shadow-md transition">
+        <div class="
+            bg-white
+            rounded-3xl
+            p-5 md:p-6
+            shadow-sm
+            border border-gray-100
+            hover:shadow-md
+            transition
+        ">
 
-            <p class="text-sm text-gray-500">
-                Total Pengguna
-            </p>
+            <div class="
+                flex items-start justify-between
+                gap-4
+            ">
 
-            <h2 class="text-2xl font-bold mt-1 text-gray-800">
-                {{ \App\Models\User::count() }}
-            </h2>
+                <div>
 
-            <p class="text-xs text-teal-600 mt-2">
+                    <p class="
+                        text-sm
+                        text-gray-400
+                    ">
+                        Total Pengguna
+                    </p>
+
+                    <h2 class="
+                        text-3xl
+                        font-bold
+                        text-gray-800
+                        mt-2
+                    ">
+
+                        {{ \App\Models\User::count() }}
+
+                    </h2>
+
+                </div>
+
+
+                <!-- ICON -->
+                <div class="
+                    w-12 h-12
+                    rounded-2xl
+                    bg-teal-50
+                    flex items-center justify-center
+                    shrink-0
+                ">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="w-6 h-6 text-teal-600"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2m10-10a4 4 0 11-8 0 4 4 0 018 0z"/>
+
+                    </svg>
+
+                </div>
+
+            </div>
+
+
+            <p class="
+                text-xs
+                text-teal-600
+                mt-5
+                font-medium
+            ">
                 Semua role dalam sistem
             </p>
 
         </div>
 
 
-        <!-- TRANSAKSI -->
-        <div class="bg-white rounded-2xl p-5 shadow hover:shadow-md transition">
+        <!-- TRANSACTION -->
+        <div class="
+            bg-white
+            rounded-3xl
+            p-5 md:p-6
+            shadow-sm
+            border border-gray-100
+            hover:shadow-md
+            transition
+        ">
 
-            <p class="text-sm text-gray-500">
-                Total Transaksi
-            </p>
+            <div class="
+                flex items-start justify-between
+                gap-4
+            ">
 
-            <h2 class="text-2xl font-bold mt-1 text-gray-800">
-                {{ \App\Models\Transaction::count() }}
-            </h2>
+                <div>
 
-            <p class="text-xs text-teal-600 mt-2">
+                    <p class="
+                        text-sm
+                        text-gray-400
+                    ">
+                        Total Transaksi
+                    </p>
+
+                    <h2 class="
+                        text-3xl
+                        font-bold
+                        text-gray-800
+                        mt-2
+                    ">
+
+                        {{ \App\Models\Transaction::count() }}
+
+                    </h2>
+
+                </div>
+
+
+                <!-- ICON -->
+                <div class="
+                    w-12 h-12
+                    rounded-2xl
+                    bg-blue-50
+                    flex items-center justify-center
+                    shrink-0
+                ">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="w-6 h-6 text-blue-600"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/>
+
+                    </svg>
+
+                </div>
+
+            </div>
+
+
+            <p class="
+                text-xs
+                text-blue-600
+                mt-5
+                font-medium
+            ">
                 Semua aktivitas pemesanan
             </p>
 
         </div>
 
 
-        <!-- PENDAPATAN -->
-        <div class="bg-white rounded-2xl p-5 shadow hover:shadow-md transition">
+        <!-- REVENUE -->
+        <div class="
+            bg-white
+            rounded-3xl
+            p-5 md:p-6
+            shadow-sm
+            border border-gray-100
+            hover:shadow-md
+            transition
+        ">
 
-            <p class="text-sm text-gray-500">
-                Total Revenue
-            </p>
+            <div class="
+                flex items-start justify-between
+                gap-4
+            ">
 
-            <h2 class="text-2xl font-bold mt-1 text-gray-800">
-                Rp {{ number_format(\App\Models\Transaction::where('order_status','completed')->sum('total_price'),0,',','.') }}
-            </h2>
+                <div>
 
-            <p class="text-xs text-teal-600 mt-2">
+                    <p class="
+                        text-sm
+                        text-gray-400
+                    ">
+                        Total Revenue
+                    </p>
+
+                    <h2 class="
+                        text-2xl md:text-3xl
+                        font-bold
+                        text-gray-800
+                        mt-2
+                        leading-tight
+                    ">
+
+                        Rp {{ number_format(
+                            \App\Models\Transaction::where('order_status','completed')
+                            ->sum('total_price'),
+                            0,
+                            ',',
+                            '.'
+                        ) }}
+
+                    </h2>
+
+                </div>
+
+
+                <!-- ICON -->
+                <div class="
+                    w-12 h-12
+                    rounded-2xl
+                    bg-green-50
+                    flex items-center justify-center
+                    shrink-0
+                ">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="w-6 h-6 text-green-600"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12V3m0 6v6m0 6v-3"/>
+
+                    </svg>
+
+                </div>
+
+            </div>
+
+
+            <p class="
+                text-xs
+                text-green-600
+                mt-5
+                font-medium
+            ">
                 Dari transaksi selesai
             </p>
-
-        </div>
-
-    </div>
-
-
-    {{--<!-- QUICK ACTION -->
-    <div class="bg-white rounded-2xl p-6 shadow">
-
-        <h3 class="font-semibold text-gray-700 mb-4">
-            Quick Actions
-        </h3>
-
-        <div class="grid grid-cols-3 gap-4">
-
-            <a href="#" class="bg-teal-50 hover:bg-teal-100 transition p-4 rounded-xl text-center">
-                <div class="text-xl">👥</div>
-                <p class="text-sm mt-2 text-gray-700">Kelola User</p>
-            </a>
-
-            <a href="#" class="bg-teal-50 hover:bg-teal-100 transition p-4 rounded-xl text-center">
-                <div class="text-xl">🏢</div>
-                <p class="text-sm mt-2 text-gray-700">Kelola Terapis</p>
-            </a>
-
-            <a href="#" class="bg-teal-50 hover:bg-teal-100 transition p-4 rounded-xl text-center">
-                <div class="text-xl">⚙️</div>
-                <p class="text-sm mt-2 text-gray-700">Pengaturan Sistem</p>
-            </a>
-
-        </div>
-
-    </div>--}}
-
-
-    <!-- INFO -->
-    <div class="bg-white rounded-2xl p-6 shadow">
-
-        <h3 class="font-semibold text-gray-700 mb-3">
-            Informasi Sistem
-        </h3>
-
-        <div class="text-sm text-gray-600 space-y-1">
-
-            <p>• Role management aktif</p>
-            <p>• Sistem transaksi berjalan normal</p>
-            <p>• Database terhubung (SQLite)</p>
 
         </div>
 

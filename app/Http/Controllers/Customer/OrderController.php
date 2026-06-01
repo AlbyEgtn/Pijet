@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Transaction;
 use App\Models\Payment;
 use App\Models\PaymentAccount;
+use App\Models\TherapistReview;
 use Midtrans\Config;
 use Midtrans\Snap;
 use App\Models\WalletTransaction;
@@ -392,5 +393,42 @@ class OrderController extends Controller
 
         return redirect()->back()
             ->with('success', 'Jadwal berhasil diubah');
+    }
+
+    public function storeReview(Request $request, $id)
+    {
+        $request->validate([
+
+            'rating' => 'required|integer|min:1|max:5',
+
+            'review' => 'required|string|max:500',
+        ]);
+
+        $order = Transaction::findOrFail($id);
+
+        if($order->order_status !== 'completed'){
+            return back()->with('error','Pesanan belum selesai');
+        }
+
+        $exists = TherapistReview::where('customer_id', auth()->id())
+            ->where('therapist_id', $order->terapis->user->id)
+            ->exists();
+
+        if($exists){
+            return back()->with('error','Anda sudah memberi review');
+        }
+
+        TherapistReview::create([
+
+            'customer_id' => auth()->id(),
+
+            'therapist_id' => $order->terapis->user->id,
+
+            'rating' => $request->rating,
+
+            'review' => $request->review,
+        ]);
+
+        return back()->with('success','Review berhasil dikirim');
     }
 }

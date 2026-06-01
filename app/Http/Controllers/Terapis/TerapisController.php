@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Notification;
+use App\Models\TherapistReview;
 
 class TerapisController extends Controller
 {
@@ -675,6 +676,75 @@ class TerapisController extends Controller
         }
 
         return $query->paginate(10);
+    }
+
+    public function review()
+    {
+        $therapist = auth()->user();
+
+        $reviews = TherapistReview::with([
+            'customer'
+        ])
+        ->where('therapist_id', $therapist->id)
+        ->latest()
+        ->paginate(10);
+
+
+        // ======================
+        // STATS
+        // ======================
+
+        $avgRating = round(
+            TherapistReview::where(
+                'therapist_id',
+                $therapist->id
+            )->avg('rating') ?? 0,
+            1
+        );
+
+        $totalReview = TherapistReview::where(
+            'therapist_id',
+            $therapist->id
+        )->count();
+
+
+        // ======================
+        // DISTRIBUTION
+        // ======================
+
+        $ratingStats = [
+
+            5 => TherapistReview::where('therapist_id', $therapist->id)
+                    ->where('rating', 5)
+                    ->count(),
+
+            4 => TherapistReview::where('therapist_id', $therapist->id)
+                    ->where('rating', 4)
+                    ->count(),
+
+            3 => TherapistReview::where('therapist_id', $therapist->id)
+                    ->where('rating', 3)
+                    ->count(),
+
+            2 => TherapistReview::where('therapist_id', $therapist->id)
+                    ->where('rating', 2)
+                    ->count(),
+
+            1 => TherapistReview::where('therapist_id', $therapist->id)
+                    ->where('rating', 1)
+                    ->count(),
+        ];
+
+
+        return view(
+            'pages.terapis.review',
+            compact(
+                'reviews',
+                'avgRating',
+                'totalReview',
+                'ratingStats'
+            )
+        );
     }
 
 }

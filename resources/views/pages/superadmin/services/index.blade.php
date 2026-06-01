@@ -7,121 +7,514 @@
 
 <div class="space-y-8">
 
-    {{-- HEADER --}}
-    <div class="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-6 rounded-2xl shadow flex justify-between items-center">
-        <div>
-            <h2 class="text-xl font-semibold">Daftar Layanan Utama</h2>
-            <p class="text-sm text-teal-100">Kelola layanan utama sistem</p>
+    <!-- ================= HERO ================= -->
+    <div class="
+        relative overflow-hidden
+        bg-gradient-to-r from-teal-600 via-teal-700 to-teal-800
+        rounded-3xl
+        p-6 md:p-8
+        text-white
+        shadow-xl
+        flex flex-col lg:flex-row
+        lg:items-center
+        lg:justify-between
+        gap-6
+    ">
+
+        <!-- BG EFFECT -->
+        <div class="
+            absolute -top-10 -right-10
+            w-52 h-52
+            bg-white/10
+            rounded-full
+            blur-3xl
+        "></div>
+
+        <div class="relative z-10">
+
+            <p class="
+                text-sm
+                text-teal-100
+                mb-2
+            ">
+                Kelola Layanan
+            </p>
+
+            <h2 class="
+                text-2xl md:text-4xl
+                font-bold
+            ">
+                Daftar Layanan
+            </h2>
+
+            <p class="
+                text-sm md:text-base
+                text-teal-100
+                mt-3
+                max-w-2xl
+            ">
+                Kelola layanan utama dan layanan tambahan aplikasi.
+            </p>
+
         </div>
-        <button onclick="toggleModal('serviceModal', true)"
-            class="bg-white text-teal-700 px-4 py-2 rounded-lg font-medium hover:bg-teal-100">
+
+
+        <!-- BUTTON -->
+        <button
+            onclick="toggleModal('serviceModal', true)"
+            class="
+                relative z-10
+                bg-white
+                hover:bg-gray-100
+                text-teal-700
+                px-5 py-3
+                rounded-2xl
+                text-sm font-semibold
+                transition
+                shadow-sm
+            "
+        >
+
             + Buat Layanan
+
         </button>
+
     </div>
 
-    {{-- GRID --}}
-    <div class="grid grid-cols-3 gap-6">
-        @foreach($services as $service)
-        <div class="bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden group">
 
-            <div class="h-40 overflow-hidden">
-                <img src="{{ $service->image ? asset('storage/'.$service->image) : 'https://via.placeholder.com/400x300' }}"
-                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-            </div>
+    <!-- ================= LAYANAN UTAMA ================= -->
+    <div>
 
-            <div class="p-4">
-                <div class="flex justify-between items-center mb-2">
+        <div class="
+            grid grid-cols-1
+            sm:grid-cols-2
+            xl:grid-cols-3
+            gap-6
+        ">
 
-                    <span class="bg-teal-100 text-teal-700 text-xs px-2 py-1 rounded-full">
-                        {{ $service->is_active ? 'Aktif' : 'Nonaktif' }}
-                    </span>
+            @foreach($services as $service)
 
-                    <div class="relative">
-                        <button onclick="toggleMenu(event, {{ $service->id }})"
-                            class="text-gray-400 text-xl px-2">⋮</button>
+            <div class="
+                bg-white
+                rounded-3xl
+                border border-gray-100
+                shadow-sm
+                overflow-hidden
+                hover:shadow-xl
+                transition
+                group
+            ">
 
-                        <div id="menu-{{ $service->id }}"
-                            class="hidden absolute right-0 mt-2 w-36 bg-white border rounded-lg shadow-lg z-50">
+                <!-- IMAGE -->
+                <div class="
+                    h-56
+                    overflow-hidden
+                    relative
+                ">
 
-                            <button onclick="openEditModal(
-                                    {{ $service->id }},
-                                    @js($service->name),
-                                    '{{ $service->price }}',
-                                    '{{ $service->duration }}',
-                                    @js($service->description),
-                                    '{{ $service->image }}'
-                                )"
-                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                                Edit
-                            </button>
+                    <img
+                        src="{{ $service->image
+                            ? asset('storage/'.$service->image)
+                            : 'https://via.placeholder.com/400x300'
+                        }}"
+                        class="
+                            w-full h-full
+                            object-cover
+                            group-hover:scale-105
+                            transition duration-500
+                        "
+                    >
 
-                            <button onclick="openDeleteModal({{ $service->id }})"
-                                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                Delete
-                            </button>
-                        </div>
+
+                    <!-- STATUS -->
+                    <div class="
+                        absolute top-4 left-4
+                    ">
+
+                        <span class="
+                            px-3 py-1.5
+                            rounded-full
+                            text-xs font-semibold
+                            backdrop-blur
+                            {{
+                                $service->is_active
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-red-100 text-red-600'
+                            }}
+                        ">
+
+                            {{ $service->is_active ? 'Aktif' : 'Nonaktif' }}
+
+                        </span>
+
                     </div>
+
+
+                    <!-- MENU -->
+                    <div class="
+                        absolute top-4 right-4
+                    ">
+
+                        <div class="relative">
+
+                            <button
+                                onclick="toggleMenu(event, {{ $service->id }})"
+                                class="
+                                    w-10 h-10
+                                    rounded-2xl
+                                    bg-white/90
+                                    backdrop-blur
+                                    hover:bg-white
+                                    text-gray-700
+                                    transition
+                                "
+                            >
+
+                                ⋮
+
+                            </button>
+
+
+                            <!-- DROPDOWN -->
+                            <div
+                                id="menu-{{ $service->id }}"
+                                class="
+                                    hidden
+                                    absolute right-0 mt-2
+                                    w-40
+                                    bg-white
+                                    border border-gray-100
+                                    rounded-2xl
+                                    shadow-xl
+                                    overflow-hidden
+                                    z-50
+                                "
+                            >
+
+                                <!-- EDIT -->
+                                <button
+                                    onclick="openEditModal(
+                                        {{ $service->id }},
+                                        @js($service->name),
+                                        '{{ $service->price }}',
+                                        '{{ $service->duration }}',
+                                        @js($service->description),
+                                        '{{ $service->image }}'
+                                    )"
+                                    class="
+                                        w-full text-left
+                                        px-4 py-3
+                                        text-sm
+                                        hover:bg-gray-50
+                                    "
+                                >
+
+                                    Edit
+
+                                </button>
+
+
+                                <!-- DELETE -->
+                                <button
+                                    onclick="openDeleteModal({{ $service->id }})"
+                                    class="
+                                        w-full text-left
+                                        px-4 py-3
+                                        text-sm
+                                        text-red-600
+                                        hover:bg-red-50
+                                    "
+                                >
+
+                                    Hapus
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <h3 class="font-semibold text-lg text-gray-800">{{ $service->name }}</h3>
-                <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ $service->description }}</p>
 
-                <div class="flex justify-between items-center text-sm">
-                    <span class="text-teal-700 font-semibold">Rp {{ number_format($service->price,0,',','.') }}</span>
-                    <span class="bg-gray-100 px-2 py-1 rounded text-xs">{{ $service->duration }} Menit</span>
+                <!-- CONTENT -->
+                <div class="p-5">
+
+                    <h3 class="
+                        text-xl
+                        font-bold
+                        text-gray-800
+                        mb-2
+                    ">
+
+                        {{ $service->name }}
+
+                    </h3>
+
+
+                    <p class="
+                        text-sm
+                        text-gray-500
+                        leading-relaxed
+                        line-clamp-2
+                        min-h-[42px]
+                    ">
+
+                        {{ $service->description }}
+
+                    </p>
+
+
+                    <!-- FOOTER -->
+                    <div class="
+                        flex items-center justify-between
+                        gap-3
+                        mt-5
+                    ">
+
+                        <div>
+
+                            <p class="
+                                text-xs
+                                text-gray-400
+                                mb-1
+                            ">
+                                Harga
+                            </p>
+
+                            <p class="
+                                text-lg
+                                font-bold
+                                text-teal-600
+                            ">
+
+                                Rp {{ number_format($service->price,0,',','.') }}
+
+                            </p>
+
+                        </div>
+
+
+                        <div class="
+                            bg-gray-100
+                            rounded-2xl
+                            px-3 py-2
+                            text-xs
+                            font-medium
+                            text-gray-600
+                        ">
+
+                            {{ $service->duration }} Menit
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
+
+            @endforeach
+
         </div>
-        @endforeach
+
     </div>
 
-    {{-- PAGINATION --}}
-    <div class="flex justify-between items-center mt-6">
+
+    <!-- ================= PAGINATION ================= -->
+    <div class="
+        flex flex-col sm:flex-row
+        items-center justify-between
+        gap-4
+    ">
+
         @if ($services->onFirstPage())
-            <span class="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg text-sm">← Previous</span>
+
+            <span class="
+                px-5 py-2.5
+                rounded-2xl
+                bg-gray-200
+                text-gray-500
+                text-sm
+            ">
+
+                ← Previous
+
+            </span>
+
         @else
-            <a href="{{ $services->previousPageUrl() }}" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm">← Previous</a>
+
+            <a
+                href="{{ $services->previousPageUrl() }}"
+                class="
+                    px-5 py-2.5
+                    rounded-2xl
+                    bg-teal-600
+                    hover:bg-teal-700
+                    text-white
+                    text-sm
+                    transition
+                "
+            >
+
+                ← Previous
+
+            </a>
+
         @endif
 
-        <span class="text-sm text-gray-500">Halaman {{ $services->currentPage() }} dari {{ $services->lastPage() }}</span>
+
+        <p class="
+            text-sm
+            text-gray-500
+        ">
+
+            Halaman
+            {{ $services->currentPage() }}
+            dari
+            {{ $services->lastPage() }}
+
+        </p>
+
 
         @if ($services->hasMorePages())
-            <a href="{{ $services->nextPageUrl() }}" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm">Next →</a>
+
+            <a
+                href="{{ $services->nextPageUrl() }}"
+                class="
+                    px-5 py-2.5
+                    rounded-2xl
+                    bg-teal-600
+                    hover:bg-teal-700
+                    text-white
+                    text-sm
+                    transition
+                "
+            >
+
+                Next →
+
+            </a>
+
         @else
-            <span class="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg text-sm">Next →</span>
+
+            <span class="
+                px-5 py-2.5
+                rounded-2xl
+                bg-gray-200
+                text-gray-500
+                text-sm
+            ">
+
+                Next →
+
+            </span>
+
         @endif
+
     </div>
 
-</div>
+
+    <!-- ================= LAYANAN TAMBAHAN ================= -->
+    <div class="space-y-5">
+
+        <!-- HEADER -->
+        <div class="
+            flex flex-col sm:flex-row
+            sm:items-center
+            justify-between
+            gap-4
+        ">
+
+            <div>
+
+                <h2 class="
+                    text-2xl
+                    font-bold
+                    text-gray-800
+                ">
+                    Layanan Tambahan
+                </h2>
+
+                <p class="
+                    text-sm
+                    text-gray-400
+                    mt-1
+                ">
+                    Daftar layanan tambahan sistem
+                </p>
+
+            </div>
 
 
-{{-- ===== LAYANAN TAMBAHAN ===== --}}
-<div class="space-y-6 mt-12">
-    <div class="flex justify-between items-center">
-        <h2 class="text-xl font-semibold">Layanan Tambahan</h2>
-        <button onclick="toggleModal('additionalServiceModal', true)"
-            class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg">
-            + Tambah Layanan
-        </button>
-    </div>
+            <!-- BUTTON -->
+            <button
+                onclick="toggleModal('additionalServiceModal', true)"
+                class="
+                    bg-teal-600
+                    hover:bg-teal-700
+                    text-white
+                    px-5 py-3
+                    rounded-2xl
+                    text-sm font-semibold
+                    transition
+                "
+            >
 
-    <div class="bg-white rounded-2xl shadow overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="text-gray-400 text-xs uppercase bg-gray-50">
-                <tr>
-                    <th class="px-4 py-3 text-left">Nama</th>
-                    <th class="px-4 py-3 text-left">Harga</th>
-                    <th class="px-4 py-3 text-left">Durasi</th>
-                    <th class="px-4 py-3 text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y">
+                + Tambah Layanan
+
+            </button>
+
+        </div>
+
+
+        <!-- TABLE -->
+        <div class="
+            bg-white
+            rounded-3xl
+            border border-gray-100
+            shadow-sm
+            overflow-hidden
+        ">
+
+            <!-- MOBILE -->
+            <div class="block md:hidden">
+
                 @foreach($additionalServices as $service)
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 font-medium">{{ $service->name }}</td>
-                    <td class="px-4 py-3 text-teal-600">Rp {{ number_format($service->price,0,',','.') }}</td>
-                    <td class="px-4 py-3">{{ $service->duration }} Menit</td>
-                    <td class="px-4 py-3 text-right">
+
+                <div class="
+                    p-5
+                    border-b border-gray-100
+                    space-y-4
+                ">
+
+                    <div class="
+                        flex items-start justify-between
+                        gap-3
+                    ">
+
+                        <div>
+
+                            <h3 class="
+                                font-semibold
+                                text-gray-800
+                            ">
+                                {{ $service->name }}
+                            </h3>
+
+                            <p class="
+                                text-sm
+                                text-gray-400
+                                mt-1
+                            ">
+                                {{ $service->duration }} Menit
+                            </p>
+
+                        </div>
+
+
                         <button
                             onclick="openEditAdditionalModal(this)"
                             data-id="{{ $service->id }}"
@@ -129,266 +522,484 @@
                             data-price="{{ $service->price }}"
                             data-duration="{{ $service->duration }}"
                             data-description="{{ $service->description }}"
-                            class="text-blue-500 text-sm">
+                            class="
+                                text-blue-600
+                                text-sm font-medium
+                            "
+                        >
+
                             Edit
+
                         </button>
-                    </td>
-                </tr>
+
+                    </div>
+
+
+                    <p class="
+                        text-lg
+                        font-bold
+                        text-teal-600
+                    ">
+
+                        Rp {{ number_format($service->price,0,',','.') }}
+
+                    </p>
+
+                </div>
+
                 @endforeach
-            </tbody>
-        </table>
+
+            </div>
+
+
+            <!-- DESKTOP -->
+            <div class="hidden md:block overflow-x-auto">
+
+                <table class="min-w-full text-sm">
+
+                    <thead class="
+                        bg-gray-50
+                        text-xs uppercase
+                        text-gray-500
+                    ">
+
+                        <tr>
+
+                            <th class="px-6 py-4 text-left">
+                                Nama
+                            </th>
+
+                            <th class="px-6 py-4 text-left">
+                                Harga
+                            </th>
+
+                            <th class="px-6 py-4 text-left">
+                                Durasi
+                            </th>
+
+                            <th class="px-6 py-4 text-right">
+                                Aksi
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody class="divide-y divide-gray-100">
+
+                        @foreach($additionalServices as $service)
+
+                        <tr class="hover:bg-gray-50 transition">
+
+                            <td class="
+                                px-6 py-5
+                                font-medium
+                                text-gray-800
+                            ">
+
+                                {{ $service->name }}
+
+                            </td>
+
+
+                            <td class="
+                                px-6 py-5
+                                font-semibold
+                                text-teal-600
+                            ">
+
+                                Rp {{ number_format($service->price,0,',','.') }}
+
+                            </td>
+
+
+                            <td class="
+                                px-6 py-5
+                                text-gray-600
+                            ">
+
+                                {{ $service->duration }} Menit
+
+                            </td>
+
+
+                            <td class="
+                                px-6 py-5
+                                text-right
+                            ">
+
+                                <button
+                                    onclick="openEditAdditionalModal(this)"
+                                    data-id="{{ $service->id }}"
+                                    data-name="{{ $service->name }}"
+                                    data-price="{{ $service->price }}"
+                                    data-duration="{{ $service->duration }}"
+                                    data-description="{{ $service->description }}"
+                                    class="
+                                        px-4 py-2
+                                        rounded-xl
+                                        bg-blue-50
+                                        hover:bg-blue-100
+                                        text-blue-600
+                                        text-sm
+                                        transition
+                                    "
+                                >
+
+                                    Edit
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
     </div>
+
 </div>
 
 
-{{-- ===== MODAL TAMBAH LAYANAN UTAMA ===== --}}
-<div id="serviceModal"
-    class="fixed inset-0 hidden items-center justify-center bg-black/30 z-50 backdrop-blur-sm px-4">
-    <div class="bg-white w-full max-w-md rounded-xl shadow-lg flex flex-col max-h-[90vh]">
+{{-- ========================================================= --}}
+{{-- ================= MODAL TAMBAH ========================== --}}
+{{-- ========================================================= --}}
 
-        <div class="flex justify-between items-center px-5 py-4 border-b">
-            <h2 class="font-semibold text-base">Buat Layanan</h2>
-            <button onclick="toggleModal('serviceModal', false)" class="text-gray-400 hover:text-gray-700">✕</button>
+<div id="serviceModal"
+    class="
+        fixed inset-0
+        hidden items-center justify-center
+        bg-black/50
+        backdrop-blur-sm
+        z-50
+        p-4
+    ">
+
+    <div class="
+        bg-white
+        w-full max-w-2xl
+        rounded-3xl
+        shadow-2xl
+        overflow-hidden
+        flex flex-col
+        max-h-[90vh]
+    ">
+
+        <!-- HEADER -->
+        <div class="
+            px-6 py-5
+            border-b border-gray-100
+            flex items-center justify-between
+        ">
+
+            <div>
+
+                <h2 class="
+                    text-xl
+                    font-bold
+                    text-gray-800
+                ">
+                    Buat Layanan
+                </h2>
+
+                <p class="
+                    text-sm
+                    text-gray-400
+                    mt-1
+                ">
+                    Tambahkan layanan baru ke sistem
+                </p>
+
+            </div>
+
+
+            <button
+                onclick="toggleModal('serviceModal', false)"
+                class="
+                    w-10 h-10
+                    rounded-2xl
+                    hover:bg-gray-100
+                    transition
+                "
+            >
+
+                ✕
+
+            </button>
+
         </div>
 
+
+        <!-- FORM -->
         <form id="serviceForm"
             action="{{ route('superadmin.services.store') }}"
             method="POST"
             enctype="multipart/form-data"
-            class="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+            class="
+                flex-1 overflow-y-auto
+                px-6 py-5
+                space-y-5
+            ">
 
             @csrf
+
             <input type="hidden" name="is_additional" value="0">
 
+
+            <!-- NAME -->
             <div>
-                <label class="text-xs text-gray-500">Nama Layanan</label>
-                <input type="text" name="name"
-                    class="w-full border rounded-lg px-3 py-2 mt-1 text-sm focus:ring-2 focus:ring-teal-500 outline-none">
+
+                <label class="
+                    text-sm
+                    font-medium
+                    text-gray-700
+                ">
+                    Nama Layanan
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    class="
+                        w-full
+                        border border-gray-200
+                        rounded-2xl
+                        px-4 py-3
+                        mt-2
+                        text-sm
+                        focus:ring-2 focus:ring-teal-500
+                        outline-none
+                    "
+                >
+
             </div>
 
+
+            <!-- IMAGE -->
             <div>
-                <label class="text-xs text-gray-500">Gambar</label>
-                <input type="file" name="image" id="imageInput" accept="image/*" class="w-full text-sm mt-1">
-                <img id="previewImage" class="mt-2 rounded-lg hidden max-h-32 object-cover w-full">
+
+                <label class="
+                    text-sm
+                    font-medium
+                    text-gray-700
+                ">
+                    Gambar
+                </label>
+
+                <input
+                    type="file"
+                    name="image"
+                    id="imageInput"
+                    accept="image/*"
+                    class="
+                        w-full
+                        mt-2
+                        text-sm
+                    "
+                >
+
+                <img
+                    id="previewImage"
+                    class="
+                        hidden
+                        mt-4
+                        rounded-2xl
+                        max-h-52
+                        w-full
+                        object-cover
+                        border
+                    "
+                >
+
             </div>
 
+
+            <!-- PRICE -->
             <div>
-                <label class="text-xs text-gray-500">Harga</label>
-                <input type="number" name="price"
-                    class="w-full border rounded-lg px-3 py-2 mt-1 text-sm focus:ring-2 focus:ring-teal-500 outline-none">
+
+                <label class="
+                    text-sm
+                    font-medium
+                    text-gray-700
+                ">
+                    Harga
+                </label>
+
+                <input
+                    type="number"
+                    name="price"
+                    class="
+                        w-full
+                        border border-gray-200
+                        rounded-2xl
+                        px-4 py-3
+                        mt-2
+                        text-sm
+                        focus:ring-2 focus:ring-teal-500
+                        outline-none
+                    "
+                >
+
             </div>
 
+
+            <!-- DURATION -->
             <div>
-                <label class="text-xs text-gray-500">Durasi</label>
-                <div class="flex gap-3 mt-2 text-sm">
-                    <label class="flex items-center gap-1"><input type="radio" name="duration" value="60"> 60m</label>
-                    <label class="flex items-center gap-1"><input type="radio" name="duration" value="90"> 90m</label>
-                    <label class="flex items-center gap-1"><input type="radio" name="duration" value="120"> 120m</label>
+
+                <label class="
+                    text-sm
+                    font-medium
+                    text-gray-700
+                ">
+                    Durasi
+                </label>
+
+                <div class="
+                    grid grid-cols-3
+                    gap-3
+                    mt-3
+                ">
+
+                    <label class="
+                        border border-gray-200
+                        rounded-2xl
+                        p-3
+                        flex items-center justify-center
+                        gap-2
+                        cursor-pointer
+                    ">
+
+                        <input type="radio" name="duration" value="60">
+                        <span class="text-sm">60 Menit</span>
+
+                    </label>
+
+
+                    <label class="
+                        border border-gray-200
+                        rounded-2xl
+                        p-3
+                        flex items-center justify-center
+                        gap-2
+                        cursor-pointer
+                    ">
+
+                        <input type="radio" name="duration" value="90">
+                        <span class="text-sm">90 Menit</span>
+
+                    </label>
+
+
+                    <label class="
+                        border border-gray-200
+                        rounded-2xl
+                        p-3
+                        flex items-center justify-center
+                        gap-2
+                        cursor-pointer
+                    ">
+
+                        <input type="radio" name="duration" value="120">
+                        <span class="text-sm">120 Menit</span>
+
+                    </label>
+
                 </div>
+
             </div>
 
+
+            <!-- DESCRIPTION -->
             <div>
-                <label class="text-xs text-gray-500">Deskripsi</label>
-                <textarea name="description" rows="3"
-                    class="w-full border rounded-lg px-3 py-2 mt-1 text-sm focus:ring-2 focus:ring-teal-500 outline-none"></textarea>
+
+                <label class="
+                    text-sm
+                    font-medium
+                    text-gray-700
+                ">
+                    Deskripsi
+                </label>
+
+                <textarea
+                    name="description"
+                    rows="5"
+                    class="
+                        w-full
+                        border border-gray-200
+                        rounded-2xl
+                        px-4 py-3
+                        mt-2
+                        text-sm
+                        focus:ring-2 focus:ring-teal-500
+                        outline-none
+                    "
+                ></textarea>
+
             </div>
+
         </form>
 
-        <div class="px-5 py-4 border-t flex justify-end">
-            <button type="submit" form="serviceForm"
-                class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm">
-                Simpan
+
+        <!-- FOOTER -->
+        <div class="
+            px-6 py-5
+            border-t border-gray-100
+            flex flex-col sm:flex-row
+            gap-3
+            justify-end
+            bg-white
+        ">
+
+            <button
+                type="button"
+                onclick="toggleModal('serviceModal', false)"
+                class="
+                    px-5 py-3
+                    rounded-2xl
+                    bg-gray-100
+                    hover:bg-gray-200
+                    text-gray-700
+                    text-sm font-medium
+                    transition
+                "
+            >
+
+                Batal
+
             </button>
-        </div>
-    </div>
-</div>
 
 
-{{-- ===== MODAL EDIT LAYANAN UTAMA ===== --}}
-<div id="editServiceModal"
-    class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50">
-    <div class="bg-white w-[500px] rounded-xl p-6 shadow-lg">
+            <button
+                type="submit"
+                form="serviceForm"
+                class="
+                    px-5 py-3
+                    rounded-2xl
+                    bg-teal-600
+                    hover:bg-teal-700
+                    text-white
+                    text-sm font-semibold
+                    transition
+                "
+            >
 
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="font-semibold text-lg">Edit Layanan</h2>
-            <button onclick="toggleModal('editServiceModal', false)">✕</button>
-        </div>
+                Simpan Layanan
 
-        <form id="editServiceForm" method="POST" enctype="multipart/form-data" class="space-y-4">
-            @csrf
-            @method('PUT')
+            </button>
 
-            <div>
-                <label class="text-sm">Nama Layanan</label>
-                <input type="text" name="name" id="edit_name" class="w-full border p-2 rounded mt-1">
-            </div>
-
-            <div>
-                <label class="text-sm">Upload Gambar</label>
-                <input type="file" name="image" id="edit_image" accept="image/*" class="w-full border p-2 rounded mt-1">
-                {{-- Preview image edit --}}
-                <img id="edit_preview" class="mt-2 rounded-lg hidden max-h-32 object-cover w-full">
-            </div>
-
-            <div>
-                <label class="text-sm">Harga</label>
-                <input type="number" name="price" id="edit_price" class="w-full border p-2 rounded mt-1">
-            </div>
-
-            <div>
-                <label class="text-sm">Durasi</label>
-                <div class="flex gap-4 mt-2">
-                    <label><input type="radio" name="duration" value="60"> 60 Menit</label>
-                    <label><input type="radio" name="duration" value="90"> 90 Menit</label>
-                    <label><input type="radio" name="duration" value="120"> 120 Menit</label>
-                </div>
-            </div>
-
-            <div>
-                <label class="text-sm">Deskripsi</label>
-                <textarea name="description" id="edit_description" class="w-full border p-2 rounded mt-1"></textarea>
-            </div>
-
-            <div class="flex justify-end">
-                <button class="bg-gray-900 text-white px-4 py-2 rounded">Update</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-{{-- ===== MODAL DELETE LAYANAN UTAMA ===== --}}
-<div id="deleteModal"
-    class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50">
-    <div class="bg-white w-[420px] rounded-xl p-6 text-center">
-
-        <div class="flex justify-center mb-4">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 9v2m0 4h.01M10.29 3.86l-7.5 13A1 1 0 003.71 18h16.58a1 1 0 00.92-1.14l-7.5-13a1 1 0 00-1.84 0z"/>
-                </svg>
-            </div>
         </div>
 
-        <h2 class="text-lg font-semibold mb-2">Hapus Layanan</h2>
-        <p class="text-gray-500 text-sm mb-6">Apakah Anda yakin ingin menghapus layanan ini? Data yang dihapus tidak dapat dikembalikan.</p>
-
-        <div class="flex justify-center gap-4">
-            <button onclick="toggleModal('deleteModal', false)" class="px-4 py-2 rounded border">Batal</button>
-            <form id="deleteForm" method="POST">
-                @csrf
-                @method('DELETE')
-                <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Hapus</button>
-            </form>
-        </div>
     </div>
-</div>
 
-
-{{-- ===== MODAL TAMBAH LAYANAN TAMBAHAN ===== --}}
-<div id="additionalServiceModal"
-    class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50">
-    <div class="bg-white w-[450px] rounded-xl p-6 shadow-lg">
-
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="font-semibold text-lg">Tambah Layanan Tambahan</h2>
-            <button onclick="toggleModal('additionalServiceModal', false)">✕</button>
-        </div>
-
-        <form action="{{ route('superadmin.services.store') }}" method="POST" class="space-y-4">
-            @csrf
-            <input type="hidden" name="is_additional" value="1">
-
-            <div>
-                <label class="text-sm">Nama Layanan</label>
-                <input type="text" name="name" class="w-full border p-2 rounded mt-1" required>
-            </div>
-
-            <div>
-                <label class="text-sm">Harga</label>
-                <input type="number" name="price" class="w-full border p-2 rounded mt-1" required>
-            </div>
-
-            <div>
-                <label class="text-sm">Durasi</label>
-                <div class="flex gap-4 mt-2">
-                    <label><input type="radio" name="duration" value="30"> 30 Menit</label>
-                    <label><input type="radio" name="duration" value="60"> 60 Menit</label>
-                </div>
-            </div>
-
-            <div>
-                <label class="text-sm">Deskripsi</label>
-                <textarea name="description" class="w-full border p-2 rounded mt-1"></textarea>
-            </div>
-
-            <div class="flex justify-end">
-                <button class="bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800">Tambahkan</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-{{-- ===== MODAL EDIT LAYANAN TAMBAHAN ===== --}}
-<div id="editAdditionalModal"
-    class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50">
-    <div class="w-full max-w-lg bg-white rounded-xl shadow-lg p-6">
-
-        <h3 class="text-lg font-semibold mb-4">Edit Layanan Tambahan</h3>
-
-        <form id="editAdditionalForm" method="POST">
-            @csrf
-            @method('PUT')
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium">Nama Layanan</label>
-                    <input type="text" name="name" id="edit_additional_name" class="w-full border rounded-lg px-3 py-2 mt-1">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium">Harga</label>
-                    <input type="number" name="price" id="edit_additional_price" class="w-full border rounded-lg px-3 py-2 mt-1">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium">Durasi (Menit)</label>
-                    <input type="number" name="duration" id="edit_additional_duration" class="w-full border rounded-lg px-3 py-2 mt-1">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium">Deskripsi</label>
-                    <textarea name="description" id="edit_additional_description" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea>
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 mt-6">
-                <button type="button" onclick="toggleModal('editAdditionalModal', false)"
-                    class="px-4 py-2 bg-gray-200 rounded-lg">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Update</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-{{-- ===== MODAL DELETE LAYANAN TAMBAHAN ===== --}}
-<div id="deleteAdditionalModal"
-    class="fixed inset-0 hidden items-center justify-center bg-black/40 z-50">
-    <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
-
-        <h3 class="text-lg font-semibold">Hapus Layanan</h3>
-        <p class="text-gray-500 mt-2">Apakah Anda yakin ingin menghapus layanan ini?</p>
-
-        <form id="deleteAdditionalForm" method="POST">
-            @csrf
-            @method('DELETE')
-            <div class="flex justify-end gap-2 mt-6">
-                <button type="button" onclick="toggleModal('deleteAdditionalModal', false)"
-                    class="px-4 py-2 bg-gray-200 rounded-lg">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-lg">Hapus</button>
-            </div>
-        </form>
-    </div>
 </div>
 
 @endsection
@@ -396,105 +1007,79 @@
 
 @section('script')
 <script>
-/* ===== HELPER MODAL ===== */
+
+/* ================= MODAL ================= */
 function toggleModal(id, show) {
+
     const modal = document.getElementById(id);
+
     if (!modal) return;
+
     modal.classList.toggle('hidden', !show);
     modal.classList.toggle('flex', show);
 }
 
-/* ===== DROPDOWN ===== */
+
+/* ================= DROPDOWN ================= */
 function toggleMenu(e, id) {
-    e.stopPropagation(); // cegah langsung ditutup oleh listener document
+
+    e.stopPropagation();
+
     const menu = document.getElementById('menu-' + id);
+
     if (!menu) return;
 
-    // tutup semua dropdown lain dulu
     document.querySelectorAll('[id^="menu-"]').forEach(m => {
-        if (m !== menu) m.classList.add('hidden');
+
+        if (m !== menu) {
+
+            m.classList.add('hidden');
+
+        }
+
     });
 
     menu.classList.toggle('hidden');
 }
 
-// tutup semua dropdown jika klik di luar
+
+/* ================= CLOSE DROPDOWN ================= */
 document.addEventListener('click', function () {
-    document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
+
+    document.querySelectorAll('[id^="menu-"]').forEach(m => {
+
+        m.classList.add('hidden');
+
+    });
+
 });
 
 
-/* ===== PREVIEW IMAGE ===== */
+/* ================= IMAGE PREVIEW ================= */
 function bindImagePreview(inputId, previewId) {
+
     const input = document.getElementById(inputId);
     const preview = document.getElementById(previewId);
+
     if (!input || !preview) return;
 
     input.addEventListener('change', function () {
+
         const file = this.files[0];
+
         if (file) {
+
             preview.src = URL.createObjectURL(file);
+
             preview.classList.remove('hidden');
+
         }
+
     });
+
 }
 
 bindImagePreview('imageInput', 'previewImage');
-bindImagePreview('edit_image', 'edit_preview');
 
-
-/* ===== MODAL EDIT LAYANAN UTAMA ===== */
-function openEditModal(id, name, price, duration, description, image) {
-    const form = document.getElementById('editServiceForm');
-    form.reset();
-    form.action = "{{ url('superadmin/services') }}/" + id;
-
-    document.getElementById('edit_name').value        = name;
-    document.getElementById('edit_price').value       = price;
-    document.getElementById('edit_description').value = description;
-
-    form.querySelectorAll('input[name="duration"]').forEach(function (radio) {
-        radio.checked = radio.value == duration;
-    });
-
-    const preview = document.getElementById('edit_preview');
-    if (image) {
-        preview.src = image.startsWith('http') ? image : '/storage/' + image;
-        preview.classList.remove('hidden');
-    } else {
-        preview.classList.add('hidden');
-    }
-
-    toggleModal('editServiceModal', true);
-}
-
-
-/* ===== MODAL DELETE LAYANAN UTAMA ===== */
-function openDeleteModal(id) {
-    document.getElementById('deleteForm').action = "{{ url('superadmin/services') }}/" + id;
-    toggleModal('deleteModal', true);
-}
-
-
-/* ===== MODAL EDIT LAYANAN TAMBAHAN ===== */
-function openEditAdditionalModal(button) {
-    const { id, name, price, duration, description } = button.dataset;
-
-    document.getElementById('edit_additional_name').value        = name;
-    document.getElementById('edit_additional_price').value       = price;
-    document.getElementById('edit_additional_duration').value    = duration;
-    document.getElementById('edit_additional_description').value = description;
-
-    document.getElementById('editAdditionalForm').action = "{{ url('superadmin/services') }}/" + id;
-
-    toggleModal('editAdditionalModal', true);
-}
-
-
-/* ===== MODAL DELETE LAYANAN TAMBAHAN ===== */
-function openDeleteAdditionalModal(id) {
-    document.getElementById('deleteAdditionalForm').action = "{{ url('superadmin/services') }}/" + id;
-    toggleModal('deleteAdditionalModal', true);
-}
 </script>
 @endsection

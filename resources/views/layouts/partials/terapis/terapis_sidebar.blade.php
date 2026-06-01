@@ -1,67 +1,134 @@
 @php
-    $dashboardActive = request()->routeIs('terapis.dashboard');
-    $pesananActive = request()->routeIs('terapis.pesanan*');
+    $menus = [
+        [
+            'title' => 'Dashboard',
+            'route' => route('terapis.dashboard'),
+            'active' => request()->routeIs('terapis.dashboard'),
+        ],
+        [
+            'title' => 'Pesanan',
+            'route' => route('terapis.pesanan'),
+            'active' => request()->routeIs('terapis.pesanan'),
+        ],
+        [
+            'title' => 'Pesanan Saya',
+            'route' => route('terapis.pesanan.saya'),
+            'active' => request()->routeIs('terapis.pesanan.saya*'),
+        ],
+        [
+            'title' => 'Review',
+            'route' => route('terapis.review'),
+            'active' => request()->routeIs('terapis.review'),
+        ],
+    ];
 @endphp
 
-<aside class="w-64 hidden md:flex bg-gradient-to-b from-teal-700 to-teal-900 text-white flex-col min-h-screen shadow-lg">
-    <!-- LOGO -->
-    <div class="px-6 py-7 flex items-center gap-3 border-b border-white/10">
-        <img src="{{ asset('images/logo-pth.png') }}"
-             alt="Logo Pijat.in"
-             class="w-10 h-10 object-contain">
+<aside class="
+    hidden md:flex
+    w-64
+    min-h-screen
+    flex-col
+    bg-gradient-to-b
+    from-teal-700
+    via-teal-800
+    to-teal-900
+    text-white
+    shadow-xl
+">
 
-        <span class="text-xl font-semibold tracking-wide">
-            Pijat.in
-        </span>
+    <!-- ================= LOGO ================= -->
+    <div class="
+        px-6 py-7
+        border-b border-white/10
+    ">
+
+        <div class="flex items-center gap-3">
+
+            <!-- LOGO -->
+            <img src="{{ asset('images/logo-pth.png') }}"
+                alt="Logo"
+                class="w-11 h-11 object-contain">
+
+            <!-- TEXT -->
+            <div>
+
+                <h2 class="text-xl font-semibold tracking-wide">
+                    Pijat.in
+                </h2>
+
+                <p class="text-xs text-teal-100 mt-1">
+                    Terapis Panel
+                </p>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <nav class="flex-1 p-4 space-y-2 text-sm">
 
-        <!-- Dashboard -->
-        <a href="{{ route('terapis.dashboard') }}"
-           class="block px-4 py-3 rounded-lg transition
-           {{ $dashboardActive 
-           ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
-           : 'hover:bg-white/10' }}">
-            Dashboard
+    <!-- ================= MENU ================= -->
+    <nav class="
+        flex-1
+        px-4 py-6
+        space-y-2
+    ">
+
+        @foreach($menus as $menu)
+
+        <a href="{{ $menu['route'] }}"
+            class="
+                block
+                px-4 py-3
+                rounded-2xl
+                text-sm
+                transition-all duration-200
+
+                {{ $menu['active']
+                    ? 'bg-white text-teal-700 font-semibold shadow-sm'
+                    : 'text-white/90 hover:bg-white/10'
+                }}
+            ">
+
+            {{ $menu['title'] }}
+
         </a>
 
-        <!-- Pesanan -->
-        <a href="{{ route('terapis.pesanan') }}"
-           class="block px-4 py-3 rounded-lg transition
-           {{ request()->routeIs('terapis.pesanan') 
-           ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
-           : 'hover:bg-white/10' }}">
-            Pesanan
-        </a>
-
-        <!-- Pesanan Saya -->
-        <a href="{{ route('terapis.pesanan.saya') }}"
-           class="block px-4 py-3 rounded-lg transition
-           {{ request()->routeIs('terapis.pesanan.saya') 
-           ? 'bg-white text-[#3E7F73] font-medium shadow-sm' 
-           : 'hover:bg-white/10' }}">
-            Pesanan Saya
-        </a>
+        @endforeach
 
     </nav>
 
-    <!-- LOGOUT -->
-    <div class="px-4 pb-6">
-        <form method="POST" action="{{ route('logout') }}">
+
+    <!-- ================= LOGOUT ================= -->
+    <div class="
+        p-4
+        border-t border-white/10
+    ">
+
+        <form method="POST"
+            action="{{ route('logout') }}">
+
             @csrf
 
             <button
-                class="flex items-center gap-3 px-4 py-3 rounded-lg w-full hover:bg-white/10 transition"
+                class="
+                    w-full
+                    text-left
+                    px-4 py-3
+                    rounded-2xl
+                    text-sm
+                    text-white/90
+                    hover:bg-white/10
+                    transition
+                "
             >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M17 16l4-4m0 0l-4-4m4 4H7"/>
-                </svg>
 
-                Keluar Akun
+                Logout
+
             </button>
+
         </form>
+
     </div>
 
 </aside>

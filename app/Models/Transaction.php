@@ -139,4 +139,11 @@ class Transaction extends Model
             }
         });
     }
+
+    public function terapis()
+    {
+        return $this->belongsTo(Terapis::class, 'terapis_id');
+    }
+
+    
 }

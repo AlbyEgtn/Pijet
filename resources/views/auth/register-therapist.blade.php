@@ -60,6 +60,12 @@
                 Form Pendaftaran Terapis
             </h2>
 
+            @if(session('error'))
+                <div class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
+                    {{ session('error') }}
+                </div>
+            @endif
+
 
             {{-- ERROR --}}
             @if ($errors->any())
@@ -90,19 +96,43 @@
                     <!-- NIK -->
                     <div>
                         <label class="text-sm text-gray-600">NIK</label>
-                        <input type="text" name="nik"
-                               value="{{ old('nik') }}"
-                               required
-                               class="w-full border rounded-lg px-4 py-3 mt-1 text-sm">
+
+                        <input
+                            type="text"
+                            name="nik"
+                            value="{{ old('nik') }}"
+                            required
+                            maxlength="16"
+                            pattern="[0-9]{16}"
+                            inputmode="numeric"
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                            class="w-full border rounded-lg px-4 py-3 mt-1 text-sm @error('nik') border-red-500 @enderror"
+                        >
+
+                        @error('nik')
+                            <p class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
 
                     <!-- NAMA -->
                     <div>
                         <label class="text-sm text-gray-600">Nama</label>
-                        <input type="text" name="name"
-                               value="{{ old('name') }}"
-                               required
-                               class="w-full border rounded-lg px-4 py-3 mt-1 text-sm">
+
+                        <input
+                            type="text"
+                            name="name"
+                            value="{{ old('name') }}"
+                            required
+                            class="w-full border rounded-lg px-4 py-3 mt-1 text-sm @error('name') border-red-500 @enderror"
+                        >
+
+                        @error('name')
+                            <p class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
 
                     <!-- GENDER -->
@@ -134,19 +164,39 @@
                     <!-- EMAIL -->
                     <div>
                         <label class="text-sm text-gray-600">Email</label>
-                        <input type="email" name="email"
-                               value="{{ old('email') }}"
-                               required
-                               class="w-full border rounded-lg px-4 py-3 mt-1 text-sm">
+
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            required
+                            class="w-full border rounded-lg px-4 py-3 mt-1 text-sm @error('email') border-red-500 @enderror"
+                        >
+
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
 
                     <!-- PHONE -->
                     <div>
                         <label class="text-sm text-gray-600">No Telepon</label>
-                        <input type="text" name="phone"
-                               value="{{ old('phone') }}"
-                               required
-                               class="w-full border rounded-lg px-4 py-3 mt-1 text-sm">
+
+                        <input
+                            type="text"
+                            name="phone"
+                            value="{{ old('phone') }}"
+                            required
+                            class="w-full border rounded-lg px-4 py-3 mt-1 text-sm @error('phone') border-red-500 @enderror"
+                        >
+
+                        @error('phone')
+                            <p class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
 
                     <!-- AREA -->
@@ -172,34 +222,72 @@
                     <!-- PASSWORD -->
                     <div>
                         <label class="text-sm text-gray-600">Password</label>
-                        <input type="password" name="password"
-                               required
-                               class="w-full border rounded-lg px-4 py-3 mt-1 text-sm">
+
+                        <input
+                            type="password"
+                            name="password"
+                            required
+                            class="w-full border rounded-lg px-4 py-3 mt-1 text-sm @error('password') border-red-500 @enderror"
+                        >
+
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
 
                     <!-- CONFIRM -->
                     <div>
-                        <label class="text-sm text-gray-600">Konfirmasi Password</label>
-                        <input type="password" name="password_confirmation"
-                               required
-                               class="w-full border rounded-lg px-4 py-3 mt-1 text-sm">
+                        <label class="text-sm text-gray-600">
+                            Konfirmasi Password
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password_confirmation"
+                            required
+                            class="w-full border rounded-lg px-4 py-3 mt-1 text-sm"
+                        >
                     </div>
 
                     <!-- FILE -->
                     <div>
                         <label class="text-sm text-gray-600">Upload KTP</label>
-                        <input type="file" name="ktp" accept="image/*"
-                            onchange="validateImage(this)
-                               required
-                               class="w-full border rounded-lg p-2 mt-1 text-sm">
+
+                        <input
+                            type="file"
+                            name="ktp"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            onchange="validateImage(this)"
+                            required
+                            class="w-full border rounded-lg p-2 mt-1 text-sm @error('ktp') border-red-500 @enderror"
+                        >
+
+                        @error('ktp')
+                            <p class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
 
                     <div>
                         <label class="text-sm text-gray-600">Upload SKCK</label>
-                        <input type="file" name="skck" accept="image/*"
+
+                        <input
+                            type="file"
+                            name="skck"
+                            accept=".jpg,.jpeg,.png,.pdf"
                             onchange="validateImage(this)"
-                               required
-                               class="w-full border rounded-lg p-2 mt-1 text-sm">
+                            required
+                            class="w-full border rounded-lg p-2 mt-1 text-sm @error('skck') border-red-500 @enderror"
+                        >
+
+                        @error('skck')
+                            <p class="text-red-500 text-xs mt-1">
+                                {{ $message }}
+                            </p>
+                        @enderror
                     </div>
 
                 </div>

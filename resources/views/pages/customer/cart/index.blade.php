@@ -127,69 +127,171 @@
 
 
 <!-- ================= CHECKOUT MODAL ================= -->
-<div id="checkoutSheet" class="fixed inset-0 bg-black/40 hidden z-50 backdrop-blur-sm">
+<div id="checkoutSheet"
+    class="fixed inset-0 bg-black/50 hidden z-50 backdrop-blur-sm">
 
-    <div class="flex items-end md:items-center justify-center min-h-screen p-4">
+    <div class="flex items-end md:items-center justify-center h-screen pb-16 md:pb-0">
 
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden animate-fadeIn">
+        <!-- MODAL -->
+        <div class="
+            bg-white w-full md:max-w-2xl
+            rounded-t-3xl md:rounded-2xl
+            shadow-2xl
+            animate-fadeIn
+            max-h-[92vh]
+            flex flex-col
+        ">
+
+            <!-- HANDLE MOBILE -->
+            <div class="md:hidden flex justify-center pt-3">
+                <div class="w-14 h-1.5 rounded-full bg-gray-300"></div>
+            </div>
 
             <!-- HEADER -->
-            <div class="flex justify-between items-center px-5 py-4 border-b">
+            <div class="flex justify-between items-center px-4 py-4 border-b">
 
                 <h2 class="font-semibold text-lg text-gray-800">
                     Checkout
                 </h2>
 
-                <button onclick="closeCheckout()" class="text-gray-400 hover:text-gray-600 text-xl">
+                <button onclick="closeCheckout()"
+                    class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500">
                     ✕
                 </button>
 
             </div>
 
 
-            <!-- LIST LAYANAN -->
-            <div class="px-5 py-4 space-y-3 max-h-60 overflow-y-auto" id="checkoutItems">
-                <!-- 🔥 akan diisi via JS -->
+            <!-- CONTENT -->
+            <div class="flex-1 overflow-y-auto">
+
+                <!-- LIST LAYANAN -->
+                <div class="px-4 py-4 space-y-3" id="checkoutItems">
+                    <!-- isi via JS -->
+                </div>
+
+                <!-- FORM -->
+                <div class="px-4 pb-5 space-y-4">
+
+                    <!-- DATE TIME -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                        <div class="relative">
+                            <input type="date"
+                                id="service_date"
+                                class="w-full border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                        </div>
+
+                        <div class="relative">
+                            <input type="time"
+                                id="service_time"
+                                class="w-full border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                        </div>
+
+                    </div>
+
+
+                    <!-- PAYMENT -->
+                    <div class="space-y-3">
+
+                        <label class="
+                            flex items-center justify-between
+                            border rounded-2xl px-4 py-4
+                            cursor-pointer
+                            hover:border-teal-500
+                            transition
+                        ">
+
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">
+                                    Cash
+                                </p>
+
+                                <p class="text-xs text-gray-400">
+                                    Bayar langsung ditempat
+                                </p>
+                            </div>
+
+                            <input type="radio"
+                                name="payment_method"
+                                value="cash"
+                                class="w-4 h-4 accent-teal-600">
+
+                        </label>
+
+
+                        <label class="
+                            flex items-center justify-between
+                            border rounded-2xl px-4 py-4
+                            cursor-pointer
+                            hover:border-teal-500
+                            transition
+                        ">
+
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">
+                                    Transfer
+                                </p>
+
+                                <p class="text-xs text-gray-400">
+                                    Pembayaran online
+                                </p>
+                            </div>
+
+                            <input type="radio"
+                                name="payment_method"
+                                value="transfer"
+                                class="w-4 h-4 accent-teal-600">
+
+                        </label>
+
+                    </div>
+
+                </div>
+
             </div>
 
 
-            <!-- FORM -->
-            <div class="px-5 pb-5 space-y-4">
+            <!-- FOOTER -->
+            <div class="
+                border-t bg-white
+                px-4 py-4
+                sticky bottom-0
+                z-50
+                shadow-[0_-4px_12px_rgba(0,0,0,0.06)]
+                pb-[calc(1rem+env(safe-area-inset-bottom))]
+            ">
 
-                <!-- JADWAL -->
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="date" id="service_date"
-                        class="border rounded-xl px-3 py-2 text-sm">
-                    <input type="time" id="service_time"
-                        class="border rounded-xl px-3 py-2 text-sm">
-                </div>
+                <div class="flex items-center justify-between gap-4">
 
-                <!-- PAYMENT -->
-                <div class="space-y-2">
-                    <label class="flex justify-between border rounded-xl p-3 text-sm cursor-pointer">
-                        Cash
-                        <input type="radio" name="payment_method" value="cash">
-                    </label>
+                    <div class="min-w-0">
 
-                    <label class="flex justify-between border rounded-xl p-3 text-sm cursor-pointer">
-                        Transfer
-                        <input type="radio" name="payment_method" value="transfer">
-                    </label>
-                </div>
+                        <p class="text-xs text-gray-400">
+                            Total Bayar
+                        </p>
 
-                <!-- TOTAL -->
-                <div class="bg-gray-100 rounded-xl p-4 flex justify-between items-center">
-
-                    <div>
-                        <p class="text-xs text-gray-500">Total Bayar</p>
-                        <p id="checkoutTotal" class="text-lg font-semibold text-teal-700">
+                        <p id="checkoutTotal"
+                            class="text-xl font-bold text-teal-700 truncate">
                             Rp 0
                         </p>
+
                     </div>
 
                     <button onclick="confirmCheckout()"
-                        class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-xl text-sm">
+                        class="
+                            bg-teal-600 hover:bg-teal-700
+                            active:scale-95
+                            transition
+                            text-white
+                            px-6 py-3
+                            rounded-2xl
+                            text-sm font-medium
+                            whitespace-nowrap
+                            shadow-md
+                        ">
+
                         Checkout
+
                     </button>
 
                 </div>

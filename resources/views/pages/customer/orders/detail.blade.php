@@ -56,86 +56,251 @@
     <!-- ================= MAIN ================= -->
     <div class="lg:col-span-2 space-y-6">
 
-        <!-- STATUS CARD -->
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-6 text-center">
+        <!-- ================= STATUS CARD ================= -->
 
-            <div id="status-icon" class="text-4xl mb-3">
-                @if($order->payment_method === 'cash')
-                    💰
-                @elseif($order->payment_status === 'verified')
-                    ✔
-                @else
-                    ⏳
-                @endif
+        @php
+
+            $statusTitle = '';
+            $statusDesc  = '';
+            $statusIcon  = '';
+            $statusClass = '';
+
+            switch($order->order_status){
+
+                case 'completed':
+
+                    $statusTitle = 'Layanan Selesai';
+                    $statusDesc  = 'Terima kasih telah menggunakan layanan kami';
+                    $statusIcon  = '🎉';
+                    $statusClass = '
+                        bg-gradient-to-r
+                        from-emerald-600
+                        to-teal-700
+                    ';
+                break;
+
+
+                case 'ongoing':
+
+                    $statusTitle = 'Layanan Sedang Berjalan';
+                    $statusDesc  = 'Therapist sedang melakukan layanan';
+                    $statusIcon  = '💆';
+                    $statusClass = '
+                        bg-gradient-to-r
+                        from-teal-600
+                        to-teal-800
+                    ';
+                break;
+
+
+                case 'assigned':
+
+                    $statusTitle = 'Therapist Sedang Menuju Lokasi';
+                    $statusDesc  = 'Therapist sedang dalam perjalanan';
+                    $statusIcon  = '🚗';
+                    $statusClass = '
+                        bg-gradient-to-r
+                        from-teal-700
+                        to-emerald-700
+                    ';
+                break;
+
+
+                case 'ready':
+
+                    $statusTitle = 'Pesanan Siap Diproses';
+                    $statusDesc  = 'Menunggu therapist mengambil pesanan';
+                    $statusIcon  = '📦';
+                    $statusClass = '
+                        bg-gradient-to-r
+                        from-slate-700
+                        to-slate-800
+                    ';
+                break;
+
+
+                default:
+
+                    if($order->payment_status === 'verified'){
+
+                        $statusTitle = 'Pembayaran Berhasil';
+                        $statusDesc  = 'Pesanan sedang diproses';
+                        $statusIcon  = '✔';
+                        $statusClass = '
+                            bg-gradient-to-r
+                            from-teal-700
+                            to-emerald-700
+                        ';
+                    }else{
+
+                        $statusTitle = 'Menunggu Pembayaran';
+                        $statusDesc  = 'Silakan selesaikan pembayaran';
+                        $statusIcon  = '⏳';
+                        $statusClass = '
+                            bg-gradient-to-r
+                            from-gray-700
+                            to-gray-900
+                        ';                    }
+                break;
+            }
+
+        @endphp
+
+
+        <div class="{{ $statusClass  }} rounded-3xl shadow-lg overflow-hidden">
+
+            <div class="p-8 text-white text-center">
+
+                <div class="text-6xl mb-4 animate-bounce">
+
+                    {{ $statusIcon }}
+
+                </div>
+
+                <h2 class="text-2xl font-bold">
+
+                    {{ $statusTitle }}
+
+                </h2>
+
+                <p class="text-white/80 mt-2">
+
+                    {{ $statusDesc }}
+
+                </p>
+
             </div>
-
-            <h2 id="status-title" class="text-lg font-semibold text-gray-800">
-                @if($order->payment_method === 'cash')
-                    Pembayaran di Tempat
-                @elseif($order->payment_status === 'verified')
-                    Pembayaran Berhasil
-                @else
-                    Menunggu Pembayaran
-                @endif
-            </h2>
-
-            <p id="status-desc" class="text-sm text-gray-400 mt-1">
-                @if($order->payment_method === 'cash')
-                    Silakan bayar langsung ke terapis
-                @elseif($order->payment_status === 'verified')
-                    Pesanan sedang diproses
-                @else
-                    Menunggu pembayaran
-                @endif
-            </p>
 
         </div>
 
+        <!-- ================= TRACKING ================= -->
 
-        <!-- TRACKING -->
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-6">
+        @php
 
-            <h3 class="font-semibold mb-6 text-gray-800">
-                Tracking Pesanan
-            </h3>
+            $steps = [
 
-            <div class="flex items-center justify-between">
+                'waiting'   => 'Order Dibuat',
+                'verified'  => 'Pembayaran',
+                'ready'     => 'Siap',
+                'assigned'  => 'Terapis Berangkat',
+                'ongoing'   => 'Sedang Berjalan',
+                'completed' => 'Selesai'
+            ];
+
+
+            // ======================
+            // CURRENT STATUS
+            // ======================
+
+            if($order->order_status == 'completed'){
+
+                $current = 'completed';
+
+            }elseif($order->order_status == 'ongoing'){
+
+                $current = 'ongoing';
+
+            }elseif($order->order_status == 'assigned'){
+
+                $current = 'assigned';
+
+            }elseif($order->order_status == 'ready'){
+
+                $current = 'ready';
+
+            }elseif($order->payment_status == 'verified'){
+
+                $current = 'verified';
+
+            }else{
+
+                $current = 'waiting';
+            }
+
+            $keys = array_keys($steps);
+
+            $currentIndex = array_search($current, $keys);
+
+        @endphp
+
+
+        <div class="bg-white rounded-3xl shadow-sm hover:shadow-lg transition p-6">
+
+            <div class="flex items-center justify-between gap-2 overflow-x-auto">
 
                 @foreach($steps as $key => $label)
 
                 @php
+
                     $index = array_search($key, $keys);
+
                     $isDone = $index < $currentIndex;
+
                     $isActive = $index === $currentIndex;
+
                 @endphp
 
-                <div class="flex-1 flex items-center">
+                <div class="flex items-center flex-1 min-w-[90px]">
 
                     <div class="flex flex-col items-center w-full text-center">
 
-                        <div 
-                            class="w-9 h-9 rounded-full flex items-center justify-center text-xs step
-                            {{ $isDone ? 'bg-green-500 text-white' : '' }}
-                            {{ $isActive ? 'bg-teal-600 text-white animate-pulse' : '' }}
-                            {{ (!$isDone && !$isActive) ? 'bg-gray-200 text-gray-400' : '' }}"
-                            data-step="{{ $key }}"
+                        <!-- ICON -->
+                        <div
+                            class="
+                                w-12 h-12 rounded-full flex items-center justify-center
+                                text-sm font-bold transition-all duration-300
+
+                                {{ $isDone ? 'bg-teal-600 text-white shadow-lg' : '' }}
+
+                                {{ $isActive ? 'bg-emerald-700 text-white scale-110 shadow-xl animate-pulse' : '' }}
+
+                                {{ (!$isDone && !$isActive) ? 'bg-gray-200 text-gray-400' : '' }}
+                            "
                         >
-                            @if($isDone) ✓
-                            @elseif($isActive) ●
-                            @else ○
+
+                            @if($isDone)
+
+                                ✓
+
+                            @elseif($isActive)
+
+                                ●
+
+                            @else
+
+                                ○
+
                             @endif
+
                         </div>
 
-                        <p class="text-xs mt-2 text-gray-500">
+                        <!-- LABEL -->
+                        <p class="
+                            text-xs mt-3 leading-tight
+
+                            {{ $isActive
+                                ? 'text-teal-700 font-semibold'
+                                : 'text-gray-500'
+                            }}
+                        ">
+
                             {{ $label }}
+
                         </p>
 
                     </div>
 
                     @if(!$loop->last)
-                    <div class="flex-1 h-1 mx-2
-                        {{ $index < $currentIndex ? 'bg-green-500' : 'bg-gray-200' }}">
-                    </div>
+
+                    <div class="
+                        flex-1 h-1 rounded-full mx-2
+
+                        {{ $index < $currentIndex
+                            ? 'bg-green-500'
+                            : 'bg-gray-200'
+                        }}
+                    "></div>
+
                     @endif
 
                 </div>
@@ -174,6 +339,92 @@
             </div>
 
         </div>
+
+        {{-- ================= TERAPIS ================= --}}
+        @if($order->terapis)
+
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5">
+
+            <div class="flex items-start justify-between gap-4">
+
+                <div class="flex items-start gap-4">
+
+                    {{-- FOTO --}}
+                    <img
+                        src="{{ $order->terapis->user->foto
+                            ? asset('storage/'.$order->terapis->user->foto)
+                            : 'https://ui-avatars.com/api/?name='.urlencode($order->terapis->user->name) }}"
+                        class="w-16 h-16 rounded-2xl object-cover border"
+                    >
+
+                    <div>
+
+                        <h3 class="font-semibold text-gray-800 text-lg">
+
+                            {{ $order->terapis->user->name }}
+
+                        </h3>
+
+                        <p class="text-sm text-gray-400 mt-1">
+                            Terapis Professional
+                        </p>
+
+                        {{-- RATING --}}
+                        <div class="flex items-center gap-2 mt-2">
+
+                            <span class="text-yellow-500">
+                                ⭐
+                            </span>
+
+                            <span class="font-semibold text-gray-700">
+
+                                {{ round($order->terapis->user->reviewsReceived()->avg('rating') ?? 0, 1) }}
+
+                            </span>
+
+                            <span class="text-xs text-gray-400">
+
+                                ({{ $order->terapis->user->reviewsReceived()->count() }} ulasan)
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- BUTTON --}}
+                @php
+
+                    $alreadyReviewed = \App\Models\TherapistReview::where('customer_id', auth()->id())
+                        ->where('therapist_id', $order->terapis->user->id)
+                        ->exists();
+
+                @endphp
+
+                @if(
+                    $order->order_status === 'completed'
+                    && !$alreadyReviewed
+                )
+
+                <button
+                    onclick="openReviewModal()"
+                    class="bg-yellow-500 hover:bg-yellow-600 transition text-white px-4 py-2 rounded-xl text-sm font-medium"
+                >
+
+                    ⭐ Rating
+
+                </button>
+
+                @endif
+
+            </div>
+
+        </div>
+
+        @endif
 
 
         <!-- SERVICES -->
@@ -257,6 +508,98 @@
     </div>
 
 </div>
+
+{{-- ================= REVIEW MODAL ================= --}}
+<div
+    id="reviewModal"
+    class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4"
+>
+
+    <div class="bg-white rounded-3xl w-full max-w-md p-6 relative animate-fadeIn">
+
+        {{-- CLOSE --}}
+        <button
+            onclick="closeReviewModal()"
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
+        >
+            ✕
+        </button>
+
+        <h2 class="text-xl font-bold text-gray-800 mb-1">
+            Beri Rating Terapis
+        </h2>
+
+        <p class="text-sm text-gray-400 mb-6">
+            Bagikan pengalaman layanan Anda
+        </p>
+
+        <form
+            action="{{ route('customer.review.store', $order->id) }}"
+            method="POST"
+            class="space-y-5"
+        >
+
+            @csrf
+
+            {{-- STAR --}}
+            <div class="text-center">
+
+                <div class="flex justify-center gap-2 text-4xl">
+
+                    @for($i=1; $i<=5; $i++)
+
+                    <button
+                        type="button"
+                        class="star text-gray-300 transition hover:scale-110"
+                        data-value="{{ $i }}"
+                    >
+                        ★
+                    </button>
+
+                    @endfor
+
+                </div>
+
+                <input
+                    type="hidden"
+                    name="rating"
+                    id="ratingInput"
+                    required
+                >
+
+            </div>
+
+            {{-- REVIEW --}}
+            <div>
+
+                <textarea
+                    name="review"
+                    rows="4"
+                    required
+                    maxlength="500"
+                    placeholder="Tulis pengalaman Anda..."
+                    class="w-full border rounded-2xl p-4 focus:ring-2 focus:ring-teal-500 outline-none"
+                ></textarea>
+
+            </div>
+
+            {{-- BUTTON --}}
+            <button
+                type="submit"
+                class="w-full bg-teal-600 hover:bg-teal-700 transition text-white py-3 rounded-2xl font-medium"
+            >
+
+                Kirim Review
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
 
 @endsection
 
@@ -363,5 +706,57 @@ function handleActionVisibility(data){
     }
 
 }
+
+function openReviewModal(){
+
+    document.getElementById('reviewModal')
+        .classList.remove('hidden');
+
+    document.getElementById('reviewModal')
+        .classList.add('flex');
+}
+
+function closeReviewModal(){
+
+    document.getElementById('reviewModal')
+        .classList.add('hidden');
+
+    document.getElementById('reviewModal')
+        .classList.remove('flex');
+}
+
+
+/* ================= STAR RATING ================= */
+
+const stars = document.querySelectorAll('.star');
+const ratingInput = document.getElementById('ratingInput');
+
+stars.forEach(star => {
+
+    star.addEventListener('click', () => {
+
+        const value = star.dataset.value;
+
+        ratingInput.value = value;
+
+        stars.forEach(s => {
+
+            if(s.dataset.value <= value){
+
+                s.classList.remove('text-gray-300');
+                s.classList.add('text-yellow-400');
+
+            }else{
+
+                s.classList.remove('text-yellow-400');
+                s.classList.add('text-gray-300');
+            }
+
+        });
+
+    });
+
+});
+
 </script>
 @endpush
