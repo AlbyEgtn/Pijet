@@ -15,6 +15,7 @@ use Midtrans\Config;
 use Midtrans\Snap;
 use App\Models\WalletTransaction;
 use App\Observers\WalletTransactionObserver;
+use App\Models\Report;
 
 class OrderController extends Controller
 {

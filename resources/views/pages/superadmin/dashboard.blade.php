@@ -321,4 +321,55 @@
 
 </div>
 
+
+<!-- SCRIPT -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// COUNTER ANIMATION
+document.querySelectorAll('.counter').forEach(counter => {
+    let update = () => {
+        let target = +counter.getAttribute('data-target');
+        let count = +counter.innerText;
+        let inc = target / 40;
+
+        if(count < target){
+            counter.innerText = Math.ceil(count + inc);
+            setTimeout(update, 20);
+        } else {
+            counter.innerText = target;
+        }
+    };
+    update();
+});
+
+// CHART (REAL DATA)
+new Chart(document.getElementById('chart'), {
+    type: 'line',
+    data: {
+        labels: @json($months),
+        datasets: [{
+            label: 'Revenue',
+            data: @json($revenues),
+            borderWidth: 3,
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4
+        }]
+    },
+    options: {
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: {
+                ticks: {
+                    callback: value => 'Rp ' + value.toLocaleString()
+                }
+            }
+        }
+    }
+});
+</script>
+
 @endsection
