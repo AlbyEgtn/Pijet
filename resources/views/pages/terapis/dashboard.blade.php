@@ -294,7 +294,7 @@
                 <div class="text-center py-16">
 
                     <div class="text-5xl mb-3">
-                        📦
+                        
                     </div>
 
                     <p class="text-gray-500 font-medium">
@@ -359,7 +359,7 @@
                     </span>
 
                     <span class="font-medium text-gray-700">
-                        {{ $terapis->whatsapp ?? '-' }}
+                        {{ $user->phone ?? '-' }}
                     </span>
 
                 </div>

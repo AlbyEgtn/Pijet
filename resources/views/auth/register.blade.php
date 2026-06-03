@@ -83,7 +83,7 @@
 
                     <!-- NIK -->
                     <div>
-                        <label class="text-sm text-gray-600">NIK KTP</label>
+                        <label class="text-sm text-gray-600">NIK</label>
                         <input type="text" name="nik"
                                value="{{ old('nik') }}"
                                required
@@ -234,5 +234,380 @@
     </div>
 
 </div>
+
+@push('scripts')
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const form = document.querySelector('form');
+
+    function setError(field, message) {
+
+        field.classList.add('border-red-500');
+
+        let error = field.parentElement.querySelector('.js-error');
+
+        if (!error) {
+
+            error = document.createElement('p');
+            error.className = 'js-error text-red-500 text-xs mt-1';
+
+            field.parentElement.appendChild(error);
+        }
+
+        error.textContent = message;
+    }
+
+    function clearError(field) {
+
+        field.classList.remove('border-red-500');
+
+        const error = field.parentElement.querySelector('.js-error');
+
+        if (error) {
+            error.remove();
+        }
+    }
+
+    // ========================
+    // NIK
+    // ========================
+
+    const nik = document.querySelector('[name="nik"]');
+
+    nik.setAttribute('maxlength', '16');
+
+    nik.addEventListener('input', function () {
+
+        this.value = this.value.replace(/\D/g, '');
+
+        validateNik();
+    });
+
+    function validateNik() {
+
+        if (nik.value.trim() === '') {
+
+            setError(nik, 'NIK wajib diisi');
+            return false;
+        }
+
+        if (nik.value.length !== 16) {
+
+            setError(nik, 'NIK harus 16 digit');
+            return false;
+        }
+
+        clearError(nik);
+        return true;
+    }
+
+    // ========================
+    // NAMA
+    // ========================
+
+    const name = document.querySelector('[name="name"]');
+
+    name.addEventListener('input', validateName);
+
+    function validateName() {
+
+        if (name.value.trim() === '') {
+
+            setError(name, 'Nama wajib diisi');
+            return false;
+        }
+
+        clearError(name);
+        return true;
+    }
+
+    // ========================
+    // EMAIL
+    // ========================
+
+    const email = document.querySelector('[name="email"]');
+
+    email.addEventListener('input', validateEmail);
+
+    function validateEmail() {
+
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (email.value.trim() === '') {
+
+            setError(email, 'Email wajib diisi');
+            return false;
+        }
+
+        if (!regex.test(email.value)) {
+
+            setError(email, 'Format email tidak valid');
+            return false;
+        }
+
+        clearError(email);
+        return true;
+    }
+
+    // ========================
+    // PHONE
+    // ========================
+
+    const phone = document.querySelector('[name="phone"]');
+
+    phone.addEventListener('input', function () {
+
+        this.value = this.value.replace(/[^\d]/g, '');
+
+        validatePhone();
+    });
+
+    function validatePhone() {
+
+        if (phone.value.trim() === '') {
+
+            setError(phone, 'Nomor telepon wajib diisi');
+            return false;
+        }
+
+        if (phone.value.length < 10) {
+
+            setError(phone, 'Nomor telepon tidak valid');
+            return false;
+        }
+
+        clearError(phone);
+        return true;
+    }
+
+    // ========================
+    // GENDER
+    // ========================
+
+    function validateGender() {
+
+        const gender =
+            document.querySelector('input[name="gender"]:checked');
+
+        if (!gender) {
+
+            const container =
+                document.querySelector('input[name="gender"]').closest('div');
+
+            let error = container.querySelector('.gender-error');
+
+            if (!error) {
+
+                error = document.createElement('p');
+                error.className =
+                    'gender-error text-red-500 text-xs mt-2';
+
+                container.appendChild(error);
+            }
+
+            error.textContent =
+                'Jenis kelamin wajib dipilih';
+
+            return false;
+        }
+
+        const oldError =
+            document.querySelector('.gender-error');
+
+        if (oldError) {
+            oldError.remove();
+        }
+
+        return true;
+    }
+
+    // ========================
+    // TANGGAL LAHIR
+    // ========================
+
+    const birthDate =
+        document.querySelector('[name="birth_date"]');
+
+    birthDate.addEventListener('change', validateBirthDate);
+
+    function validateBirthDate() {
+
+        if (birthDate.value === '') {
+
+            setError(
+                birthDate,
+                'Tanggal lahir wajib diisi'
+            );
+
+            return false;
+        }
+
+        clearError(birthDate);
+
+        return true;
+    }
+
+    // ========================
+    // KOTA
+    // ========================
+
+    const city =
+        document.querySelector('[name="city_id"]');
+
+    city.addEventListener('change', validateCity);
+
+    function validateCity() {
+
+        if (city.value === '') {
+
+            setError(city, 'Kota wajib dipilih');
+            return false;
+        }
+
+        clearError(city);
+
+        return true;
+    }
+
+    // ========================
+    // ALAMAT
+    // ========================
+
+    const address =
+        document.querySelector('[name="address"]');
+
+    address.addEventListener('input', validateAddress);
+
+    function validateAddress() {
+
+        if (address.value.trim() === '') {
+
+            setError(
+                address,
+                'Alamat wajib diisi'
+            );
+
+            return false;
+        }
+
+        clearError(address);
+
+        return true;
+    }
+
+    // ========================
+    // PASSWORD
+    // ========================
+
+    const password =
+        document.querySelector('[name="password"]');
+
+    password.addEventListener('input', validatePassword);
+
+    function validatePassword() {
+
+        if (password.value === '') {
+
+            setError(
+                password,
+                'Password wajib diisi'
+            );
+
+            return false;
+        }
+
+        if (password.value.length < 6) {
+
+            setError(
+                password,
+                'Password minimal 6 karakter'
+            );
+
+            return false;
+        }
+
+        clearError(password);
+
+        return true;
+    }
+
+    // ========================
+    // CONFIRM PASSWORD
+    // ========================
+
+    const confirmPassword =
+        document.querySelector(
+            '[name="password_confirmation"]'
+        );
+
+    confirmPassword.addEventListener(
+        'input',
+        validateConfirmPassword
+    );
+
+    function validateConfirmPassword() {
+
+        if (confirmPassword.value === '') {
+
+            setError(
+                confirmPassword,
+                'Konfirmasi password wajib diisi'
+            );
+
+            return false;
+        }
+
+        if (
+            password.value !==
+            confirmPassword.value
+        ) {
+
+            setError(
+                confirmPassword,
+                'Konfirmasi password tidak cocok'
+            );
+
+            return false;
+        }
+
+        clearError(confirmPassword);
+
+        return true;
+    }
+
+    // ========================
+    // SUBMIT
+    // ========================
+
+    form.addEventListener('submit', function (e) {
+
+        const valid =
+            validateNik() &&
+            validateName() &&
+            validateEmail() &&
+            validatePhone() &&
+            validateGender() &&
+            validateBirthDate() &&
+            validateCity() &&
+            validateAddress() &&
+            validatePassword() &&
+            validateConfirmPassword();
+
+        if (!valid) {
+
+            e.preventDefault();
+
+        }
+
+    });
+
+});
+
+</script>
+
+@endpush
 
 @endsection

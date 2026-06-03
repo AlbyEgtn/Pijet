@@ -141,11 +141,14 @@ class FinanceHelper
 
     public static function payCompanyFee(Transaction $order)
     {
-        Log::info('PAY COMPANY FEE', [
+        \Log::info('PAY COMPANY FEE START', [
             'order_id' => $order->id
         ]);
 
         if ($order->is_company_paid) {
+
+            \Log::info('ALREADY PAID');
+
             return;
         }
 
@@ -155,9 +158,9 @@ class FinanceHelper
 
             $amount = $order->company_income;
 
-            if (!$amount || $amount <= 0) {
-                throw new \Exception('Invalid company income');
-            }
+            \Log::info('AMOUNT', [
+                'amount' => $amount
+            ]);
 
             self::addBalance(
                 $companyWallet,
@@ -166,10 +169,21 @@ class FinanceHelper
                 'Pembayaran Hutang Terapis'
             );
 
-            $order->updateQuietly([
-                'is_company_paid' => true,
+            $updated = $order->update([
+                'is_company_paid' => 1,
                 'company_paid_at' => now()
             ]);
+
+            \Log::info('UPDATE RESULT', [
+                'updated' => $updated
+            ]);
+
+            $order->refresh();
+
+            \Log::info('AFTER UPDATE', [
+                'paid' => $order->is_company_paid
+            ]);
+
         });
     }
 

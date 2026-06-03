@@ -23,12 +23,17 @@ class LoginController extends Controller
 
             $user = Auth::user();
 
-            if ($user->role === 'terapis' && $user->verification_status !== 'approved') {
+            if ($user->role === 'terapis') {
 
-                Auth::logout(); // paksa logout
+                if ($user->verification_status === 'pending') {
+                    return redirect()->route('therapist.pending');
+                }
 
-                return redirect('/login')
-                    ->with('error','Akun terapis belum disetujui admin');
+                if ($user->verification_status === 'rejected') {
+                    return redirect()->route('therapist.rejected');
+                }
+
+                return redirect()->route('terapis.dashboard');
             }
 
             switch ($user->role) {

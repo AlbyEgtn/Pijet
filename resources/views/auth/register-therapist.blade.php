@@ -325,10 +325,13 @@
 </div>
 
 <script>
+
 function showToast(message) {
+
     const toast = document.createElement('div');
 
     toast.innerText = message;
+
     toast.className = `
         fixed top-5 right-5 z-50
         bg-red-500 text-white px-4 py-2
@@ -343,19 +346,441 @@ function showToast(message) {
     }, 3000);
 }
 
+// ===============================
+// FILE VALIDATION
+// ===============================
+
 function validateImage(input) {
+
     const file = input.files[0];
 
-    if (!file) return;
+    if (!file) return true;
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+    const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/jpg',
+        'application/pdf'
+    ];
+
+    const maxSize = 2 * 1024 * 1024;
 
     if (!allowedTypes.includes(file.type)) {
-        showToast('Hanya file gambar (JPG, JPEG, PNG) atau PDF yang diperbolehkan');
 
-        input.value = ''; // reset file
+        showToast(
+            'Hanya file JPG, JPEG, PNG atau PDF yang diperbolehkan'
+        );
+
+        input.value = '';
+
+        return false;
     }
+
+    if (file.size > maxSize) {
+
+        showToast(
+            'Ukuran file maksimal 2 MB'
+        );
+
+        input.value = '';
+
+        return false;
+    }
+
+    return true;
 }
+
+// ===============================
+// FORM VALIDATION
+// ===============================
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const form = document.querySelector('form');
+
+    function setError(field, message) {
+
+        field.classList.add('border-red-500');
+
+        let error =
+            field.parentElement.querySelector('.js-error');
+
+        if (!error) {
+
+            error = document.createElement('p');
+
+            error.className =
+                'js-error text-red-500 text-xs mt-1';
+
+            field.parentElement.appendChild(error);
+        }
+
+        error.textContent = message;
+    }
+
+    function clearError(field) {
+
+        field.classList.remove('border-red-500');
+
+        const error =
+            field.parentElement.querySelector('.js-error');
+
+        if (error) {
+
+            error.remove();
+        }
+    }
+
+    // ===========================
+    // ELEMENTS
+    // ===========================
+
+    const nik =
+        document.querySelector('[name="nik"]');
+
+    const name =
+        document.querySelector('[name="name"]');
+
+    const email =
+        document.querySelector('[name="email"]');
+
+    const phone =
+        document.querySelector('[name="phone"]');
+
+    const birthDate =
+        document.querySelector('[name="birth_date"]');
+
+    const city =
+        document.querySelector('[name="city_id"]');
+
+    const password =
+        document.querySelector('[name="password"]');
+
+    const confirmPassword =
+        document.querySelector(
+            '[name="password_confirmation"]'
+        );
+
+    const ktp =
+        document.querySelector('[name="ktp"]');
+
+    const skck =
+        document.querySelector('[name="skck"]');
+
+    // ===========================
+    // NIK
+    // ===========================
+
+    nik.addEventListener('input', function () {
+
+        this.value =
+            this.value.replace(/\D/g, '');
+
+        validateNik();
+    });
+
+    function validateNik() {
+
+        if (nik.value.trim() === '') {
+
+            setError(nik, 'NIK wajib diisi');
+            return false;
+        }
+
+        if (nik.value.length !== 16) {
+
+            setError(
+                nik,
+                'NIK harus 16 digit'
+            );
+
+            return false;
+        }
+
+        clearError(nik);
+
+        return true;
+    }
+
+    // ===========================
+    // NAME
+    // ===========================
+
+    name.addEventListener(
+        'input',
+        validateName
+    );
+
+    function validateName() {
+
+        if (name.value.trim() === '') {
+
+            setError(
+                name,
+                'Nama wajib diisi'
+            );
+
+            return false;
+        }
+
+        clearError(name);
+
+        return true;
+    }
+
+    // ===========================
+    // EMAIL
+    // ===========================
+
+    email.addEventListener(
+        'input',
+        validateEmail
+    );
+
+    function validateEmail() {
+
+        const regex =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (email.value.trim() === '') {
+
+            setError(
+                email,
+                'Email wajib diisi'
+            );
+
+            return false;
+        }
+
+        if (!regex.test(email.value)) {
+
+            setError(
+                email,
+                'Format email tidak valid'
+            );
+
+            return false;
+        }
+
+        clearError(email);
+
+        return true;
+    }
+
+    // ===========================
+    // PHONE
+    // ===========================
+
+    phone.addEventListener(
+        'input',
+        function () {
+
+            this.value =
+                this.value.replace(/[^\d]/g, '');
+
+            validatePhone();
+        }
+    );
+
+    function validatePhone() {
+
+        if (phone.value.trim() === '') {
+
+            setError(
+                phone,
+                'Nomor telepon wajib diisi'
+            );
+
+            return false;
+        }
+
+        if (phone.value.length < 10) {
+
+            setError(
+                phone,
+                'Nomor telepon tidak valid'
+            );
+
+            return false;
+        }
+
+        clearError(phone);
+
+        return true;
+    }
+
+    // ===========================
+    // GENDER
+    // ===========================
+
+    function validateGender() {
+
+        const gender =
+            document.querySelector(
+                'input[name="gender"]:checked'
+            );
+
+        if (!gender) {
+
+            showToast(
+                'Jenis kelamin wajib dipilih'
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    // ===========================
+    // BIRTH DATE
+    // ===========================
+
+    function validateBirthDate() {
+
+        if (birthDate.value === '') {
+
+            setError(
+                birthDate,
+                'Tanggal lahir wajib diisi'
+            );
+
+            return false;
+        }
+
+        clearError(birthDate);
+
+        return true;
+    }
+
+    // ===========================
+    // CITY
+    // ===========================
+
+    function validateCity() {
+
+        if (city.value === '') {
+
+            setError(
+                city,
+                'Area kerja wajib dipilih'
+            );
+
+            return false;
+        }
+
+        clearError(city);
+
+        return true;
+    }
+
+    // ===========================
+    // PASSWORD
+    // ===========================
+
+    function validatePassword() {
+
+        if (password.value === '') {
+
+            setError(
+                password,
+                'Password wajib diisi'
+            );
+
+            return false;
+        }
+
+        if (password.value.length < 6) {
+
+            setError(
+                password,
+                'Password minimal 6 karakter'
+            );
+
+            return false;
+        }
+
+        clearError(password);
+
+        return true;
+    }
+
+    // ===========================
+    // CONFIRM PASSWORD
+    // ===========================
+
+    function validateConfirmPassword() {
+
+        if (
+            confirmPassword.value === ''
+        ) {
+
+            setError(
+                confirmPassword,
+                'Konfirmasi password wajib diisi'
+            );
+
+            return false;
+        }
+
+        if (
+            password.value !==
+            confirmPassword.value
+        ) {
+
+            setError(
+                confirmPassword,
+                'Konfirmasi password tidak cocok'
+            );
+
+            return false;
+        }
+
+        clearError(confirmPassword);
+
+        return true;
+    }
+
+    // ===========================
+    // FILES
+    // ===========================
+
+    ktp.addEventListener('change', function () {
+        validateImage(this);
+    });
+
+    skck.addEventListener('change', function () {
+        validateImage(this);
+    });
+
+    // ===========================
+    // SUBMIT
+    // ===========================
+
+    form.addEventListener(
+        'submit',
+        function (e) {
+
+            const valid =
+                validateNik() &&
+                validateName() &&
+                validateEmail() &&
+                validatePhone() &&
+                validateGender() &&
+                validateBirthDate() &&
+                validateCity() &&
+                validatePassword() &&
+                validateConfirmPassword();
+
+            if (!valid) {
+
+                e.preventDefault();
+            }
+        }
+    );
+
+});
+
 </script>
 
 <style>

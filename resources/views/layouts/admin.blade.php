@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- ALPINE -->
-    <script src="//unpkg.com/alpinejs" defer></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- APP CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
@@ -83,117 +83,189 @@
         </div>
 
 
-        <!-- ================= MENU ================= -->
-        <nav class="
-            flex-1
-            px-4 py-6
-            space-y-2
-        ">
+    <!-- ================= MENU ================= -->
+    <nav class="flex-1 px-4 py-6 space-y-2 text-sm">
 
-            <!-- DASHBOARD -->
-            <a href="{{ route('admin.dashboard') }}"
+        <!-- DASHBOARD -->
+        <a href="{{ route('admin.dashboard') }}"
+            class="
+                block px-4 py-3 rounded-2xl transition-all duration-200
+                {{ request()->routeIs('admin.dashboard')
+                    ? 'bg-white text-teal-700 font-semibold shadow-sm'
+                    : 'text-white/90 hover:bg-white/10'
+                }}
+            ">
+            Dashboard
+        </a>
+
+        <!-- ================= ORDER ================= -->
+        @php
+            $orderActive = request()->routeIs('admin.orders.*');
+        @endphp
+
+        <div
+            x-data="{ open: {{ $orderActive ? 'true' : 'false' }} }"
+            class="space-y-2"
+        >
+
+            <button
+                @click="open = !open"
                 class="
-                    block
-                    px-4 py-3
-                    rounded-2xl
-                    text-sm
-                    transition-all duration-200
-
-                    {{ request()->routeIs('admin.dashboard')
+                    w-full flex items-center justify-between
+                    px-4 py-3 rounded-2xl transition-all duration-200
+                    {{ $orderActive
                         ? 'bg-white text-teal-700 font-semibold shadow-sm'
                         : 'text-white/90 hover:bg-white/10'
                     }}
-                ">
+                "
+            >
 
-                Dashboard
+                <span>Pesanan</span>
 
-            </a>
+                <svg
+                    class="w-4 h-4 transition-transform duration-200"
+                    :class="open ? 'rotate-180' : ''"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                    />
+                </svg>
 
+            </button>
 
-            <!-- ORDER -->
-            <a href="{{ route('admin.orders.status') }}"
+            <div
+                x-show="open"
+                x-transition
+                class="space-y-1 pl-3"
+            >
+
+                <a href="{{ route('admin.orders.status') }}"
+                    class="block px-4 py-2 rounded-xl transition hover:bg-white/10">
+                    Status Order
+                </a>
+
+                <a href="{{ route('admin.orders.waiting') }}"
+                    class="block px-4 py-2 rounded-xl transition hover:bg-white/10">
+                    Menunggu
+                </a>
+
+                <a href="{{ route('admin.orders.finished') }}"
+                    class="block px-4 py-2 rounded-xl transition hover:bg-white/10">
+                    Selesai
+                </a>
+
+                <a href="{{ route('admin.orders.reschedule') }}"
+                    class="block px-4 py-2 rounded-xl transition hover:bg-white/10">
+                    Reschedule
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- CUSTOMER -->
+        <a href="{{ route('admin.customer.index') }}"
+            class="
+                block px-4 py-3 rounded-2xl transition-all duration-200
+                {{ request()->routeIs('admin.customer.*')
+                    ? 'bg-white text-teal-700 font-semibold shadow-sm'
+                    : 'text-white/90 hover:bg-white/10'
+                }}
+            ">
+            Pelanggan
+        </a>
+
+        <!-- ================= TERAPIS ================= -->
+        @php
+            $terapisActive = request()->routeIs('admin.therapist.*');
+        @endphp
+
+        <div
+            x-data="{ open: {{ $terapisActive ? 'true' : 'false' }} }"
+            class="space-y-2"
+        >
+
+            <button
+                @click="open = !open"
                 class="
-                    block
-                    px-4 py-3
-                    rounded-2xl
-                    text-sm
-                    transition-all duration-200
-
-                    {{ request()->routeIs('admin.orders.*')
+                    w-full flex items-center justify-between
+                    px-4 py-3 rounded-2xl transition-all duration-200
+                    {{ $terapisActive
                         ? 'bg-white text-teal-700 font-semibold shadow-sm'
                         : 'text-white/90 hover:bg-white/10'
                     }}
-                ">
+                "
+            >
 
-                Pesanan
+                <span>Data Terapis</span>
 
-            </a>
+                <svg
+                    class="w-4 h-4 transition-transform duration-200"
+                    :class="open ? 'rotate-180' : ''"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                    />
+                </svg>
 
+            </button>
 
-            <!-- CUSTOMER -->
-            <a href="{{ route('admin.customer.index') }}"
-                class="
-                    block
-                    px-4 py-3
-                    rounded-2xl
-                    text-sm
-                    transition-all duration-200
+            <div
+                x-show="open"
+                x-transition
+                class="space-y-1 pl-3"
+            >
 
-                    {{ request()->routeIs('admin.customer.*')
-                        ? 'bg-white text-teal-700 font-semibold shadow-sm'
-                        : 'text-white/90 hover:bg-white/10'
-                    }}
-                ">
+                <a href="{{ route('admin.therapist.index') }}"
+                    class="block px-4 py-2 rounded-xl transition hover:bg-white/10">
+                    Akun
+                </a>
 
-                Pelanggan
+                <a href="{{ route('admin.therapist.verification') }}"
+                    class="block px-4 py-2 rounded-xl transition hover:bg-white/10">
+                    Verifikasi
+                </a>
 
-            </a>
+                <a href="{{ route('admin.therapist.review') }}"
+                    class="block px-4 py-2 rounded-xl transition hover:bg-white/10">
+                    Rating & Ulasan
+                </a>
 
+            </div>
 
-            <!-- TERAPIS -->
-            <a href="{{ route('admin.therapist.index') }}"
-                class="
-                    block
-                    px-4 py-3
-                    rounded-2xl
-                    text-sm
-                    transition-all duration-200
+        </div>
 
-                    {{ request()->routeIs('admin.therapist.*')
-                        ? 'bg-white text-teal-700 font-semibold shadow-sm'
-                        : 'text-white/90 hover:bg-white/10'
-                    }}
-                ">
+        <!-- REPORT -->
+        <a href="{{ route('admin.report.index') }}"
+            class="
+                block px-4 py-3 rounded-2xl transition-all duration-200
+                {{ request()->routeIs('admin.report.*')
+                    ? 'bg-white text-teal-700 font-semibold shadow-sm'
+                    : 'text-white/90 hover:bg-white/10'
+                }}
+            ">
+            Report
+        </a>
 
-                Terapis
-
-            </a>
-
-
-            <!-- REPORT -->
-            <a href="{{ route('admin.report.index') }}"
-                class="
-                    block
-                    px-4 py-3
-                    rounded-2xl
-                    text-sm
-                    transition-all duration-200
-
-                    {{ request()->routeIs('admin.report.*')
-                        ? 'bg-white text-teal-700 font-semibold shadow-sm'
-                        : 'text-white/90 hover:bg-white/10'
-                    }}
-                ">
-
-                Report
-
-            </a>
+        </a>
 
         </nav>
 
-
         <!-- ================= LOGOUT ================= -->
         <div class="
+            mt-auto
             p-4
             border-t border-white/10
         ">

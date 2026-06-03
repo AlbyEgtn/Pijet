@@ -30,10 +30,13 @@ use App\Http\Controllers\Superadmin\ServiceController;
 use App\Http\Controllers\Superadmin\SuperadminController;
 use App\Http\Controllers\SuperAdmin\KaryawanController;
 use \App\Http\Controllers\SuperAdmin\PenggunaController;
+use App\Http\Controllers\SuperAdmin\CityController;
 
 // Terapis
 use App\Http\Controllers\Terapis\TerapisController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\TherapistApprovedMiddleware;
+use Illuminate\Foundation\Http\Middleware\TherapistDebtMiddleware;
 use App\Http\Controllers\MidtransController;
 
 
@@ -199,6 +202,31 @@ Route::middleware(['auth','role:super_admin'])
             [LandingPageController::class,'destroyBenefit']
         )->name('benefit.destroy');
 
+        Route::get(
+            '/cities',
+            [CityController::class, 'index']
+        )->name('cities.index');
+
+        Route::post(
+            '/cities',
+            [CityController::class, 'store']
+        )->name('cities.store');
+
+        Route::get(
+            '/cities/{city}',
+            [CityController::class, 'show']
+        )->name('cities.show');
+
+        Route::put(
+            '/cities/{city}',
+            [CityController::class, 'update']
+        )->name('cities.update');
+
+        Route::delete(
+            '/cities/{city}',
+            [CityController::class, 'destroy']
+        )->name('cities.destroy');
+    
     /*
     |--------------------------------------------------------------------------
     | Karyawan
@@ -420,9 +448,14 @@ Route::middleware(['auth','role:finance'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth','role:terapis'])
+Route::middleware([
+    'auth',
+    'role:terapis',
+    'therapist.approved',
+    'therapist.debt'
+])
     ->prefix('terapis')
-    ->name('terapis.') // 🔥 INI YANG KURANG
+    ->name('terapis.')
     ->group(function () {
 
         Route::get('/dashboard', [TerapisController::class, 'dashboard'])
@@ -430,7 +463,7 @@ Route::middleware(['auth','role:terapis'])
 
         Route::get('/profile', [TerapisController::class, 'profile'])
             ->name('profile');
-            
+
         Route::get('/pesanan', [TerapisController::class, 'pesanan'])
             ->name('pesanan');
 
@@ -445,8 +478,17 @@ Route::middleware(['auth','role:terapis'])
 
         Route::get('/pesanan-saya/{id}', [TerapisController::class, 'detailPesananSaya'])
             ->name('pesanan.saya.detail');
-        
+
         Route::post('/pesanan/{id}/batal', [TerapisController::class, 'batalkanPesanan'])
+            ->name('pesanan.batal');
+
+        Route::post('/pesanan/{id}/mulai', [TerapisController::class, 'mulaiPesanan'])
+            ->name('pesanan.mulai');
+
+        Route::post('/pesanan/{id}/selesai', [TerapisController::class, 'selesaiPesanan'])
+            ->name('pesanan.selesai');
+
+        Route::post('/pesanan/{id}/batal', [TerapisController::class, 'batalPesanan'])
             ->name('pesanan.batal');
 
         Route::get('/profile/confirm', [TerapisController::class,'confirmPassword'])
@@ -461,22 +503,28 @@ Route::middleware(['auth','role:terapis'])
         Route::post('/update', [TerapisController::class, 'update'])
             ->name('update');
 
-        Route::get('/informasi/confirm',[TerapisController::class,'confirmInformasi'])
+        Route::post('/profile/update', [TerapisController::class, 'update'])
+            ->name('profile.update');
+
+        Route::get('/informasi/confirm', [TerapisController::class,'confirmInformasi'])
             ->name('informasi.confirm');
 
-        Route::post('/informasi/confirm',[TerapisController::class,'checkInformasiPassword'])
+        Route::post('/informasi/confirm', [TerapisController::class,'checkInformasiPassword'])
             ->name('informasi.check');
 
-        Route::get('/informasi',[TerapisController::class,'informasi'])
+        Route::get('/informasi', [TerapisController::class,'informasi'])
             ->name('informasi');
 
-        Route::post('/informasi/update',[TerapisController::class,'updateInformasi'])
+        Route::post('/informasi/update', [TerapisController::class,'updateInformasi'])
             ->name('informasi.update');
 
-        Route::get('/pedoman',[TerapisController::class,'pedoman'])
+        Route::post('/terapis/update-informasi', [TerapisController::class, 'updateInformasi'])
+            ->name('update.informasi');
+
+        Route::get('/pedoman', [TerapisController::class,'pedoman'])
             ->name('pedoman');
-            
-        Route::get('/bantuan',[TerapisController::class,'bantuan'])
+
+        Route::get('/bantuan', [TerapisController::class,'bantuan'])
             ->name('bantuan');
 
         Route::get('/terapis/password', [TerapisController::class,'passwordForm'])
@@ -484,16 +532,6 @@ Route::middleware(['auth','role:terapis'])
 
         Route::post('/terapis/password/update', [TerapisController::class,'updatePassword'])
             ->name('password.update');
-
-        Route::post('/terapis/update-informasi', [TerapisController::class, 'updateInformasi'])
-            ->name('update.informasi');
-
-        Route::post('/pesanan/{id}/mulai', [TerapisController::class, 'mulaiPesanan'])->name('pesanan.mulai');
-        Route::post('/pesanan/{id}/selesai', [TerapisController::class, 'selesaiPesanan'])->name('pesanan.selesai');
-        Route::post('/pesanan/{id}/batal', [TerapisController::class, 'batalPesanan'])->name('pesanan.batal');
-
-        Route::post('/profile/update', [TerapisController::class, 'update'])
-            ->name('profile.update');
 
         Route::get('/rekening', [TerapisController::class, 'paymentAccounts'])
             ->name('rekening');
@@ -509,22 +547,51 @@ Route::middleware(['auth','role:terapis'])
 
         Route::post('/rekening/withdraw', [TerapisController::class, 'withdraw']);
 
+        Route::get('/hutang/{id}', [TerapisController::class, 'hutang'])
+            ->name('bayar.hutang');
+
+        Route::post('/hutang/{id}', [TerapisController::class, 'prosesBayarHutang'])
+            ->name('bayar.hutang.proses');
+
         Route::get('/hutang/{id}/snap', [TerapisController::class, 'snapHutang'])
             ->name('terapis.hutang.snap');
 
         Route::get('/hutang/{id}/midtrans', [TerapisController::class, 'bayarHutangMidtrans'])
             ->name('bayar.hutang.midtrans');
-        
-        Route::get('/hutang/{id}', [TerapisController::class, 'hutang'])
-            ->name('bayar.hutang');
-        
-        Route::post('/hutang/{id}', [TerapisController::class, 'prosesBayarHutang'])
-            ->name('bayar.hutang.proses');
 
         Route::get('/review', [TerapisController::class,'review'])
             ->name('review');
+
+        Route::get('/informasi', [TerapisController::class, 'informasi'])
+            ->name('informasi');
+
+        Route::post('/informasi/update', [TerapisController::class, 'updateInformasi'])
+            ->name('informasi.update');
+
 });
 
+/*
+|--------------------------------------------------------------------------
+| STATUS VERIFIKASI TERAPIS
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','role:terapis'])
+    ->prefix('terapis')
+    ->name('therapist.')
+    ->group(function () {
+
+        Route::view('/pending', 'pages.terapis.pending')
+            ->name('pending');
+
+        Route::view('/rejected', 'pages.terapis.rejected')
+            ->name('rejected');
+
+        Route::post('/verification/resubmit', [TerapisController::class, 'resubmitVerification'])
+            ->name('verification.resubmit');
+
+
+});
 
 /*
 |--------------------------------------------------------------------------

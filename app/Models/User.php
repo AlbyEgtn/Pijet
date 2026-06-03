@@ -32,7 +32,8 @@ class User extends Authenticatable
         'skck',
         'email_otp',
         'otp_expired_at',
-        'verification_status'
+        'verification_status',
+        'reject_reason'
     ];
 
     /**

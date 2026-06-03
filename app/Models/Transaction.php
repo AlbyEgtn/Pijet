@@ -25,6 +25,8 @@ class Transaction extends Model
         'therapist_income',
         'is_balance_recorded',   
         'is_profit_shared', 
+        'is_company_paid',
+        'company_paid_at',
         'service_date',
         'service_time',
         'payment_method',
@@ -144,11 +146,4 @@ class Transaction extends Model
             }
         });
     }
-
-    public function terapis()
-    {
-        return $this->belongsTo(Terapis::class, 'terapis_id');
-    }
-
-    
 }

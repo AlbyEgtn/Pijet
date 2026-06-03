@@ -122,6 +122,24 @@
 
         </a> -->
 
+        <!-- KOTA -->
+        <a
+            href="{{ route('cities.index') }}"
+            class="
+                block
+                px-4 py-3
+                rounded-2xl
+                text-sm
+                transition
+                {{ request()->routeIs('superadmin.cities*')
+                    ? 'bg-white text-teal-700 font-semibold shadow-sm'
+                    : 'text-white/80 hover:bg-white/10 hover:text-white'
+                }}
+            "
+        >
+            Kota
+        </a>
+
 
         <!-- KARYAWAN -->
         <a

@@ -300,31 +300,6 @@ class TerapisController extends Controller
     }
 
 
-    public function informasi()
-    {
-        if(!session('informasi_verified')){
-            return redirect()->route('terapis.informasi.confirm');
-        }
-
-        $user = auth()->user();
-        $terapis = $user->terapis;
-
-        return view('pages.terapis.informasi',compact('user','terapis'));
-    }
-
-
-    public function updateInformasi(Request $request)
-    {
-        $terapis = auth()->user()->terapis;
-
-        $terapis->update([
-            'status' => $request->status
-        ]);
-
-        return back()->with('success','Informasi berhasil diperbarui');
-    }
-
-
     public function checkPassword(Request $request)
     {
         $request->validate([
@@ -640,13 +615,18 @@ class TerapisController extends Controller
         $order = Transaction::findOrFail($id);
 
         if (!$order->is_company_paid) {
-            \Log::info('🔥 SUCCESS PAGE TRIGGER PAY', ['order_id' => $id]);
 
             \App\Helpers\FinanceHelper::payCompanyFee($order);
+
+            $order->refresh();
         }
 
-        return redirect()->route('terapis.pesanan.saya')
-            ->with('success', 'Pembayaran berhasil');
+        return redirect()
+            ->route('terapis.pesanan.saya')
+            ->with(
+                'success',
+                'Pembayaran hutang berhasil'
+            );
     }
 
     private function getAvailableTransactions($user, $terapis, $limit = null)
@@ -744,6 +724,181 @@ class TerapisController extends Controller
                 'totalReview',
                 'ratingStats'
             )
+        );
+    }
+
+    public function resubmitVerification()
+    {
+        $user = auth()->user();
+
+        $user->verification_status = 'pending';
+        $user->reject_reason = null;
+
+        $user->save();
+
+        return redirect()
+            ->route('terapis.pending')
+            ->with(
+                'success',
+                'Pengajuan verifikasi berhasil dikirim ulang. Silakan tunggu proses review admin.'
+            );
+    }
+
+    public function informasi()
+    {
+        $user = auth()->user();
+
+        $terapis = $user->terapis;
+
+        $profile = $user->therapistProfile;
+
+        return view(
+            'pages.terapis.informasi',
+            compact(
+                'user',
+                'terapis',
+                'profile'
+            )
+        );
+    }
+
+    public function updateInformasi(Request $request)
+    {
+        $user = auth()->user();
+
+        // =========================
+        // VALIDASI
+        // =========================
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nik' => 'nullable|string|max:30',
+            'gender' => 'nullable|in:L,P',
+            'birth_date' => 'nullable|date',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+
+            'whatsapp' => 'nullable|string|max:20',
+
+            'experience_years' => 'nullable|integer|min:0',
+            'skills' => 'nullable|string',
+            'certifications' => 'nullable|string',
+
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'ktp' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+            'skck' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+        ]);
+
+        // =========================
+        // USER
+        // =========================
+
+        $user->update([
+            'name'       => $request->name,
+            'nik'        => $request->nik,
+            'gender'     => $request->gender,
+            'birth_date' => $request->birth_date,
+            'phone'      => $request->phone,
+            'address'    => $request->address,
+        ]);
+
+        // =========================
+        // KTP
+        // =========================
+
+        if ($request->hasFile('ktp')) {
+
+            if ($user->ktp) {
+                Storage::disk('public')->delete($user->ktp);
+            }
+
+            $user->ktp = $request
+                ->file('ktp')
+                ->store('ktp', 'public');
+        }
+
+        // =========================
+        // SKCK
+        // =========================
+
+        if ($request->hasFile('skck')) {
+
+            if ($user->skck) {
+                Storage::disk('public')->delete($user->skck);
+            }
+
+            $user->skck = $request
+                ->file('skck')
+                ->store('skck', 'public');
+        }
+
+        $user->save();
+
+        // =========================
+        // TERAPIS
+        // =========================
+
+        $terapis = Terapis::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'nik' => '',
+                'gender' => '',
+                'address' => '',
+                'status' => 1,
+                'total_orders' => 0,
+                'balance' => 0,
+            ]
+        );
+
+        $terapis->update([
+            'nik' => $request->nik,
+            'gender' => $request->gender,
+            'address' => $request->address,
+        ]);
+
+        // =========================
+        // THERAPIST PROFILE
+        // =========================
+
+        $profile = $user->therapistProfile;
+
+        if (!$profile) {
+
+            $profile = $user->therapistProfile()->create([
+                'experience_years' => 0,
+                'skills' => '',
+                'certifications' => '',
+            ]);
+        }
+
+        $profile->update([
+            'experience_years' => $request->experience_years,
+            'skills' => $request->skills,
+            'certifications' => $request->certifications,
+        ]);
+
+        // =========================
+        // RESUBMIT OTOMATIS
+        // =========================
+
+        if ($user->verification_status === 'rejected') {
+
+            $user->update([
+                'verification_status' => 'pending',
+                'reject_reason' => null,
+            ]);
+
+            return redirect()
+                ->route('therapist.pending')
+                ->with(
+                    'success',
+                    'Data berhasil diperbarui dan dikirim ulang untuk verifikasi.'
+                );
+        }
+
+        return back()->with(
+            'success',
+            'Data berhasil diperbarui.'
         );
     }
 
