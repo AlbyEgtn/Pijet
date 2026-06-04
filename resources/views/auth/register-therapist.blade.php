@@ -753,6 +753,22 @@ document.addEventListener('DOMContentLoaded', function () {
         validateImage(this);
     });
 
+    // PASSWORD
+    password.addEventListener('input', function () {
+        validatePassword();
+
+        // kalau user mengubah password,
+        // cek ulang konfirmasi password
+        if (confirmPassword.value !== '') {
+            validateConfirmPassword();
+        }
+    });
+
+    // CONFIRM PASSWORD
+    confirmPassword.addEventListener('input', function () {
+        validateConfirmPassword();
+    });
+
     // ===========================
     // SUBMIT
     // ===========================

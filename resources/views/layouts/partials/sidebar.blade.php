@@ -9,7 +9,7 @@
         <img src="{{ asset('images/logo.png') }}"
              class="w-10 h-10 bg-white rounded object-contain">
         <span class="text-xl font-semibold tracking-wide">
-            Pijat.in
+            PijatJogja.com
         </span>
     </div>
 

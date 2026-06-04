@@ -18,7 +18,7 @@ class CabangSeeder extends Seeder
                 'tanggal_peresmian' => '2022-05-10',
                 'detail_lokasi' => 'Jl. ZA Pagar Alam No. 45, Rajabasa',
                 'email' => 'lampung@pijat.in',
-                'deskripsi' => 'Cabang utama Pijat.in di Bandar Lampung dengan layanan refleksi lengkap.',
+                'deskripsi' => 'Cabang utama PijatJogja.com di Bandar Lampung dengan layanan refleksi lengkap.',
                 'status' => 'Aktif'
             ],
 

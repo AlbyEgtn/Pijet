@@ -10,7 +10,7 @@
         <!-- LOGO -->
         <div class="flex items-center gap-2">
             <img src="{{ asset('images/logo-pth.png') }}" class="h-7">
-            <span class="text-sm font-semibold">Pijat.in</span>
+            <span class="text-sm font-semibold">PijatJogja.com</span>
         </div>
 
         <!-- RIGHT -->
@@ -80,7 +80,7 @@
             <!-- LOGO -->
             <div class="flex items-center gap-3">
                 <img src="{{ asset('images/logo-pth.png') }}" class="h-9">
-                <span class="font-semibold text-lg">Pijat.in</span>
+                <span class="font-semibold text-lg">PijatJogja.com</span>
             </div>
 
             <!-- MENU -->

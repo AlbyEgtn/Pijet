@@ -57,7 +57,7 @@
                 mt-3
                 max-w-2xl
             ">
-                Kelola tampilan website landing page aplikasi Pijat.in.
+                Kelola tampilan website landing page aplikasi PijatJogja.com.
             </p>
 
         </div>

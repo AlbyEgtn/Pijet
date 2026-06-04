@@ -31,7 +31,7 @@
             </h2>
 
             <p class="text-sm text-teal-100 mt-2">
-                Monitoring sistem & performa layanan Pijat.in
+                Monitoring sistem & performa layanan PijatJogja.com
             </p>
 
         </div>

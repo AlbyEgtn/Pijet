@@ -99,7 +99,7 @@
                         text-gray-400
                         mt-1
                     ">
-                        Customer Pijat.in
+                        Customer PijatJogja.com
                     </p>
 
                 </div>

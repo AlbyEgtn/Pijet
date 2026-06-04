@@ -6,7 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Pijat.in</title>
+    <title>PijatJogja.com</title>
+
+    <link rel="icon" href="{{ asset('images/logo-pth.png') }}">
     
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -71,12 +73,12 @@
 
                 <img
                     src="{{ asset('images/logo-pth.png') }}"
-                    alt="Pijat.in Logo"
+                    alt="PijatJogja.com Logo"
                     class="h-10 w-auto"
                     fetchpriority="high">
 
                 <span class="font-semibold text-xl tracking-tight">
-                    Pijat.in
+                    PijatJogja.com
                 </span>
 
             </div>
@@ -432,7 +434,7 @@
         <div>
 
             <h3 class="font-bold text-2xl">
-                Pijat.in
+                PijatJogja.com
             </h3>
 
             <p class="text-sm opacity-70 mt-4">
@@ -480,7 +482,7 @@
 
     <div class="container-custom text-center text-xs opacity-40 mt-16 pt-8 border-t border-emerald-800">
 
-        Copyright © {{ date('Y') }} Pijat.in
+        Copyright © {{ date('Y') }} PijatJogja.com
 
     </div>
 

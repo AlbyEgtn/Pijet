@@ -11,7 +11,7 @@
             <!-- LOGO -->
             <div class="flex items-center gap-3">
                 <img src="{{ asset('images/logo-pth.png') }}" class="w-9 h-9">
-                <span class="font-semibold">Pijat.in</span>
+                <span class="font-semibold">PijatJogja.com</span>
             </div>
 
             <!-- MENU -->

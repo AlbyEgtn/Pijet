@@ -432,4 +432,58 @@ class OrderController extends Controller
 
         return back()->with('success','Review berhasil dikirim');
     }
+
+    public function storeReport(Request $request, $id)
+    {
+        $request->validate([
+            'reason'      => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+        ]);
+
+        $order = Transaction::with('terapis.user')
+            ->findOrFail($id);
+
+        if ($order->order_status !== 'completed') {
+            return back()->with(
+                'error',
+                'Pesanan belum selesai.'
+            );
+        }
+
+        if (!$order->terapis) {
+            return back()->with(
+                'error',
+                'Terapis tidak ditemukan.'
+            );
+        }
+
+        $alreadyReported = Report::where(
+            'user_id',
+            auth()->id()
+        )
+        ->where(
+            'reported_user_id',
+            $order->terapis->user->id
+        )
+        ->exists();
+
+        if ($alreadyReported) {
+            return back()->with(
+                'error',
+                'Anda sudah pernah melaporkan terapis ini.'
+            );
+        }
+
+        Report::create([
+            'user_id'          => auth()->id(),
+            'reported_user_id' => $order->terapis->user->id,
+            'reason'           => $request->reason,
+            'description'      => $request->description,
+        ]);
+
+        return back()->with(
+            'success',
+            'Laporan berhasil dikirim.'
+        );
+    }
 }

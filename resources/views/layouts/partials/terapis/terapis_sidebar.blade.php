@@ -53,7 +53,7 @@
             <div>
 
                 <h2 class="text-xl font-semibold tracking-wide">
-                    Pijat.in
+                    PijatJogja.com
                 </h2>
 
                 <p class="text-xs text-teal-100 mt-1">

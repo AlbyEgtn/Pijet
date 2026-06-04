@@ -13,6 +13,20 @@
     class="space-y-6"
 >
 
+@php
+    $startedAt = $transaction->started_at
+        ? \Carbon\Carbon::parse($transaction->started_at)
+        : null;
+
+    $completedAt = $transaction->completed_at
+        ? \Carbon\Carbon::parse($transaction->completed_at)
+        : null;
+
+    $duration = ($startedAt && $completedAt)
+        ? $startedAt->diffInMinutes($completedAt)
+        : null;
+@endphp
+
     <!-- ================= BACK ================= -->
     <a href="{{ route('admin.orders.status') }}"
        class="
@@ -232,6 +246,64 @@
 
                 </div>
 
+                @if($transaction->terapis)
+
+                <div class="
+                    bg-white
+                    rounded-3xl
+                    border border-gray-100
+                    shadow-sm
+                    p-5 md:p-6
+                ">
+
+                    <h3 class="
+                        text-lg
+                        font-semibold
+                        text-gray-800
+                        mb-4
+                    ">
+                        Terapis Bertugas
+                    </h3>
+
+                    <div class="flex items-center gap-4">
+
+                        <img
+                            src="{{ $transaction->terapis->user->foto
+                                ? asset('storage/'.$transaction->terapis->user->foto)
+                                : 'https://ui-avatars.com/api/?name='.urlencode($transaction->terapis->user->name) }}"
+                            class="w-16 h-16 rounded-2xl object-cover border">
+
+                        <div>
+
+                            <p class="
+                                font-semibold
+                                text-gray-800
+                            ">
+                                {{ $transaction->terapis->user->name }}
+                            </p>
+
+                            <p class="
+                                text-sm
+                                text-gray-500
+                            ">
+                                {{ $transaction->terapis->user->email }}
+                            </p>
+
+                            <p class="
+                                text-sm
+                                text-gray-500
+                            ">
+                                {{ $transaction->terapis->user->phone }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                @endif
+
 
                 <div class="
                     grid grid-cols-1 md:grid-cols-2
@@ -419,8 +491,14 @@
 
             </div>
 
+            <!-- ================= WAKTU LAYANAN ================= -->
+            @if(
+                $transaction->started_at ||
+                $transaction->completed_at ||
+                $transaction->order_status == 'ongoing' ||
+                $transaction->order_status == 'completed'
+            )
 
-            <!-- ================= SERVICES ================= -->
             <div class="
                 bg-white
                 rounded-3xl
@@ -436,7 +514,7 @@
                         font-semibold
                         text-gray-800
                     ">
-                        Detail Layanan
+                        Waktu Layanan
                     </h3>
 
                     <p class="
@@ -444,146 +522,176 @@
                         text-gray-400
                         mt-1
                     ">
-                        Daftar layanan yang dipilih customer
+                        Monitoring durasi pengerjaan layanan
                     </p>
 
                 </div>
 
+                <div class="
+                    grid grid-cols-1 md:grid-cols-3
+                    gap-4
+                ">
 
-                <div class="space-y-5">
-
-                    @forelse($transaction->services as $service)
-
+                    <!-- MULAI -->
                     <div class="
-                        border border-gray-100
-                        rounded-3xl
-                        overflow-hidden
+                        bg-emerald-50
+                        border border-emerald-200
+                        rounded-2xl
+                        p-5
+                        text-center
                     ">
 
-                        <!-- HEADER -->
-                        <div class="
-                            bg-teal-600
-                            text-white
-                            px-5 py-4
+                        <p class="
+                            text-xs
+                            text-gray-500
+                            mb-2
                         ">
+                            Mulai Layanan
+                        </p>
+
+                        @if($startedAt)
 
                             <p class="
-                                font-semibold
+                                text-2xl
+                                font-bold
+                                text-emerald-600
                             ">
-                                {{ $service->service_name }}
+                                {{ $startedAt->format('H:i') }}
                             </p>
 
-                        </div>
+                            <p class="
+                                text-xs
+                                text-gray-400
+                                mt-2
+                            ">
+                                {{ $startedAt->format('d M Y') }}
+                            </p>
 
+                        @else
 
-                        <!-- CONTENT -->
-                        <div class="
-                            p-5
-                            grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4
-                            gap-5
-                            text-sm
-                        ">
+                            <p class="text-gray-400">
+                                Belum Dimulai
+                            </p>
 
-                            <!-- THERAPIST -->
-                            <div>
-
-                                <p class="
-                                    text-gray-400
-                                    text-xs mb-1
-                                ">
-                                    Terapis
-                                </p>
-
-                                <p class="
-                                    font-medium
-                                    text-gray-700
-                                ">
-                                    {{ $service->therapist_name }}
-                                </p>
-
-                            </div>
-
-
-                            <!-- DURATION -->
-                            <div>
-
-                                <p class="
-                                    text-gray-400
-                                    text-xs mb-1
-                                ">
-                                    Durasi
-                                </p>
-
-                                <p class="
-                                    font-medium
-                                    text-gray-700
-                                ">
-                                    {{ $service->duration }} menit
-                                </p>
-
-                            </div>
-
-
-                            <!-- ADDITIONAL -->
-                            <div>
-
-                                <p class="
-                                    text-gray-400
-                                    text-xs mb-1
-                                ">
-                                    Tambahan
-                                </p>
-
-                                <p class="
-                                    font-medium
-                                    text-gray-700
-                                ">
-                                    {{ $service->additional_service ?? '-' }}
-                                </p>
-
-                            </div>
-
-
-                            <!-- TOTAL -->
-                            <div>
-
-                                <p class="
-                                    text-gray-400
-                                    text-xs mb-1
-                                ">
-                                    Total Durasi
-                                </p>
-
-                                <p class="
-                                    font-medium
-                                    text-gray-700
-                                ">
-                                    {{ $service->total_duration }} menit
-                                </p>
-
-                            </div>
-
-                        </div>
+                        @endif
 
                     </div>
 
-                    @empty
-
+                    <!-- DURASI -->
                     <div class="
+                        bg-amber-50
+                        border border-amber-200
+                        rounded-2xl
+                        p-5
                         text-center
-                        py-10
-                        text-gray-400
                     ">
 
-                        Tidak ada layanan
+                        <p class="
+                            text-xs
+                            text-gray-500
+                            mb-2
+                        ">
+                            Durasi
+                        </p>
+
+                        @if($duration !== null)
+
+                            <p class="
+                                text-2xl
+                                font-bold
+                                text-amber-600
+                            ">
+
+                                @if($duration >= 60)
+
+                                    {{ intdiv($duration,60) }}j
+                                    {{ $duration % 60 }}m
+
+                                @else
+
+                                    {{ $duration }} Menit
+
+                                @endif
+
+                            </p>
+
+                            <p class="
+                                text-xs
+                                text-gray-400
+                                mt-2
+                            ">
+                                {{ $duration }} menit
+                            </p>
+
+                        @elseif($startedAt)
+
+                            <p class="
+                                text-amber-600
+                                font-semibold
+                            ">
+                                Sedang Berjalan
+                            </p>
+
+                        @else
+
+                            <p class="text-gray-400">
+                                -
+                            </p>
+
+                        @endif
 
                     </div>
 
-                    @endforelse
+                    <!-- SELESAI -->
+                    <div class="
+                        bg-blue-50
+                        border border-blue-200
+                        rounded-2xl
+                        p-5
+                        text-center
+                    ">
+
+                        <p class="
+                            text-xs
+                            text-gray-500
+                            mb-2
+                        ">
+                            Selesai
+                        </p>
+
+                        @if($completedAt)
+
+                            <p class="
+                                text-2xl
+                                font-bold
+                                text-blue-600
+                            ">
+                                {{ $completedAt->format('H:i') }}
+                            </p>
+
+                            <p class="
+                                text-xs
+                                text-gray-400
+                                mt-2
+                            ">
+                                {{ $completedAt->format('d M Y') }}
+                            </p>
+
+                        @else
+
+                            <p class="text-gray-400">
+                                Belum Selesai
+                            </p>
+
+                        @endif
+
+                    </div>
 
                 </div>
 
             </div>
+
+            @endif
 
         </div>
 

@@ -6,8 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title','Admin Dashboard')</title>
+    <title>@yield('title')</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-pth.png') }}">
+    
     <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -69,7 +71,7 @@
                 <div>
 
                     <h2 class="text-xl font-semibold tracking-wide">
-                        Pijat.in
+                        PijatJogja.com
                     </h2>
 
                     <p class="text-xs text-teal-100 mt-1">

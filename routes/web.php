@@ -271,7 +271,7 @@ Route::middleware(['auth','role:super_admin'])
             [PenggunaController::class, 'penangguhan']
         )->name('superadmin.penangguhan');
 
-        Route::get('/penangguhan/{report}', 
+        Route::get('/penangguhan/detail/{report}',
             [PenggunaController::class, 'detail']
         )->name('superadmin.penangguhan.detail');
 });
@@ -675,9 +675,16 @@ Route::middleware(['auth','role:customer'])
 
         Route::get('/orders/{id}/status', [OrderController::class, 'status']);
 
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('customer.profile');
-        Route::post('/profile', [ProfileController::class, 'update'])->name('customer.profile.update');
+        Route::get('/profile', [ProfileController::class, 'edit'])
+            ->name('customer.profile');
 
-        Route::post('/customer/review/{order}', [OrderController::class,'storeReview'])->name('customer.review.store');
+        Route::post('/profile', [ProfileController::class, 'update'])
+            ->name('customer.profile.update');
+
+        Route::post('/customer/review/{order}', [OrderController::class,'storeReview'])
+            ->name('customer.review.store');
+
+        Route::post('/customer/report/{order}', [OrderController::class, 'storeReport'])
+            ->name('customer.report.store');
 
 });

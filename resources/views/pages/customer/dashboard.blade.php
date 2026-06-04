@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title','Dashboard')
+@section('title','PijatJogja.com')
 
 @section('content')
 

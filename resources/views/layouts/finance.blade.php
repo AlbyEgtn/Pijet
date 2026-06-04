@@ -6,9 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        @yield('title','Finance Dashboard')
-    </title>
+    <title>@yield('title')</title>
+
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-pth.png') }}">
 
     <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -291,7 +291,7 @@
             text-gray-500
         ">
 
-            © {{ date('Y') }} Pijat.in Finance Panel
+            © {{ date('Y') }} PijatJogja.com Finance Panel
 
         </footer>
 

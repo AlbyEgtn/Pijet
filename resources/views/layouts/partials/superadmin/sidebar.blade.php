@@ -22,7 +22,7 @@
             <!-- LOGO -->
             <img
                 src="{{ asset('images/logo-pth.png') }}"
-                alt="Logo Pijat.in"
+                alt="Logo PijatJogja.com"
                 class="w-10 h-10 object-contain"
             >
 
@@ -34,7 +34,7 @@
                     font-semibold
                     tracking-wide
                 ">
-                    Pijat.in
+                    PijatJogja.com
                 </h2>
 
                 <p class="

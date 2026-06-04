@@ -8,6 +8,8 @@
 
     <title>@yield('title')</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-pth.png') }}">
+
     <script src="https://cdn.tailwindcss.com"></script>
         {{-- APP CSS (WAJIB untuk scrollbar) --}}
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">

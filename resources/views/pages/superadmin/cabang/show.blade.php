@@ -143,7 +143,7 @@
                         max-w-2xl
                     ">
 
-                        Cabang aktif yang terdaftar di sistem Pijat.in.
+                        Cabang aktif yang terdaftar di sistem PijatJogja.com.
 
                     </p>
 

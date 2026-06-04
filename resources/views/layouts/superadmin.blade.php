@@ -6,9 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        @yield('title','Super Admin Dashboard')
-    </title>
+    <title>@yield('title')</title>
+
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-pth.png') }}">
 
     <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -258,7 +258,7 @@
             text-center
         ">
 
-            © {{ date('Y') }} Pijat.in
+            © {{ date('Y') }} PijatJogja.com
 
         </footer>
 

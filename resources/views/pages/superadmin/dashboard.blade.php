@@ -50,7 +50,7 @@
                 font-bold
                 leading-tight
             ">
-                Kontrol Sistem Pijat.in
+                Kontrol Sistem PijatJogja.com
             </h2>
 
             <p class="

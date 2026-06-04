@@ -542,10 +542,6 @@
                     <tr>
 
                         <th class="px-6 py-4 text-left">
-                            Nomor ID
-                        </th>
-
-                        <th class="px-6 py-4 text-left">
                             Nama Lengkap
                         </th>
 
@@ -587,18 +583,6 @@
                         hover:bg-gray-50
                         transition
                     ">
-
-                        <!-- ID -->
-                        <td class="
-                            px-6 py-5
-                            font-semibold
-                            text-gray-700
-                        ">
-
-                            {{ $user->kode }}
-
-                        </td>
-
 
                         <!-- NAME -->
                         <td class="px-6 py-5">

@@ -79,7 +79,7 @@ class UserSeeder extends Seeder
         // ======================
         // CUSTOMER DUMMY
         // ======================
-        for ($i = 1; $i <= 6; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
 
             User::updateOrCreate(
                 ['email' => 'customer'.$i.'@gmail.com'],

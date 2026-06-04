@@ -64,7 +64,7 @@
                 <img src="{{ asset('images/logo.png') }}" class="w-8 h-8">
 
                 <span class="text-teal-600 font-semibold text-lg">
-                    Pijat.in
+                    PijatJogja.com
                 </span>
 
             </div>
